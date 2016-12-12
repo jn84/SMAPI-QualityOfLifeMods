@@ -1,0 +1,13 @@
+﻿{
+  "Name": "your project name",
+   "Author": "your name",
+   "Version": {
+      "MajorVersion": 1,
+      "MinorVersion": 0,
+      "PatchVersion": 0,
+      "Build": 0
+   },
+   "Description": "One or two sentences about the mod99",
+   "UniqueID": "your project name blooo",
+   "EntryDll": "ClassLibrary1.dll"
+}
