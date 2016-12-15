@@ -4,10 +4,8 @@ using StardewValley.Tools;
 
 namespace Demiacle_SVM {
     public class ScytheDamageMod {
-        public  ModEntry mod;
 
-        public ScytheDamageMod( ModEntry mod ) {
-            this.mod = mod;
+        public ScytheDamageMod() {
         }
 
         /// <summary>
@@ -16,13 +14,13 @@ namespace Demiacle_SVM {
         /// </summary>
         internal void onInvChange( object sender, EventArgsInventoryChanged e ) {
             foreach( StardewModdingAPI.Inheritance.ItemStackChange item in e.Removed ) {
-                mod.Monitor.Log( "onInvChange " + item.Item.Name );
+                ModEntry.Log( "onInvChange " + item.Item.Name );
             }
 
             // makes all weapons weak af!
             for( int i = 0; i < e.Inventory.Count; i++ ) {
                 if( e.Inventory[i] is MeleeWeapon && e.Inventory[i].Name != "Scythe" ) {
-                    mod.Monitor.Log( e.Inventory[ i ].Name );
+                    ModEntry.Log( e.Inventory[ i ].Name );
                     ( ( MeleeWeapon ) e.Inventory[ i ] ).minDamage = 1;
                     ( ( MeleeWeapon ) e.Inventory[ i ] ).maxDamage = 1;
                 } else if( e.Inventory[ i ] is MeleeWeapon && e.Inventory[ i ].Name == "Scythe" ) {

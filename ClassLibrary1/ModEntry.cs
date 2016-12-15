@@ -16,6 +16,7 @@ using StardewValley.Objects;
 using StardewValley.Quests;
 using StardewValley.TerrainFeatures;
 using System.Xml.Serialization;
+using Demiacle_SVM.OutdoorMonsters;
 
 //create list of mobs
 
@@ -33,28 +34,61 @@ using System.Xml.Serialization;
 namespace Demiacle_SVM {
     public class ModEntry : Mod {
 
-        public ModData modData;
+        public static ModData modData;
+        private static string saveFilePostfix = "_modData";
         private PersistantMonsters persistantMonsters;
         private ScytheDamageMod scytheDamageMod;
+        private SpeedMod speedMod;
+        private MineShaftMod mineShaftMod;
+        public static ModEntry modEntry;
 
         public ModEntry() {
-            updateXmlSerializer();
-            persistantMonsters = new PersistantMonsters( this );
-            scytheDamageMod = new ScytheDamageMod( this );       
+            modEntry = this;
+            
+            //this.Monitor.Log( "loading mod" );
+            //updateXmlSerializer();
+            persistantMonsters = new PersistantMonsters();
+            scytheDamageMod = new ScytheDamageMod();
+            speedMod = new SpeedMod();
+            mineShaftMod = new MineShaftMod();
         }
-        
+
+        internal static void Log( string log ) {
+            modEntry.Monitor.Log( log );
+        }
+
         public override void Entry(IModHelper helper) {
+            //general mods needed for all other mods
+            GameEvents.GameLoaded += this.updateXmlSerializer;
             ControlEvents.KeyPressed += this.ReceiveKeyPress;
+            PlayerEvents.LoadedGame += this.onLoadedGame;
             //LocationEvents.CurrentLocationChanged += this.OnLocationChange;
-            //PlayerEvents.FarmerChanged += persistantMonsters.OnFarmerChange;
+
+
+            //Weapon and tool mod
+            PlayerEvents.InventoryChanged += scytheDamageMod.onInvChange;
+
+
+            //persistantMonster mod
             GraphicsEvents.OnPreRenderEvent += persistantMonsters.onPreRenderEvent;
             GraphicsEvents.OnPostRenderEvent += persistantMonsters.onPostRenderEvent;
-            PlayerEvents.LoadedGame += this.onLoadedGame;
-            PlayerEvents.LoadedGame += persistantMonsters.onLoadedGame;
-            //PlayerEvents.FarmerChanged += persistantMonsters.onFarmerChanged;
-            TimeEvents.OnNewDay += persistantMonsters.onNewDay;
-            PlayerEvents.InventoryChanged += scytheDamageMod.onInvChange;
             LocationEvents.CurrentLocationChanged += persistantMonsters.onLocationChange;
+            PlayerEvents.LoadedGame += persistantMonsters.onLoadedGame;
+            TimeEvents.OnNewDay += persistantMonsters.onNewDay;
+            TimeEvents.DayOfMonthChanged += persistantMonsters.onDayChange;
+            //PlayerEvents.FarmerChanged += persistantMonsters.onFarmerChanged;
+
+
+
+            //minshaft mod
+            //PlayerEvents.LoadedGame += mineShaftMod.onLoad;
+            LocationEvents.CurrentLocationChanged += mineShaftMod.onLocationChange;
+            GraphicsEvents.OnPreRenderGuiEvent += mineShaftMod.OnPreRenderGuiEvent;
+
+            //speed mod
+            PlayerEvents.InventoryChanged += speedMod.onInvChange;
+            GameEvents.SecondUpdateTick += speedMod.checkTileForRoad;
+            GameEvents.QuarterSecondTick += speedMod.forcePlayerToSpeed;
         }
 
         private void ReceiveKeyPress(object sender, EventArgsKeyPressed e){
@@ -89,14 +123,14 @@ namespace Demiacle_SVM {
 
             // file \Mods\Demiacle_SVM\playerName.xml
             // load file 
-            if( Serializer.FileExists( playerName ) ) {
+            if( Serializer.FileExists( playerName + saveFilePostfix ) ) {
                 this.Monitor.Log( "Mod file already exists for this player.... loading" );
-                modData = Serializer.ReadFromXmlFile( modData, playerName );
+                Serializer.ReadFromXmlFile( out modData, playerName + saveFilePostfix );
                 // create file and ModData
             } else {
                 this.Monitor.Log( "Mod file does not exist for this player... creating file" );
                 modData = new ModData();
-                Serializer.WriteToXmlFile( modData, playerName );
+                updateModData();
             }
         }
 
@@ -104,8 +138,8 @@ namespace Demiacle_SVM {
         /// Updates the XmlSerializer to allow specific monster types.
         /// This allows us to save all the specific monster data between days.
         /// </summary>
-        private void updateXmlSerializer() {
-            StardewValley.SaveGame.locationSerializer = new XmlSerializer( typeof( GameLocation ), new Type[ 38 ]
+        private void updateXmlSerializer( object sender, EventArgs e ) {
+            StardewValley.SaveGame.locationSerializer = new XmlSerializer( typeof( GameLocation ), new Type[ 39 ]
             {
                 typeof (Tool),
                 typeof (Crow),
@@ -138,18 +172,19 @@ namespace Demiacle_SVM {
                 typeof (GreenSlime),
                 typeof (Mummy),
                 typeof (RockCrab),
-                typeof (ShadowBrute),
+                typeof (OutDoorShadowBrute),
                 typeof (ShadowShaman),
                 typeof (Skeleton),
                 typeof (RockGolem),
                 typeof (SkeletonWarrior),
                 typeof (SkeletonMage),
-                typeof(ScytheDamageMod.Scythe)
+                typeof(ScytheDamageMod.Scythe),
+                typeof(OutDoorRockCrab)
             } );
 
             SaveGame.farmerSerializer = new XmlSerializer( typeof( Farmer ), new Type[ 2 ] { typeof( Tool ), typeof( ScytheDamageMod.Scythe ) } );
 
-            SaveGame.serializer = new XmlSerializer( typeof( SaveGame ), new Type[ 39 ]
+            SaveGame.serializer = new XmlSerializer( typeof( SaveGame ), new Type[ 40 ]
                 {
                   typeof (Tool),
                   typeof (GameLocation),
@@ -184,13 +219,21 @@ namespace Demiacle_SVM {
                   typeof (Mummy),
                   typeof (RockCrab),
                   typeof (RockGolem),
-                  typeof (ShadowBrute),
+                  typeof (OutDoorShadowBrute),
                   typeof (ShadowShaman),
                   typeof (Skeleton),
                   typeof (SkeletonWarrior),
                   typeof (SkeletonMage),
-                  typeof(ScytheDamageMod.Scythe)
+                  typeof(ScytheDamageMod.Scythe),
+                  typeof(OutDoorRockCrab)
                 } );
+        }
+
+        /// <summary>
+        /// Overwrites the current modData to file
+        /// </summary>
+        internal static void updateModData() {
+            Serializer.WriteToXmlFile( modData, Game1.player.name + saveFilePostfix );
         }
     }
 }

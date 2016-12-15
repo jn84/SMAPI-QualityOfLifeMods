@@ -26,6 +26,7 @@ namespace Demiacle_SVM {
         /// <param name="append">If false the file will be overwritten if it already exists. If true the contents will be appended to the file.</param>
         public static void WriteToXmlFile<T>( T objectToWrite, string playerName, bool append = false) where T : new() {
             TextWriter writer = null;
+
             try {
                 var serializer = new XmlSerializer( typeof( T ) );
                 writer = new StreamWriter( fileToWrite + playerName + ".xml", append);
@@ -35,20 +36,20 @@ namespace Demiacle_SVM {
                     writer.Close();
             }
         }
-
-        /// <summary>
-        /// Reads an object instance from an XML file.
-        /// <para>Object type must have a parameterless constructor.</para>
-        /// </summary>
-        /// <typeparam name="T">The type of object to read from the file.</typeparam>
-        /// <param name="filePath">The file path to read the object instance from.</param>
-        /// <returns>Returns a new instance of the object read from the XML file.</returns>
-        public static T ReadFromXmlFile<T>( T objectTypeToRead, string playerName ) where T : new() {
+        
+    /// <summary>
+    /// Reads an object instance from an XML file.
+    /// <para>Object type must have a parameterless constructor.</para>
+    /// </summary>
+    /// <typeparam name="T">The object to read from the file to.</typeparam>
+    /// <param name="filePath">The file path to read the object instance from.</param>
+    /// <returns>Returns a new instance of the object read from the XML file.</returns>
+    public static void ReadFromXmlFile<T>( out T objectTypeToRead, string playerName ) where T : new() {
             TextReader reader = null;
             try {
                 var serializer = new XmlSerializer(typeof(T));
                 reader = new StreamReader( fileToWrite + playerName + ".xml" );
-                return (T)serializer.Deserialize(reader);
+                objectTypeToRead = ( T)serializer.Deserialize(reader);
             } finally {
                 if (reader != null)
                     reader.Close();

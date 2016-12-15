@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StardewValley.Monsters;
+using StardewValley;
 
 namespace Demiacle_SVM {
     public class ModData {
@@ -12,9 +13,7 @@ namespace Demiacle_SVM {
         //public Boolean usePersistantMonstersMod = true;
         //public Boolean useScytheDamageMod = true;
 
-        List<Monster> persistantMonsters = new List<Monster>();
-
-        public ModData() {
-        }
+        //public Dictionary<Monster, GameLocation> savedMonsters = new Dictionary<Monster, GameLocation>();
+        
     }
 }

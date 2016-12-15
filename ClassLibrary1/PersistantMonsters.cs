@@ -11,41 +11,88 @@ using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using System.Threading.Tasks;
 using StardewValley.Tools;
+using System.Xml;
+using Polenter.Serialization;
+using System.IO;
+using Demiacle_SVM.OutdoorMonsters;
+
+
+//TODO will have to save persistant monsters to its own xml and place inside mod
+
 
 namespace Demiacle_SVM
 {
     class PersistantMonsters {
         List<Monster> monsterGlidersToFix = new List<Monster>();
+        public Dictionary<Monster, GameLocation> savedMonsters = new Dictionary<Monster, GameLocation>();
+        SharpSerializer serializer = new SharpSerializer();
         Random random = new Random();
-        
-        private ModEntry mod;
+        string saveFileLocation;
+
+        private bool isFirstLoad = true;
 
         /// <summary>
         /// Mod that adds a slew of monsters and allows them to persist between days.
         /// Also makes mines persistant instead of respawn randomized, adds elevator every level of mine, and makes all mines dark.
         /// Also expands the dark forest area.
         /// </summary>
-        public PersistantMonsters( ModEntry mod ) {
-            
-            this.mod = mod;
-        }
+        public PersistantMonsters() { }
 
         /// <summary>
         /// Creates all the monsters if they havent been created
         /// Moves all the positions of monsters to their home position
         /// </summary>
         public void onNewDay(object sender, EventArgsNewDay e) {
-            foreach ( GameLocation location in Game1.locations) {
-                foreach (NPC npc in location.characters) {
-                    if (npc is Monster) {
-                        //DefaultPosition is the position the npc was spawned at
-                        npc.position = npc.DefaultPosition;
-                    }
+            
+            if( !e.IsNewDay ) {
+
+                //this isnt late enough monsters still get saved after this call
+                ModEntry.Log("day is starting");
+
+                if( !ModEntry.modData.hasMonstersBeenCreated ) {
+                    ModEntry.Log( "creating persistant monsters" );
+                    createAllMonsters();
+                } else {
+                    ModEntry.Log( "loading persistant monsters" );
+                    savedMonsters = ( Dictionary<Monster, GameLocation> ) serializer.Deserialize( saveFileLocation );
+                }
+
+                foreach( KeyValuePair<Monster, GameLocation> entry in savedMonsters ) {
+                    entry.Value.addCharacter( entry.Key );
+                }
+                savedMonsters.Clear();
+
+                //remove mobs from locations so they dont save and save them in their own file
+            } else {
+                ModEntry.Log( "day is ending" );
+                if( savedMonsters.Count > 0 ) {
+                    putPersistantMonstersInSave();
                 }
             }
         }
 
-        
+        internal void onDayChange( object sender, EventArgsIntChanged e ) {
+            ModEntry.Log("Day is changed");
+        }
+
+        private void putPersistantMonstersInSave() {
+            foreach( GameLocation location in Game1.locations.ToArray() ) {
+                foreach( NPC npc in location.characters.ToArray() ) {
+                    if( npc is Monster ) {
+                        //ModEntry.Log( "removing" + npc.name );
+
+                        location.characters.Remove( npc );
+                        savedMonsters.Add( ( Monster ) npc, location );
+                        npc.position = npc.DefaultPosition; //the position the npc was spawned at
+                    }
+                }
+            }
+            foreach( KeyValuePair<Monster,GameLocation> monster in savedMonsters) {
+                //ModEntry.Log( "save data has this monster : " + monster.Key.name );
+            }
+
+            serializer.Serialize( savedMonsters, saveFileLocation );
+        }
 
         internal void onLocationChange( object sender, EventArgsCurrentLocationChanged e ) {
             //Game1.globalOutdoorLighting -= 0.1f;
@@ -54,9 +101,7 @@ namespace Demiacle_SVM
         }
 
         internal void onLoadedGame( object sender, EventArgsLoadedGameChanged e ) {
-            if( !mod.modData.hasMonstersBeenCreated ) {
-                createAllMonsters();
-            }
+            saveFileLocation = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_SVM\\" + Game1.player.name + "_monsterData.xml";
         }
         
         /// <summary>
@@ -83,9 +128,8 @@ namespace Demiacle_SVM
         /// </summary>
         private void createAllMonsters() {
             foreach ( GameLocation location in Game1.locations ) {
-                //mod.Monitor.Log( location.ToString() );
+                //ModEntry.Log( location.ToString() );
                 List<NPC> characters = location.characters;
-
 
                 int minX = 100;
                 int maxX = 600;
@@ -98,17 +142,23 @@ namespace Demiacle_SVM
                 int omitMaxY = 0;
 
                 int amountOfFarmMobsToSpawn = 200;
-                int amountOfBusMobsToSpawn = 64;
+                int amountOfBusMobsToSpawn = 68;
                 int amountOfForestMobsToSpawn = 500;
+                int amountOfBackwoodsMobsToSpawn = 40;
+                int amountOfMountainMobsToSpawn = 10;
+                int amountOfTownMobsToSpawn = 10;
+                int amountOfBeachMobsToSpawn = 200;
 
                 switch ( location.name ){
                     case "FarmHouse":
-                        mod.Monitor.Log( "Building FarmHouse mobs" );
+                        ModEntry.Log( "Building FarmHouse mobs" );
 
                         characters.Add( new Bat( new Vector2( 300, 200 ) ) );
+                        characters.Add( new Bat( new Vector2( 100, 220 ) ) );
+                        characters.Add( new Bat( new Vector2( 600, 350 ) ) );
                         break;
                     case "FarmCave":
-                        mod.Monitor.Log( "Building FarmCave mobs" );
+                        ModEntry.Log( "Building FarmCave mobs" );
                         int amountOfBatsToSpawn = 17;
                         minX = 100;
                         maxX = 600;
@@ -124,7 +174,7 @@ namespace Demiacle_SVM
                         //characters.Add(bat1);
                         break;
                     case "BusStop":
-                        mod.Monitor.Log( "Building BusStop mobs" );
+                        ModEntry.Log( "Building BusStop mobs" );
                         
                         minX = 300;
                         maxX = 1750;
@@ -137,7 +187,7 @@ namespace Demiacle_SVM
                         omitMaxY = 640;
 
                         for( int i = 0; i < amountOfBusMobsToSpawn; i++ ) {
-                            Vector2 position = getRandomInsideSquare( minX, maxX, minY, maxY, omitMinX, omitMaxX, omitMinY, omitMaxY );
+                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
                             characters.Add( new GreenSlime( position ) );
                         }
                         break;
@@ -148,21 +198,57 @@ namespace Demiacle_SVM
                         maxY = 3750;
 
                         for( int i = 0; i < amountOfFarmMobsToSpawn; i++ ) {
-                            Vector2 position = getRandomInsideSquare( minX, maxX, minY, maxY );
+                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
                             characters.Add( generateRandomEasyMob( position ) );
                         }
 
                         break;
                     case "Town":
+                        minX = 250;
+                        maxX = 4550;
+                        minY = 550;
+                        maxY = 3750;
+
+                        for( int i = 0; i < amountOfTownMobsToSpawn; i++ ) {
+                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                            characters.Add( new Bat( position ) );
+                        }
 
                         break;
                     case "Beach":
+                        minX = 250;
+                        maxX = 4550;
+                        minY = 550;
+                        maxY = 3750;
+
+                        for( int i = 0; i < amountOfBeachMobsToSpawn; i++ ) {
+                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                            characters.Add( generateRandomEasyMob( position ) );
+                        }
 
                         break;
                     case "Mountain":
+                        minX = 350;
+                        maxX = 4550;
+                        minY = 350;
+                        maxY = 3750;
+
+                        for( int i = 0; i < amountOfMountainMobsToSpawn; i++ ) {
+                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                            characters.Add( new Bat( position ) );
+                        }
 
                         break;
                     case "Backwoods":
+                        minX = 250;
+                        maxX = 3000;
+                        minY = 250;
+                        maxY = 2300;
+
+                        for( int i = 0; i < amountOfBackwoodsMobsToSpawn; i++ ) {
+                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                            characters.Add( generateRandomMediumMob( position ) );
+                        }
 
                         break;
                     case "Forest":
@@ -171,9 +257,9 @@ namespace Demiacle_SVM
                         minY = 640;
                         maxY = 6000;
 
-                        for( int i = 0; i < amountOfFarmMobsToSpawn; i++ ) {
-                            Vector2 position = getRandomInsideSquare( minX, maxX, minY, maxY );
-                            characters.Add( generateRandomEasyMob( position ) );
+                        for( int i = 0; i < amountOfForestMobsToSpawn; i++ ) {
+                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                            characters.Add( generateRandomMediumMob( position ) );
                         }
 
                         break;
@@ -184,9 +270,11 @@ namespace Demiacle_SVM
             createSafeDialogue( "Things feel different today...", 20000 );
             createSafeDialogue( "Its as if the world just got a little more strange... odd...", 45000 );
             
-            mod.Monitor.Log( "Mobs finished creating" );
-            mod.modData.hasMonstersBeenCreated = true;
-            Serializer.WriteToXmlFile( mod.modData, Game1.player.name );
+            ModEntry.Log( "Mobs finished creating" );
+            ModEntry.modData.hasMonstersBeenCreated = true;
+            ModEntry.updateModData();
+            putPersistantMonstersInSave();
+            
         }
 
         
@@ -203,6 +291,7 @@ namespace Demiacle_SVM
         /// <param name="position"></param>
         /// <returns></returns>
         private NPC generateRandomEasyMob( Vector2 position ) {
+
             int chance = random.Next( 1, 6);
             switch( chance ) {
                 case 1:
@@ -210,12 +299,35 @@ namespace Demiacle_SVM
                 case 2:
                     return new Bat( position );
                 case 3:
-                    return new ShadowBrute( position );
+                    return new OutDoorShadowBrute( position );
                 case 4:
-                    return new RockCrab( position );
+                    return new OutDoorRockCrab( position );
                 case 5:
-                    mod.Monitor.Log("creating golem");
-                    return new RockGolem( position );
+                    //return new RockGolem( position );
+                default:
+                    return new Bat( position );
+            }
+        }
+
+        private bool isTileOccupied( Vector2 v, GameLocation l ) {
+            int x = (int) v.X / Game1.tileSize;
+            int y = (int) v.Y / Game1.tileSize;
+            return (l.getTileIndexAt( x, y, "Buildings" ) != -1 && ( l.doesTileHaveProperty( x, y, "Action", "Buildings" ) == null || !l.doesTileHaveProperty( x, y, "Action", "Buildings" ).Contains( "Door" ) && !l.doesTileHaveProperty( x, y, "Action", "Buildings" ).Contains( "Passable" ) ) || l.isTerrainFeatureAt( x, y ));
+        }
+
+        private NPC generateRandomMediumMob( Vector2 position ) {
+            int chance = random.Next( 1, 6 );
+            switch( chance ) {
+                case 1:
+                    return new Bat( position );
+                case 2:
+                    return new Bat( position );
+                case 3:
+                    //return new ShadowBrute( position );
+                case 4:
+                    //return new ShadowBrute( position );
+                case 5:
+                   // return new ShadowBrute( position );
                 default:
                     return new Bat( position );
             }
@@ -230,6 +342,15 @@ namespace Demiacle_SVM
             Rectangle rectangle = new Rectangle( omitMinX, omitMinY, omitMaxX - omitMinX, omitMaxY - omitMinY);
             if( isInOmittedSquare( position, rectangle ) ) {
                return getRandomInsideSquare( minX, maxX, minY, maxY, omitMinX, omitMaxX, omitMinY, omitMaxY );
+            } else {
+                return position;
+            }
+        }
+
+        private Vector2 getValidRandomInsideSquare( int minX, int maxX, int minY, int maxY, GameLocation location ) {
+            Vector2 position = new Vector2( random.Next( minX, maxX ), random.Next( minY, maxY ) );
+            if( isTileOccupied( position, location ) ) {
+                return getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
             } else {
                 return position;
             }
@@ -283,6 +404,5 @@ namespace Demiacle_SVM
             }
         }
 
-        
     }
 }
