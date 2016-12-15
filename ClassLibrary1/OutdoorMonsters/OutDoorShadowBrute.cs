@@ -10,20 +10,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Demiacle_SVM.OutdoorMonsters {
     public class OutDoorShadowBrute : OutDoorMonster {
-        private int wasHitCounter;
-        private float targetRotation;
-        private bool turningRight;
         private bool seenPlayer;
 
         public OutDoorShadowBrute() : base() {
 
         }
+
         public OutDoorShadowBrute( Vector2 position )
             : base("Shadow Brute", position) {
             this.speed = 1;
             this.addedSpeed = 0;
+
             reloadSprite();
-            this.ignoresCollissions = true;
             
             //this.slipperiness = 8;
             this.moveSpeedExtension = MoveSpeedExtension.slower;
@@ -32,6 +30,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
         }
 
         public override void draw( SpriteBatch b ) {
+            //draw Transparently
             base.draw( b, 0.5f );
         }
 
@@ -66,10 +65,6 @@ namespace Demiacle_SVM.OutdoorMonsters {
             Game1.createRadialDebris( Game1.currentLocation, this.sprite.Texture, new Rectangle( this.sprite.SourceRect.X, this.sprite.SourceRect.Y, 16, 5 ), 16, this.getStandingX(), this.getStandingY() - Game1.tileSize / 2, 1, this.getStandingY() / Game1.tileSize, Color.White, ( float ) Game1.pixelZoom );
             Game1.createRadialDebris( Game1.currentLocation, this.sprite.Texture, new Rectangle( this.sprite.SourceRect.X + 2, this.sprite.SourceRect.Y + 5, 16, 5 ), 10, this.getStandingX(), this.getStandingY() - Game1.tileSize / 2, 1, this.getStandingY() / Game1.tileSize, Color.White, ( float ) Game1.pixelZoom );
         }
-
-        
     }
-
-
 }
 

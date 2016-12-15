@@ -30,7 +30,11 @@ namespace Demiacle_SVM.OutdoorMonsters {
             
         }
 
-        public enum MoveType { noCollisions, medium, slow, knockback }
+        public enum MoveType {
+            noCollisions,
+            knockback,
+            pathFinding
+        }
 
         public struct MoveSpeedExtension {
             public const float fast = 0.5f;
@@ -49,9 +53,12 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 case MoveType.knockback:
                     getKnockedBacked( time, viewport, currentLocation );
                     break;
-                default:
+                case MoveType.pathFinding:
+                    MoveWithPathFinding( time, viewport, currentLocation );
                     break;
-
+                default:
+                    ModEntry.Log( "ruh roh this guy has no movement type...." );
+                    break;
             }
         }
 
@@ -134,6 +141,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
         }
         
 
+        //this chooses the type of movement
         public void MoveWithoutCollision( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
             this.lastPosition = this.position;
 
@@ -223,27 +231,21 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
 
                         float local = this.position.Y;
-                        // ISSUE: explicit reference operation
                         double num1 = ( double ) local;
                         double speed = ( double ) this.speed;
                         elapsedGameTime = time.ElapsedGameTime;
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 + num3;
-                        // ISSUE: explicit reference operation
                         local = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        // ISSUE: explicit reference operation
-                        // ISSUE: variable of a reference type
                         float local = this.position.Y;
-                        // ISSUE: explicit reference operation
                         double num1 = ( double ) local;
                         double speed = ( double ) this.speed;
                         elapsedGameTime = time.ElapsedGameTime;
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 - num3;
-                        // ISSUE: explicit reference operation
                         local = ( float ) num4;
                     }
                     if( !currentLocation.isTilePassable( this.nextPosition( 1 ), viewport ) || !this.willDestroyObjectsUnderfoot )
@@ -278,30 +280,22 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     bool flag2 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
                     TimeSpan elapsedGameTime;
                     if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        // ISSUE: explicit reference operation
-                        // ISSUE: variable of a reference type
                         float local = this.position.X;
-                        // ISSUE: explicit reference operation
                         double num1 = ( double ) local;
                         double speed = ( double ) this.speed;
                         elapsedGameTime = time.ElapsedGameTime;
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 + num3;
-                        // ISSUE: explicit reference operation
                         local = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        // ISSUE: explicit reference operation
-                        // ISSUE: variable of a reference type
                         float local = this.position.X;
-                        // ISSUE: explicit reference operation
                         double num1 = ( double ) local;
                         double speed = ( double ) this.speed;
                         elapsedGameTime = time.ElapsedGameTime;
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 - num3;
-                        // ISSUE: explicit reference operation
                         local = ( float ) num4;
                     }
                     if( !currentLocation.isTilePassable( this.nextPosition( 2 ), viewport ) || !this.willDestroyObjectsUnderfoot )
@@ -410,6 +404,268 @@ namespace Demiacle_SVM.OutdoorMonsters {
             }
         }
 
+        public void MoveWithPathFinding( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
+            this.lastPosition = this.position;
+
+            float actualSpeed = ( float ) ( this.speed + this.addedSpeed ) / moveSpeedExtension;
+
+            if( this.moveUp ) {
+
+                // next position takes a direction
+                //if something in next spot dont do nothin
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
+                    this.position.Y -= actualSpeed;
+                    if( !this.ignoreMovementAnimations )
+                        this.sprite.AnimateUp( time, 0, "" );
+                    this.facingDirection = 0;
+                    this.faceDirection( 0 );
+
+                    //else move
+                } else {
+                    Microsoft.Xna.Framework.Rectangle nextPosition = this.nextPosition( 0 );
+                    nextPosition.Width /= 4;
+                    bool flag1 = currentLocation.isCollidingPosition( nextPosition, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    nextPosition.X += nextPosition.Width * 3;
+                    bool flag2 = currentLocation.isCollidingPosition( nextPosition, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    TimeSpan elapsedGameTime;
+                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+
+                        float local = this.position.X;
+
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 + num3;
+
+                        local = ( float ) num4;
+                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+
+                        float local = this.position.X;
+
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 - num3;
+
+                        local = ( float ) num4;
+                    }
+                    if( !currentLocation.isTilePassable( this.nextPosition( 0 ), viewport ) || !this.willDestroyObjectsUnderfoot )
+                        this.Halt();
+
+
+                    else if( this.willDestroyObjectsUnderfoot ) {
+                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize ), ( float ) ( this.getStandingY() / Game1.tileSize - 1 ) );
+                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 0 ), true ) ) {
+                            Game1.playSound( "stoneCrack" );
+                            this.position.Y -= ( float ) ( this.speed + this.addedSpeed );
+                        } else {
+                            int blockedInterval = this.blockedInterval;
+                            elapsedGameTime = time.ElapsedGameTime;
+                            int milliseconds = elapsedGameTime.Milliseconds;
+                            this.blockedInterval = blockedInterval + milliseconds;
+                        }
+                    }
+                    if( this.onCollision != null )
+                        this.onCollision( currentLocation );
+                }
+
+
+
+            } else if( this.moveRight ) {
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
+                    this.position.X += actualSpeed;
+                    if( !this.ignoreMovementAnimations )
+                        this.sprite.AnimateRight( time, 0, "" );
+                    this.facingDirection = 1;
+                    this.faceDirection( 1 );
+                } else {
+                    Microsoft.Xna.Framework.Rectangle position = this.nextPosition( 1 );
+                    position.Height /= 4;
+                    bool flag1 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    position.Y += position.Height * 3;
+                    bool flag2 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    TimeSpan elapsedGameTime;
+                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+
+                        float local = this.position.Y;
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 + num3;
+                        local = ( float ) num4;
+                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+                        float local = this.position.Y;
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 - num3;
+                        local = ( float ) num4;
+                    }
+                    if( !currentLocation.isTilePassable( this.nextPosition( 1 ), viewport ) || !this.willDestroyObjectsUnderfoot )
+                        this.Halt();
+                    else if( this.willDestroyObjectsUnderfoot ) {
+                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize + 1 ), ( float ) ( this.getStandingY() / Game1.tileSize ) );
+                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 1 ), true ) ) {
+                            Game1.playSound( "stoneCrack" );
+                            this.position.X += ( float ) ( this.speed + this.addedSpeed );
+                        } else {
+                            int blockedInterval = this.blockedInterval;
+                            elapsedGameTime = time.ElapsedGameTime;
+                            int milliseconds = elapsedGameTime.Milliseconds;
+                            this.blockedInterval = blockedInterval + milliseconds;
+                        }
+                    }
+                    if( this.onCollision != null )
+                        this.onCollision( currentLocation );
+                }
+            } else if( this.moveDown ) {
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
+                    this.position.Y += actualSpeed;
+                    if( !this.ignoreMovementAnimations )
+                        this.sprite.AnimateDown( time, 0, "" );
+                    this.facingDirection = 2;
+                    this.faceDirection( 2 );
+                } else {
+                    Microsoft.Xna.Framework.Rectangle position = this.nextPosition( 2 );
+                    position.Width /= 4;
+                    bool flag1 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    position.X += position.Width * 3;
+                    bool flag2 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    TimeSpan elapsedGameTime;
+                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+                        float local = this.position.X;
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 + num3;
+                        local = ( float ) num4;
+                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+                        float local = this.position.X;
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 - num3;
+                        local = ( float ) num4;
+                    }
+                    if( !currentLocation.isTilePassable( this.nextPosition( 2 ), viewport ) || !this.willDestroyObjectsUnderfoot )
+                        this.Halt();
+                    else if( this.willDestroyObjectsUnderfoot ) {
+                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize ), ( float ) ( this.getStandingY() / Game1.tileSize + 1 ) );
+                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 2 ), true ) ) {
+                            Game1.playSound( "stoneCrack" );
+                            this.position.Y += ( float ) ( this.speed + this.addedSpeed );
+                        } else {
+                            int blockedInterval = this.blockedInterval;
+                            elapsedGameTime = time.ElapsedGameTime;
+                            int milliseconds = elapsedGameTime.Milliseconds;
+                            this.blockedInterval = blockedInterval + milliseconds;
+                        }
+                    }
+                    if( this.onCollision != null )
+                        this.onCollision( currentLocation );
+                }
+            } else if( this.moveLeft ) {
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
+                    this.position.X -= actualSpeed;
+                    this.facingDirection = 3;
+                    if( !this.ignoreMovementAnimations )
+                        this.sprite.AnimateLeft( time, 0, "" );
+                    this.faceDirection( 3 );
+                } else {
+                    Microsoft.Xna.Framework.Rectangle position = this.nextPosition( 3 );
+                    position.Height /= 4;
+                    bool flag1 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    position.Y += position.Height * 3;
+                    bool flag2 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
+                    TimeSpan elapsedGameTime;
+                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+                        float local = this.position.Y;
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 + num3;
+                        local = ( float ) num4;
+                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+
+                        float local = this.position.Y;
+
+                        double num1 = ( double ) local;
+                        double speed = ( double ) this.speed;
+                        elapsedGameTime = time.ElapsedGameTime;
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
+                        double num3 = speed * num2;
+                        double num4 = num1 - num3;
+                        local = ( float ) num4;
+                    }
+                    if( !currentLocation.isTilePassable( this.nextPosition( 3 ), viewport ) || !this.willDestroyObjectsUnderfoot )
+                        this.Halt();
+                    else if( this.willDestroyObjectsUnderfoot ) {
+                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize - 1 ), ( float ) ( this.getStandingY() / Game1.tileSize ) );
+                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 3 ), true ) ) {
+                            Game1.playSound( "stoneCrack" );
+                            this.position.X -= ( float ) ( this.speed + this.addedSpeed );
+                        } else {
+                            int blockedInterval = this.blockedInterval;
+                            elapsedGameTime = time.ElapsedGameTime;
+                            int milliseconds = elapsedGameTime.Milliseconds;
+                            this.blockedInterval = blockedInterval + milliseconds;
+                        }
+                    }
+                    if( this.onCollision != null )
+                        this.onCollision( currentLocation );
+                }
+            } else if( !this.ignoreMovementAnimations ) {
+                if( this.moveUp )
+                    this.sprite.AnimateUp( time, 0, "" );
+                else if( this.moveRight )
+                    this.sprite.AnimateRight( time, 0, "" );
+                else if( this.moveDown )
+                    this.sprite.AnimateDown( time, 0, "" );
+                else if( this.moveLeft )
+                    this.sprite.AnimateLeft( time, 0, "" );
+            }
+            if( !this.ignoreMovementAnimations )
+                this.sprite.interval = ( float ) this.defaultAnimationInterval - ( float ) ( this.speed + this.addedSpeed - 2 ) * 20f;
+            if( ( this.blockedInterval < 3000 || ( double ) this.blockedInterval > 3750.0 ) && this.blockedInterval >= 5000 ) {
+                this.speed = 4;
+                this.isCharging = true;
+                this.blockedInterval = 0;
+            }
+            if( this.damageToFarmer <= 0 || Game1.random.NextDouble() >= 0.000333333333333333 )
+                return;
+            if( this.name.Equals( "Shadow Guy" ) && Game1.random.NextDouble() < 0.3 ) {
+                if( Game1.random.NextDouble() < 0.5 )
+                    Game1.playSound( "grunt" );
+                else
+                    Game1.playSound( "shadowpeep" );
+            } else {
+                if( this.name.Equals( "Shadow Girl" ) )
+                    return;
+                if( this.name.Equals( "Ghost" ) ) {
+                    Game1.playSound( "ghost" );
+                } else {
+                    if( this.name.Contains( "Slime" ) )
+                        return;
+                    this.name.Contains( "Jelly" );
+                }
+            }
+        }
+
+        //this actually moves the target
         public override void behaviorAtGameTick( GameTime time ) {
 
             if( ( double ) this.timeBeforeAIMovementAgain > 0.0 ) {
