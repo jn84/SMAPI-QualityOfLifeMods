@@ -31,7 +31,8 @@ namespace Demiacle_SVM {
             //RuntimeHelpers.PrepareMethod( methodToInject.MethodHandle );
         }
 
-        public new void loadLevel( int level ) {
+        //will have to inject this
+        public void loadLevel( int level ) {
             ModEntry.Log("this shit is hijacked aww yea");
             this.isMonsterArea.SetValue( this, false );
             this.isSlimeArea.SetValue( this, false );

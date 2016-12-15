@@ -73,6 +73,7 @@
     <Compile Include="MineShaftMod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
+    <Compile Include="OutdoorMonsters\OutDoorMonster.cs" />
     <Compile Include="OutdoorMonsters\OutDoorRockCrab.cs" />
     <Compile Include="OutdoorMonsters\OutDoorShadowBrute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
