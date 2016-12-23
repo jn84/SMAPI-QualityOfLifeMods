@@ -13,13 +13,11 @@ using StardewModdingAPI.Events;
 using Demiacle_SVM.OutdoorMonsters.AI;
 
 namespace Demiacle_SVM.OutdoorMonsters {
+
     /// <summary>
-    /// Adds a layer for easily modifiable properties and types of movement to the monster class.
+    /// A layer for easily modifiable properties and types of movement to the monster class.
     /// </summary>
-    public class OutDoorMonster : Monster {
-
-
-        
+    public class OutDoorMonster : Monster {        
         private Character target = Game1.player;//redundant
         public float defaultAlpha = 1;
         public float alpha;
@@ -34,7 +32,9 @@ namespace Demiacle_SVM.OutdoorMonsters {
         protected PathFinder pathFinder;
         public int distanceToFindTarget = 20;
 
-        Random r = new Random();
+        //TODO use these enums as an easy means to change behavior of how fast a monster reacts and changes course
+        public enum timeToDecideNextMovement { fast, medium, slow } 
+
 
         //needed for serialization just leave empty
         public OutDoorMonster() : base() {
@@ -67,8 +67,6 @@ namespace Demiacle_SVM.OutdoorMonsters {
             isInvisible = false;
         }
 
-        public enum timeToDecideNextMovement { fast, medium, slow }
-        
         public void changeMoveType( MoveType newMoveType ) {
             previousMoveType = moveType;
             moveType = newMoveType;
@@ -84,7 +82,10 @@ namespace Demiacle_SVM.OutdoorMonsters {
             moveType = previousMoveType;
         }
 
-        private void getKnockedBacked() {
+        /// <summary>
+        /// Moves the monster in a line away from the player
+        /// </summary>
+        private void calculateAndGetKnockedBacked() {
             xTile.Dimensions.Rectangle viewport  = Game1.viewport;
             GameTime time = Game1.currentGameTime;
             this.lastPosition = this.position;
@@ -152,17 +153,18 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 isGettingKnockedBack = false;
             }
         }
-        
-
-        //Actually moves the character
-        //The override is needed to allow for other behaviors
+                
+        /// <summary>
+        /// Moves the monster in a direction.
+        /// If the monster is barely clipping an edge it will shift him over before moving in that direction.
+        /// If the monster is getting knocked back it will perform a knockback motion instead.
+        /// </summary>
         public override void MovePosition( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
-            //Need to check next position to make sure it is clear before moving, if clear then pop the queued path and/or reset timebeforeAimovement
-
             if( isGettingKnockedBack ) {
-                getKnockedBacked();
+                calculateAndGetKnockedBacked();
                 return;
-            }
+            }            
+
             //ModEntry.Log( "moving without collision" );
             this.lastPosition = this.position;
 
@@ -170,9 +172,8 @@ namespace Demiacle_SVM.OutdoorMonsters {
             //ModEntry.Log(" actual spee dis :" + actualSpeed);
 
             if( this.moveUp ) {
-
-                // next position takes a direction
-                //if something in next spot dont do nothin
+                
+                //if next spot is open then move
                 if( !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
                     this.position.Y -= actualSpeed;
                     if( !this.ignoreMovementAnimations )
@@ -180,7 +181,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     this.facingDirection = 0;
                     this.faceDirection( 0 );
 
-                    //else move
+                //else slider a little left or right dependin on box collision
                 } else {
                     Microsoft.Xna.Framework.Rectangle nextPosition = this.nextPosition( 0 );
                     nextPosition.Width /= 4;
@@ -188,6 +189,8 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     nextPosition.X += nextPosition.Width * 3;
                     bool flag2 = currentLocation.isCollidingPosition( nextPosition, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
                     TimeSpan elapsedGameTime;
+
+                    //if you are on the edge of a block you will slide over
                     if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
 
                         float local = this.position.X;
@@ -405,6 +408,8 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 this.isCharging = true;
                 this.blockedInterval = 0;
             }
+
+            //make a noise if hits the farmer
             if( this.damageToFarmer <= 0 || Game1.random.NextDouble() >= 0.000333333333333333 )
                 return;
             if( this.name.Equals( "Shadow Guy" ) && Game1.random.NextDouble() < 0.3 ) {
@@ -427,13 +432,15 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
         
 
+        /// <summary>
+        /// Finds a path to the target and sets the movement towards that path
+        /// </summary>
         public void setMovementPathFinding() {
             ModEntry.Log("path finding");
             Point monsterPoint = new Point( getTileX(), getTileY() );
             Point targetPoint = new Point( target.getTileX(), target.getTileY() );
 
-
-            //Move in a random direction if 
+            //Move in a random direction if player is not within distance
             if( PathFinder.Node.getHardDistanceBetweenPoints( monsterPoint, targetPoint ) > distanceToFindTarget ) {
                 ModEntry.Log( "Moving Random Direction because target is far" );
                 moveRandomDirection();
@@ -442,7 +449,8 @@ namespace Demiacle_SVM.OutdoorMonsters {
             pathFinder = new PathFinder( monsterPoint, targetPoint );
             pathFinder.FindPath();
 
-            // if a path is found and is greater than 2 nodes, 1 or less nodes means the mob is on the same tile
+            // if a path is found and is greater than 2 nodes
+            // 1 or less nodes means the mob is on the same tile or has not found a path
             if( pathFinder.foundPath.Count > 1 ) {
                 ModEntry.Log( "path found moving towards path" );
                 pathFinder.setNextDirection( this );
@@ -450,10 +458,12 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 setMovementNoCollision();
             }
         }
-
-        //TODO must compensate for objects CHECK FARMER CLASS FOR OBJECT DETECTION
+        
+        /// <summary>
+        /// Sets a random direction to move in
+        /// </summary>
         public void moveRandomDirection() {
-            int chance = r.Next( 1, 4 );
+            int chance = Game1.random.Next( 1, 4 );
             switch( chance ) {
                 case 1:
                     SetMovingOnlyLeft();
@@ -469,11 +479,13 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     break;
             }
         }
-
-        //Decides which way to move
+        
+        /// <summary>
+        /// Decides which way a monster should move for next update
+        /// </summary>
         public override void behaviorAtGameTick( GameTime time ) {
-            //ModEntry.Log("mob behavior");
 
+            //TODO this needs to be refactored
             alpha -= amountToFadePerGameTick * time.ElapsedGameTime.Milliseconds / 1000;
             if( alpha <= 0 ) {
                 isInvisible = true;
@@ -483,10 +495,10 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 this.timeBeforeAIMovementAgain = this.timeBeforeAIMovementAgain - ( ( float ) time.ElapsedGameTime.Milliseconds / 300 );
                 return;
             }
+
             this.timeBeforeAIMovementAgain = 1;
+            Halt(); // reset movement for next movement 
 
-
-            Halt(); // reset movement
             //TODO refactor into object oriented design
             switch( this.moveType ) {
                 case MoveType.noCollisions:
@@ -496,41 +508,34 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     setMovementPathFinding();
                     break;
                 case MoveType.standingStill:
-                    setMovementStandingStill();
+                    Halt();
                     break;
                 default:
                     ModEntry.Log( "ruh roh this guy has no movement type...." );
                     break;
-            }
-            //this.MovePosition( time, Game1.viewport, Game1.currentLocation );
-            
+            }            
         }
 
-        private void setMovementStandingStill() {
-            Halt();
-        }
-
+        /// <summary>
+        /// Move in a direction without considering object collision
+        /// </summary>
         public void setMovementNoCollision (){
-            Microsoft.Xna.Framework.Rectangle boundingBox = Game1.player.GetBoundingBox();
-            int playerX = boundingBox.Center.X;
-            int playerY = boundingBox.Center.Y;
-            boundingBox = this.GetBoundingBox();
-            int monsterX = boundingBox.Center.X;
-            int monsterY = boundingBox.Center.Y;
+            Microsoft.Xna.Framework.Rectangle playerBoundingBox = Game1.player.GetBoundingBox();
+            int playerX = playerBoundingBox.Center.X;
+            int playerY = playerBoundingBox.Center.Y;
+
+            int monsterX = GetBoundingBox().Center.X;
+            int monsterY = GetBoundingBox().Center.Y;
 
 
             int distanceX = Math.Abs( playerX - monsterX );
             int distanceY = Math.Abs( playerY - monsterY );
-
             
-
-            if( distanceX + distanceY > Game1.tileSize * 10 ) {
-                return; // or do idle behavior
+            if( distanceX + distanceY > Game1.tileSize * distanceToFindTarget ) {
+                return;
             }
 
-            //ModEntry.modEntry.Monitor.Log( "speed is :" + this.speed + " and added is :" + this.addedSpeed );
-
-            //decide to move horizontal or vertical
+            //decide to move horizontal or vertical based on distance of x and y
             if( distanceX > distanceY ) {
                 if( playerX - monsterX < 0 )
                     this.SetMovingLeft( true );
@@ -544,6 +549,5 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     this.SetMovingDown( true );
             }
         }
-
     }
 }

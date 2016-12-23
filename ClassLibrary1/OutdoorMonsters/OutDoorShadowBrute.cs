@@ -11,9 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Demiacle_SVM.OutdoorMonsters {
     public class OutDoorShadowBrute : OutDoorMonster {
         
-
+        //needed for serialization
         public OutDoorShadowBrute() : base() {
-            //moveType = MoveType.pathFinding;
         }
 
         public OutDoorShadowBrute( Vector2 position )
@@ -21,7 +20,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
             speed = 1;
             addedSpeed = 0;
             alpha = 0.5f;
-            moveSpeedExtension = MoveSpeedExtension.medium;
+            moveSpeedExtension = MoveSpeedExtension.slow;
             //moveType = MoveType.noCollisions;
             moveType = MoveType.pathFinding;
 

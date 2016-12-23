@@ -26,7 +26,6 @@ namespace Demiacle_SVM
         List<Monster> monsterGlidersToFix = new List<Monster>();
         public Dictionary<Monster, GameLocation> savedMonsters = new Dictionary<Monster, GameLocation>();
         SharpSerializer serializer = new SharpSerializer();
-        Random random = new Random();
         string saveFileLocation;
 
         private bool isFirstLoad = true;
@@ -170,7 +169,7 @@ namespace Demiacle_SVM
                         maxY = 300;
 
                         for ( int i = 0; i < amountOfBatsToSpawn; i++ ) {
-                            Vector2 position = new Vector2( random.Next( minX, maxX ), random.Next( minY, maxY ) );
+                            Vector2 position = new Vector2( Game1.random.Next( minX, maxX ), Game1.random.Next( minY, maxY ) );
                             characters.Add( new Bat( position ) );
                         }
                         
@@ -303,7 +302,7 @@ namespace Demiacle_SVM
         /// <returns></returns>
         private NPC generateRandomEasyMob( Vector2 position ) {
 
-            int chance = random.Next( 1, 6);
+            int chance = Game1.random.Next( 1, 6);
             switch( chance ) {
                 case 1:
                     return new GreenSlime( position );
@@ -327,7 +326,7 @@ namespace Demiacle_SVM
         }
 
         private NPC generateRandomMediumMob( Vector2 position ) {
-            int chance = random.Next( 1, 6 );
+            int chance = Game1.random.Next( 1, 6 );
             switch( chance ) {
                 case 1:
                     return new Bat( position );
@@ -345,11 +344,11 @@ namespace Demiacle_SVM
         }
 
         private Vector2 getRandomInsideSquare( int minX, int maxX, int minY, int maxY ) {
-            return new Vector2( random.Next( minX, maxX ), random.Next( minY, maxY ) );
+            return new Vector2( Game1.random.Next( minX, maxX ), Game1.random.Next( minY, maxY ) );
         }
 
         private Vector2 getRandomInsideSquare( int minX, int maxX, int minY, int maxY, int omitMinX, int omitMaxX, int omitMinY, int omitMaxY ) {
-            Vector2 position = new Vector2( random.Next( minX, maxX ), random.Next( minY, maxY ) );
+            Vector2 position = new Vector2( Game1.random.Next( minX, maxX ), Game1.random.Next( minY, maxY ) );
             Rectangle rectangle = new Rectangle( omitMinX, omitMinY, omitMaxX - omitMinX, omitMaxY - omitMinY);
             if( isInOmittedSquare( position, rectangle ) ) {
                return getRandomInsideSquare( minX, maxX, minY, maxY, omitMinX, omitMaxX, omitMinY, omitMaxY );
@@ -359,7 +358,7 @@ namespace Demiacle_SVM
         }
 
         private Vector2 getValidRandomInsideSquare( int minX, int maxX, int minY, int maxY, GameLocation location ) {
-            Vector2 position = new Vector2( random.Next( minX, maxX ), random.Next( minY, maxY ) );
+            Vector2 position = new Vector2( Game1.random.Next( minX, maxX ), Game1.random.Next( minY, maxY ) );
             if( isTileOccupied( position, location ) ) {
                 return getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
             } else {

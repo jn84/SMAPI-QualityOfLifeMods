@@ -12,15 +12,19 @@ using xTile.Dimensions;
 namespace Demiacle_SVM.OutdoorMonsters.AI {
 
     public class PathFinder {
-        //possible refactor
+        
         public Node[,] map; //unchecked nodes that are both walkable and unwalkable
-        private Node startNode;
-        private Node endNode;
+        public Node startNode;
+        public Node endNode;
+
         public List<Point> foundPath; //needs refactoring its far too coupled
         public List<Node> openNodes = new List<Node>();
         public List<Node> closedNodes = new List<Node>();
+
         Boolean startAndFinishAreSamePoint;
-        //private int testCounter = 0;
+
+        public int width;
+        public int height;
 
         /// <summary>
         /// Create a new instance of PathFinder
@@ -29,12 +33,13 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
             //clone the size and nodes that are walkable from the PathFinderMap instance.
             map = PathFinderMap.Instance.clone();
-
+            width = PathFinderMap.Instance.width;
+            height = PathFinderMap.Instance.height;
 
             this.startNode = new Node( start.X, start.Y, true );
-            //this.startNode.state = Node.NodeState.open;
             this.startNode.distanceTraveled = 0;
-            map[start.X,start.Y] = startNode;
+
+            map[ start.X, start.Y ] = startNode;
 
             openNodes.Add( this.startNode );
 
@@ -44,7 +49,6 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             if( start.Equals( target ) ) {
                 startAndFinishAreSamePoint = true;
             }
-
         }
 
         /// <summary>
@@ -56,59 +60,25 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 foundPath = new List<Point>();
                 return;
             }
-
-            // The start node is the first entry in the 'open' list
+            
             List<Point> path = new List<Point>();
+
+            //becin recusive search
             bool success = Search( startNode );
             if( success ) {
 
-                // If a path was found, follow the parents from the end node to build a list of locations
+                // If a path was found, follow the parents from the end node to build a list of points
                 Node node = this.endNode;
                 while( node.parentNode != null ) {
                     path.Add( node.point );
                     node = node.parentNode;
                 }
 
-                // Reverse the list so it's in the correct order when returned
+                // Reverse the list so it's in the correct order
                 path.Reverse();
             }
-            //drawPath( path );
+            //drawPathToConsole( path, this );
             foundPath = path; ;
-        }
-
-        //TODO factor this out
-        /// <summary>
-        /// Draws a finalized map with a map to the console
-        /// </summary>
-        private void drawPath( List<Point> path ) {
-            Console.WriteLine("PATH IS");
-            for( int y = 0; y < PathFinderMap.Instance.height; y++ ) {
-                for( int x = 0; x < PathFinderMap.Instance.width; x++ ) {
-                    Point checkingPoint = map[ x, y ].point;
-
-                    if( checkingPoint.Equals( startNode.point ) ) {
-                        System.Console.Write( "█" );
-                        continue;
-                    }
-
-                    if( path.Exists( point => point.Equals( checkingPoint ) ) ) {
-                        System.Console.Write( "*" );
-                        continue;
-                    }
-
-                    if( openNodes.Exists( node => node.point.Equals( checkingPoint ) ) ) {
-                        System.Console.Write( "$" );
-                        continue;
-                    }
-
-                    if( map[ x, y ].isWalkable == true ) {
-                        System.Console.Write( "-" );
-                    } else {
-                        System.Console.Write( "0" );
-                    }
-                }
-                Console.Write('\n');
-            }
         }
 
         /// <summary>
@@ -117,31 +87,31 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// <param name="currentNode">The node from which to find a path</param>
         /// <returns>True if a path to the destination has been found, otherwise false</returns>
         private bool Search( Node currentNode ) {
-            
-            // Set the current node to Closed since it cannot be traversed more than once
-            //currentNode.state = Node.NodeState.closed;
+
+            // Move the current node to Closed
             openNodes.Remove( currentNode );
             closedNodes.Add( currentNode );
+
             calculateAdjacentNodes( currentNode );
 
-            // Sort all checked nodes for their estimated totale Distnance (F) so that the shortest possible routes are considered first
+            // Sort all checked nodes for their estimated total Distnance (F) so that the shortest possible routes are considered first
             openNodes.Sort( ( node1, node2 ) => node1.estimatedTotalDistance.CompareTo( node2.estimatedTotalDistance ) );
             foreach( var nextNode in openNodes.ToList() ) {
 
                 // Check whether the end node has been reached
                 if( nextNode.point.X == endNode.point.X && nextNode.point.Y == endNode.point.Y ) {
                     endNode = nextNode;
-                    //Console.WriteLine( "TARGET IS ACHEIVED TARGET IS ACHIEVED" );
                     return true;
-                } else {
 
-                    // If not, check the next set of nodes
+
+                // If not, check the next set of nodes
+                } else {
                     if( Search( nextNode ) ) // recursion
                         return true;
                 }
             }
 
-            // The method returns false if this path leads to be a dead end
+            // Return false if no path is possible
             return false;
         }
 
@@ -153,7 +123,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         private void calculateAdjacentNodes( Node fromNode ) {
 
             //Console.WriteLine( $"Point is : {fromNode.point.X}, {fromNode.point.Y} and NodeTravelDistance is :{fromNode.distanceTraveled}" );
-            //List<Node> walkableNodes = new List<Node>();
+
             Point fromLocation = fromNode.point;
 
             IEnumerable<Point> nextLocations = new Point[]
@@ -170,61 +140,55 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 int y = location.Y;
 
                 // Don't check paths that are out of bounds
-                if( x < 0 || x > PathFinderMap.Instance.width - 1 || y < 0 || y > PathFinderMap.Instance.height - 1)
+                if( x < 0 || x > width - 1 || y < 0 || y > height - 1 )
                     continue;
 
-                Node node = map[ x, y ];
-                //Console.WriteLine( $"testing point x:{x}  y:{y}" );
+                Node node = map[ x, y ];                
                 node.distanceFromTarget = Node.getDistanceBetweenPoints( node.point, endNode.point );
-                
-
-                //drawMap( location );
 
                 // Ignore non-walkable nodes unless the target point is there
-                if( !node.isWalkable && !(node.point.Equals(endNode.point)) )
+                if( !node.isWalkable && !( node.point.Equals( endNode.point ) ) )
                     continue;
 
                 // Ignore already-closed nodes
                 if( closedNodes.Exists( nodeToCheck => nodeToCheck.point.Equals( node.point ) ) )
                     continue;
 
-                // ignore open nodes - an open node will never be a shorter path than it already is however this check is useful for weighted graphs (diagonals or slower terrain)
+                // Ignore open nodes 
+                // An open node will never provide a shorter path than is already calculated
+                // This check is useful for weighted graphs ( diagonals or costly terrain )
                 if( openNodes.Exists( nodeToCheck => nodeToCheck.point.Equals( node.point ) ) ) {
-                    
 
+                // If node is valid
                 } else {
 
-                    // If it's untested, set the parent and flag it as 'Open' for consideration
+                    // Set the parent and move to openNodes
                     node.parentNode = fromNode;
-                    //node.state = Node.NodeState.open;
-                    
                     openNodes.Add( node );
 
-                    // distance between tiles will ALWAYS be 1 - no calculation necessary
-                    node.distanceTraveled = node.parentNode.distanceTraveled + 1; 
+                    // distance between tiles will ALWAYS be 1. No calculation is necessary
+                    node.distanceTraveled = node.parentNode.distanceTraveled + 1;
                 }
             }
         }
 
         /// <summary>
-        /// The point used for A* pathfinding
+        /// The point used for the PathFinder class.
         /// </summary>
         public class Node {
             public float estimatedTotalDistance { get { return this.distanceTraveled + this.distanceFromTarget; } }
             public float distanceTraveled;
             public float distanceFromTarget;
+
             public Point point;
             public Boolean isWalkable;
             public Node parentNode { get; set; }
-
-            //public NodeState state = NodeState.untested;
-            public enum NodeState { open, closed, untested }
 
             public Node( int x, int y, Boolean isWalkable ) {
                 this.point = new Point( x, y );
                 this.isWalkable = isWalkable;
             }
-            
+
             /// <summary>
             /// Calculates the total distance score between two points giving a lower score the closer deltaX is to deltaY
             /// </summary>
@@ -245,70 +209,26 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             }
 
         }
-
         
-        //TODO factor this out
         /// <summary>
-        /// Draws a text map to the console for testing purposed... 
+        /// Sets the movement direction of a monster.
         /// </summary>
-        public void drawMap( Point point ) {
-            
-            Console.WriteLine( "- means passable" );
-            Console.WriteLine( "0 means blocked" );
-            Console.WriteLine( "" );
-            for( int y = 0; y < PathFinderMap.Instance.height; y++ ) {
-                for( int x = 0; x < PathFinderMap.Instance.width; x++ ) {
+        /// <param name="outDoorMonster">The monster to alter movement</param>
+        internal void setNextDirection( OutDoorMonster outDoorMonster ) {
+            ModEntry.Log( $"Monster is at x:{foundPath[0].X} y:{foundPath[ 0 ].Y} and next square is at x:{foundPath[ 1 ].X} y:{foundPath[ 1 ].Y}" );
 
-                    Node node = map[ x, y ];
+            if( foundPath[ 0 ].X < foundPath[ 1 ].X ) {
+                outDoorMonster.SetMovingOnlyRight();
+            } else {
+                outDoorMonster.SetMovingOnlyLeft();
+            }
 
-                    if( startNode.point.X == x && startNode.point.Y == y ) {
-                        System.Console.Write( "█ " );
-                        continue;
-                    }
-
-                    if( point.X == x && point.Y == y ) {
-                        System.Console.Write( "* " );
-                        continue;
-                    }
-
-                    if( openNodes.Exists( openNode => openNode.point.Equals( node.point ) ) ) {
-                        System.Console.Write( "$ " );
-                        continue;
-                    }
-
-                    if( closedNodes.Exists( closdedNode => closdedNode.point.Equals( node.point ) ) ) {
-                        System.Console.Write( "< " );
-                        continue;
-                    }
-
-                    if( endNode.point.X == x && endNode.point.Y == y ) {
-                        System.Console.Write( "% " );
-                        continue;
-                    }
-
-                    if( map[ x, y ].isWalkable == true ) {
-                        System.Console.Write( "- " );
-                    } else {
-                        System.Console.Write( "0 " );
-                    }
-                }
-                System.Console.Write( "\n" );
+            if ( foundPath[ 0 ].Y > foundPath[ 1 ].Y ) {
+                outDoorMonster.SetMovingOnlyUp();
+            } else {
+                outDoorMonster.SetMovingOnlyDown();
             }
         }
 
-        internal void setNextDirection( OutDoorMonster outDoorMonster ) {
-
-            Boolean isMovingRight = foundPath[ 0 ].X < foundPath[ 1 ].X;
-            Boolean isMovingLeft = foundPath[ 0 ].X > foundPath[ 1 ].X;
-            Boolean isMovingUp = foundPath[ 0 ].Y > foundPath[ 1 ].Y;
-            Boolean isMovingDown = foundPath[ 0 ].Y < foundPath[ 1 ].Y;
-
-            outDoorMonster.SetMovingDown( isMovingDown );
-            outDoorMonster.SetMovingUp( isMovingUp );
-            outDoorMonster.SetMovingLeft( isMovingLeft );
-            outDoorMonster.SetMovingRight( isMovingRight );
-
-
-        }
     }
 }

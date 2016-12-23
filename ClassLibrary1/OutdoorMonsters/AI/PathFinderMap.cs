@@ -1,34 +1,32 @@
 ﻿using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using xTile.Dimensions;
 using static Demiacle_SVM.OutdoorMonsters.AI.PathFinder;
 using StardewModdingAPI.Events;
-using xTile.Tiles;
-using xTile.ObjectModel;
 using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace Demiacle_SVM.OutdoorMonsters.AI {
+
+    /// <summary>
+    /// A singleton class holding map data of walkable/unwalkable tiles.
+    /// </summary>
     public class PathFinderMap {
 
         public int width;
         public int height;
 
         private GameLocation location;
-        public Node[,] map { get; set; } //contains a list of walkable and unwalkable nodes
+        public Node[,] map { get; set; } //Array of walkable and unwalkable nodes
 
         private static readonly PathFinderMap instance = new PathFinderMap();
-
-        private PathFinderMap() { }
-
         public static PathFinderMap Instance {
             get {
                 return instance;
             }
         }
+
+        private PathFinderMap() { }
 
         /// <summary>
         /// Updates data needed for pathfinding. This includes a map of [ x, y ] coordinates, the width and height and the GameLocation.
@@ -87,6 +85,88 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 }
             }
             return newMap;
+        }
+
+        /// <summary>
+        /// Draws a text map to the console. Used for testing purposes
+        /// </summary>
+        public static void drawMapWithMinimalDataToConsole( PathFinder pathFinder ) {
+            List<Node> openNodes = pathFinder.openNodes;
+            List<Node> closedNodes = pathFinder.closedNodes;
+            Node[,] map = pathFinder.map;
+            Node startNode = pathFinder.startNode;
+            Node endNode = pathFinder.endNode;
+
+            Console.WriteLine( "- means passable" );
+            Console.WriteLine( "0 means blocked" );
+            Console.WriteLine( "" );
+            for( int y = 0; y < pathFinder.height; y++ ) {
+                for( int x = 0; x < pathFinder.width; x++ ) {
+
+                    Node node = map[ x, y ];
+
+                    if( startNode.point.X == x && startNode.point.Y == y ) {
+                        System.Console.Write( "█ " );
+                        continue;
+                    }
+
+                    if( openNodes.Exists( openNode => openNode.point.Equals( node.point ) ) ) {
+                        System.Console.Write( "$ " );
+                        continue;
+                    }
+
+                    if( closedNodes.Exists( closdedNode => closdedNode.point.Equals( node.point ) ) ) {
+                        System.Console.Write( "< " );
+                        continue;
+                    }
+
+                    if( endNode.point.X == x && endNode.point.Y == y ) {
+                        System.Console.Write( "% " );
+                        continue;
+                    }
+
+                    if( map[ x, y ].isWalkable == true ) {
+                        System.Console.Write( "- " );
+                    } else {
+                        System.Console.Write( "0 " );
+                    }
+                }
+                System.Console.Write( "\n" );
+            }
+        }
+        
+        /// <summary>
+        /// Draws a finalized map with a path and search data to the console. Used for testing purposes
+        /// </summary>
+        public static void drawPathToConsole( List<Point> path, PathFinder pathFinder ) {
+            Console.WriteLine( "PATH IS" );
+            for( int y = 0; y < pathFinder.height; y++ ) {
+                for( int x = 0; x < pathFinder.width; x++ ) {
+                    Point checkingPoint = pathFinder.map[ x, y ].point;
+
+                    if( checkingPoint.Equals( pathFinder.startNode.point ) ) {
+                        System.Console.Write( "█" );
+                        continue;
+                    }
+
+                    if( path.Exists( point => point.Equals( checkingPoint ) ) ) {
+                        System.Console.Write( "*" );
+                        continue;
+                    }
+
+                    if( pathFinder.openNodes.Exists( node => node.point.Equals( checkingPoint ) ) ) {
+                        System.Console.Write( "$" );
+                        continue;
+                    }
+
+                    if( pathFinder.map[ x, y ].isWalkable == true ) {
+                        System.Console.Write( "-" );
+                    } else {
+                        System.Console.Write( "0" );
+                    }
+                }
+                Console.Write( '\n' );
+            }
         }
     }
 }
