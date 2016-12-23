@@ -17,6 +17,7 @@ using StardewValley.Quests;
 using StardewValley.TerrainFeatures;
 using System.Xml.Serialization;
 using Demiacle_SVM.OutdoorMonsters;
+using Demiacle_SVM.OutdoorMonsters.AI;
 
 //create list of mobs
 
@@ -41,11 +42,10 @@ namespace Demiacle_SVM {
         private SpeedMod speedMod;
         private MineShaftMod mineShaftMod;
         public static ModEntry modEntry;
+        public static Boolean isTesting = false;
 
         public ModEntry() {
             modEntry = this;
-            
-            //this.Monitor.Log( "loading mod" );
             //updateXmlSerializer();
             persistantMonsters = new PersistantMonsters();
             scytheDamageMod = new ScytheDamageMod();
@@ -54,6 +54,11 @@ namespace Demiacle_SVM {
         }
 
         internal static void Log( string log ) {
+            if( isTesting ) {
+                System.Console.WriteLine( log );
+                return;
+            }
+
             modEntry.Monitor.Log( log );
         }
 
@@ -76,6 +81,10 @@ namespace Demiacle_SVM {
             PlayerEvents.LoadedGame += persistantMonsters.onLoadedGame;
             TimeEvents.OnNewDay += persistantMonsters.onNewDay;
             TimeEvents.DayOfMonthChanged += persistantMonsters.onDayChange;
+            GameEvents.OneSecondTick += persistantMonsters.onGameOneSecondTick;
+            //LocationEvents.CurrentLocationChanged += PathFinder.onLocationChange;
+            LocationEvents.LocationObjectsChanged += PathFinderMap.Instance.updatePassableTilesOnLocationObjectsChanged;
+            LocationEvents.CurrentLocationChanged += PathFinderMap.Instance.updateMapOnChangeLocation;
             //PlayerEvents.FarmerChanged += persistantMonsters.onFarmerChanged;
 
 
@@ -95,7 +104,7 @@ namespace Demiacle_SVM {
             if( Game1.currentLocation.name == null) {
                 return;
             }
-            this.Monitor.Log( $"Player pressed {e.KeyPressed} and is currently in {Game1.currentLocation.name} at location {Game1.player.position} and color is {Game1.outdoorLight}" );
+            //this.Monitor.Log( $"Player pressed {e.KeyPressed} and is currently in {Game1.currentLocation.name} at location {Game1.player.position} and color is {Game1.outdoorLight}" );
             foreach (NPC npc in Game1.currentLocation.characters) {
                 //this.Monitor.Log("char list after " + npc.name);
             }
@@ -110,6 +119,18 @@ namespace Demiacle_SVM {
                 characters.Add( bat1 );
                 Game1.playSound("batScreech");
             }
+
+            if( $"{e.KeyPressed}" == "N" ) {
+
+                Log( "Current gettilelocation.x is X: " + Game1.player.getTileLocation().X + " Y:" + Game1.player.position.Y / Game1.tileSize );
+                Log( "Current gettilex is X: " + Game1.player.getTileX() + " Y:" + Game1.player.position.Y / Game1.tileSize );
+                Log( "Current getTilelocationpoint is X: " + Game1.player.getTileLocationPoint() + " Y:" + Game1.player.position.Y / Game1.tileSize );
+
+                Log("Map size is width: " + Game1.currentLocation.map.DisplayWidth / Game1.tileSize +" height: "+ +Game1.currentLocation.map.DisplayHeight / Game1.tileSize );
+                
+            }
+
+
         }
 
         /// <summary>

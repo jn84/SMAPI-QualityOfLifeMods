@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework;
 using StardewValley;
 using Microsoft.Xna.Framework.Graphics;
 using xTile.Dimensions;
+using System.Threading;
+using StardewModdingAPI.Events;
+using Demiacle_SVM.OutdoorMonsters.AI;
 
 namespace Demiacle_SVM.OutdoorMonsters {
     /// <summary>
@@ -15,25 +18,41 @@ namespace Demiacle_SVM.OutdoorMonsters {
     /// </summary>
     public class OutDoorMonster : Monster {
 
+
+        
+        private Character target = Game1.player;//redundant
+        public float defaultAlpha = 1;
+        public float alpha;
+        public int knockbackSpeed = 10;
         public int slideAnimationTimer = 100;
-        public Boolean ignoresCollissions = false;
-        private MoveType moveType;
+        public  MoveType moveType;
         private MoveType previousMoveType;
         public float moveSpeedExtension = MoveSpeedExtension.medium;
+        private MoveType nextMoveType;
+        public float amountToFadePerGameTick = 0;
+        public Boolean isGettingKnockedBack = false;
+        protected PathFinder pathFinder;
+        public int distanceToFindTarget = 20;
 
+        Random r = new Random();
+
+        //needed for serialization just leave empty
         public OutDoorMonster() : base() {
 
         }
 
         public OutDoorMonster( string name, Vector2 position )
             : base( name, position ) {
+            alpha = defaultAlpha;
             
         }
 
         public enum MoveType {
             noCollisions,
             knockback,
-            pathFinding
+            pathFinding,
+            FadeOut,
+            standingStill
         }
 
         public struct MoveSpeedExtension {
@@ -43,40 +62,31 @@ namespace Demiacle_SVM.OutdoorMonsters {
             public const float slower = 10; 
         }
 
-        public enum timeToDecideNextMovement { fast, medium, slow }
-
-        public override void MovePosition( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
-            switch( this.moveType) {
-                case MoveType.noCollisions:
-                    MoveWithoutCollision( time, viewport, currentLocation);
-                    break;
-                case MoveType.knockback:
-                    getKnockedBacked( time, viewport, currentLocation );
-                    break;
-                case MoveType.pathFinding:
-                    MoveWithPathFinding( time, viewport, currentLocation );
-                    break;
-                default:
-                    ModEntry.Log( "ruh roh this guy has no movement type...." );
-                    break;
-            }
+        public virtual void activateMonster() {
+            alpha = defaultAlpha;
+            isInvisible = false;
         }
 
+        public enum timeToDecideNextMovement { fast, medium, slow }
+        
         public void changeMoveType( MoveType newMoveType ) {
             previousMoveType = moveType;
             moveType = newMoveType;
+        }
+
+        public void changeMoveType( MoveType newMoveType, MoveType afterNewMoveType ) {
+            previousMoveType = moveType;
+            moveType = newMoveType;
+            nextMoveType = afterNewMoveType;
         }
 
         public void restorePreviousMoveType() {
             moveType = previousMoveType;
         }
 
-        private void getKnockedBacked( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
-
-            if( this.xVelocity <= 0 && this.yVelocity <= 0) {
-                restorePreviousMoveType();
-            }
-
+        private void getKnockedBacked() {
+            xTile.Dimensions.Rectangle viewport  = Game1.viewport;
+            GameTime time = Game1.currentGameTime;
             this.lastPosition = this.position;
             if( ( double ) this.xVelocity != 0.0 || ( double ) this.yVelocity != 0.0 ) {
                 if( double.IsNaN( ( double ) this.xVelocity ) || double.IsNaN( ( double ) this.yVelocity ) ) {
@@ -138,11 +148,22 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 }
             }
 
+            if( xVelocity <= 0 && yVelocity <= 0) {
+                isGettingKnockedBack = false;
+            }
         }
         
 
-        //this chooses the type of movement
-        public void MoveWithoutCollision( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
+        //Actually moves the character
+        //The override is needed to allow for other behaviors
+        public override void MovePosition( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
+            //Need to check next position to make sure it is clear before moving, if clear then pop the queued path and/or reset timebeforeAimovement
+
+            if( isGettingKnockedBack ) {
+                getKnockedBacked();
+                return;
+            }
+            //ModEntry.Log( "moving without collision" );
             this.lastPosition = this.position;
 
             float actualSpeed = ( float ) ( this.speed + this.addedSpeed ) / moveSpeedExtension;
@@ -404,275 +425,92 @@ namespace Demiacle_SVM.OutdoorMonsters {
             }
         }
 
-        public void MoveWithPathFinding( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
-            this.lastPosition = this.position;
+        
 
-            float actualSpeed = ( float ) ( this.speed + this.addedSpeed ) / moveSpeedExtension;
-
-            if( this.moveUp ) {
-
-                // next position takes a direction
-                //if something in next spot dont do nothin
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
-                    this.position.Y -= actualSpeed;
-                    if( !this.ignoreMovementAnimations )
-                        this.sprite.AnimateUp( time, 0, "" );
-                    this.facingDirection = 0;
-                    this.faceDirection( 0 );
-
-                    //else move
-                } else {
-                    Microsoft.Xna.Framework.Rectangle nextPosition = this.nextPosition( 0 );
-                    nextPosition.Width /= 4;
-                    bool flag1 = currentLocation.isCollidingPosition( nextPosition, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    nextPosition.X += nextPosition.Width * 3;
-                    bool flag2 = currentLocation.isCollidingPosition( nextPosition, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    TimeSpan elapsedGameTime;
-                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-
-                        float local = this.position.X;
-
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 + num3;
-
-                        local = ( float ) num4;
-                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-
-                        float local = this.position.X;
-
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 - num3;
-
-                        local = ( float ) num4;
-                    }
-                    if( !currentLocation.isTilePassable( this.nextPosition( 0 ), viewport ) || !this.willDestroyObjectsUnderfoot )
-                        this.Halt();
+        public void setMovementPathFinding() {
+            ModEntry.Log("path finding");
+            Point monsterPoint = new Point( getTileX(), getTileY() );
+            Point targetPoint = new Point( target.getTileX(), target.getTileY() );
 
 
-                    else if( this.willDestroyObjectsUnderfoot ) {
-                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize ), ( float ) ( this.getStandingY() / Game1.tileSize - 1 ) );
-                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 0 ), true ) ) {
-                            Game1.playSound( "stoneCrack" );
-                            this.position.Y -= ( float ) ( this.speed + this.addedSpeed );
-                        } else {
-                            int blockedInterval = this.blockedInterval;
-                            elapsedGameTime = time.ElapsedGameTime;
-                            int milliseconds = elapsedGameTime.Milliseconds;
-                            this.blockedInterval = blockedInterval + milliseconds;
-                        }
-                    }
-                    if( this.onCollision != null )
-                        this.onCollision( currentLocation );
-                }
-
-
-
-            } else if( this.moveRight ) {
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
-                    this.position.X += actualSpeed;
-                    if( !this.ignoreMovementAnimations )
-                        this.sprite.AnimateRight( time, 0, "" );
-                    this.facingDirection = 1;
-                    this.faceDirection( 1 );
-                } else {
-                    Microsoft.Xna.Framework.Rectangle position = this.nextPosition( 1 );
-                    position.Height /= 4;
-                    bool flag1 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    position.Y += position.Height * 3;
-                    bool flag2 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    TimeSpan elapsedGameTime;
-                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-
-                        float local = this.position.Y;
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 + num3;
-                        local = ( float ) num4;
-                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        float local = this.position.Y;
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 - num3;
-                        local = ( float ) num4;
-                    }
-                    if( !currentLocation.isTilePassable( this.nextPosition( 1 ), viewport ) || !this.willDestroyObjectsUnderfoot )
-                        this.Halt();
-                    else if( this.willDestroyObjectsUnderfoot ) {
-                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize + 1 ), ( float ) ( this.getStandingY() / Game1.tileSize ) );
-                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 1 ), true ) ) {
-                            Game1.playSound( "stoneCrack" );
-                            this.position.X += ( float ) ( this.speed + this.addedSpeed );
-                        } else {
-                            int blockedInterval = this.blockedInterval;
-                            elapsedGameTime = time.ElapsedGameTime;
-                            int milliseconds = elapsedGameTime.Milliseconds;
-                            this.blockedInterval = blockedInterval + milliseconds;
-                        }
-                    }
-                    if( this.onCollision != null )
-                        this.onCollision( currentLocation );
-                }
-            } else if( this.moveDown ) {
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
-                    this.position.Y += actualSpeed;
-                    if( !this.ignoreMovementAnimations )
-                        this.sprite.AnimateDown( time, 0, "" );
-                    this.facingDirection = 2;
-                    this.faceDirection( 2 );
-                } else {
-                    Microsoft.Xna.Framework.Rectangle position = this.nextPosition( 2 );
-                    position.Width /= 4;
-                    bool flag1 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    position.X += position.Width * 3;
-                    bool flag2 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    TimeSpan elapsedGameTime;
-                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        float local = this.position.X;
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 + num3;
-                        local = ( float ) num4;
-                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        float local = this.position.X;
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 - num3;
-                        local = ( float ) num4;
-                    }
-                    if( !currentLocation.isTilePassable( this.nextPosition( 2 ), viewport ) || !this.willDestroyObjectsUnderfoot )
-                        this.Halt();
-                    else if( this.willDestroyObjectsUnderfoot ) {
-                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize ), ( float ) ( this.getStandingY() / Game1.tileSize + 1 ) );
-                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 2 ), true ) ) {
-                            Game1.playSound( "stoneCrack" );
-                            this.position.Y += ( float ) ( this.speed + this.addedSpeed );
-                        } else {
-                            int blockedInterval = this.blockedInterval;
-                            elapsedGameTime = time.ElapsedGameTime;
-                            int milliseconds = elapsedGameTime.Milliseconds;
-                            this.blockedInterval = blockedInterval + milliseconds;
-                        }
-                    }
-                    if( this.onCollision != null )
-                        this.onCollision( currentLocation );
-                }
-            } else if( this.moveLeft ) {
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
-                    this.position.X -= actualSpeed;
-                    this.facingDirection = 3;
-                    if( !this.ignoreMovementAnimations )
-                        this.sprite.AnimateLeft( time, 0, "" );
-                    this.faceDirection( 3 );
-                } else {
-                    Microsoft.Xna.Framework.Rectangle position = this.nextPosition( 3 );
-                    position.Height /= 4;
-                    bool flag1 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    position.Y += position.Height * 3;
-                    bool flag2 = currentLocation.isCollidingPosition( position, viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this );
-                    TimeSpan elapsedGameTime;
-                    if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        float local = this.position.Y;
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 + num3;
-                        local = ( float ) num4;
-                    } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-
-                        float local = this.position.Y;
-
-                        double num1 = ( double ) local;
-                        double speed = ( double ) this.speed;
-                        elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
-                        double num3 = speed * num2;
-                        double num4 = num1 - num3;
-                        local = ( float ) num4;
-                    }
-                    if( !currentLocation.isTilePassable( this.nextPosition( 3 ), viewport ) || !this.willDestroyObjectsUnderfoot )
-                        this.Halt();
-                    else if( this.willDestroyObjectsUnderfoot ) {
-                        Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize - 1 ), ( float ) ( this.getStandingY() / Game1.tileSize ) );
-                        if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 3 ), true ) ) {
-                            Game1.playSound( "stoneCrack" );
-                            this.position.X -= ( float ) ( this.speed + this.addedSpeed );
-                        } else {
-                            int blockedInterval = this.blockedInterval;
-                            elapsedGameTime = time.ElapsedGameTime;
-                            int milliseconds = elapsedGameTime.Milliseconds;
-                            this.blockedInterval = blockedInterval + milliseconds;
-                        }
-                    }
-                    if( this.onCollision != null )
-                        this.onCollision( currentLocation );
-                }
-            } else if( !this.ignoreMovementAnimations ) {
-                if( this.moveUp )
-                    this.sprite.AnimateUp( time, 0, "" );
-                else if( this.moveRight )
-                    this.sprite.AnimateRight( time, 0, "" );
-                else if( this.moveDown )
-                    this.sprite.AnimateDown( time, 0, "" );
-                else if( this.moveLeft )
-                    this.sprite.AnimateLeft( time, 0, "" );
-            }
-            if( !this.ignoreMovementAnimations )
-                this.sprite.interval = ( float ) this.defaultAnimationInterval - ( float ) ( this.speed + this.addedSpeed - 2 ) * 20f;
-            if( ( this.blockedInterval < 3000 || ( double ) this.blockedInterval > 3750.0 ) && this.blockedInterval >= 5000 ) {
-                this.speed = 4;
-                this.isCharging = true;
-                this.blockedInterval = 0;
-            }
-            if( this.damageToFarmer <= 0 || Game1.random.NextDouble() >= 0.000333333333333333 )
+            //Move in a random direction if 
+            if( PathFinder.Node.getHardDistanceBetweenPoints( monsterPoint, targetPoint ) > distanceToFindTarget ) {
+                ModEntry.Log( "Moving Random Direction because target is far" );
+                moveRandomDirection();
                 return;
-            if( this.name.Equals( "Shadow Guy" ) && Game1.random.NextDouble() < 0.3 ) {
-                if( Game1.random.NextDouble() < 0.5 )
-                    Game1.playSound( "grunt" );
-                else
-                    Game1.playSound( "shadowpeep" );
+            }
+            pathFinder = new PathFinder( monsterPoint, targetPoint );
+            pathFinder.FindPath();
+
+            // if a path is found and is greater than 2 nodes, 1 or less nodes means the mob is on the same tile
+            if( pathFinder.foundPath.Count > 1 ) {
+                ModEntry.Log( "path found moving towards path" );
+                pathFinder.setNextDirection( this );
             } else {
-                if( this.name.Equals( "Shadow Girl" ) )
-                    return;
-                if( this.name.Equals( "Ghost" ) ) {
-                    Game1.playSound( "ghost" );
-                } else {
-                    if( this.name.Contains( "Slime" ) )
-                        return;
-                    this.name.Contains( "Jelly" );
-                }
+                setMovementNoCollision();
             }
         }
 
-        //this actually moves the target
+        //TODO must compensate for objects CHECK FARMER CLASS FOR OBJECT DETECTION
+        public void moveRandomDirection() {
+            int chance = r.Next( 1, 4 );
+            switch( chance ) {
+                case 1:
+                    SetMovingOnlyLeft();
+                    break;
+                case 2:
+                    SetMovingOnlyRight();
+                    break;
+                case 3:
+                    SetMovingOnlyUp();
+                    break;
+                case 4:
+                    SetMovingOnlyDown();
+                    break;
+            }
+        }
+
+        //Decides which way to move
         public override void behaviorAtGameTick( GameTime time ) {
+            //ModEntry.Log("mob behavior");
+
+            alpha -= amountToFadePerGameTick * time.ElapsedGameTime.Milliseconds / 1000;
+            if( alpha <= 0 ) {
+                isInvisible = true;
+            }
 
             if( ( double ) this.timeBeforeAIMovementAgain > 0.0 ) {
                 this.timeBeforeAIMovementAgain = this.timeBeforeAIMovementAgain - ( ( float ) time.ElapsedGameTime.Milliseconds / 300 );
                 return;
             }
             this.timeBeforeAIMovementAgain = 1;
+
+
+            Halt(); // reset movement
+            //TODO refactor into object oriented design
+            switch( this.moveType ) {
+                case MoveType.noCollisions:
+                    setMovementNoCollision();
+                    break;
+                case MoveType.pathFinding:
+                    setMovementPathFinding();
+                    break;
+                case MoveType.standingStill:
+                    setMovementStandingStill();
+                    break;
+                default:
+                    ModEntry.Log( "ruh roh this guy has no movement type...." );
+                    break;
+            }
+            //this.MovePosition( time, Game1.viewport, Game1.currentLocation );
+            
+        }
+
+        private void setMovementStandingStill() {
+            Halt();
+        }
+
+        public void setMovementNoCollision (){
             Microsoft.Xna.Framework.Rectangle boundingBox = Game1.player.GetBoundingBox();
             int playerX = boundingBox.Center.X;
             int playerY = boundingBox.Center.Y;
@@ -684,14 +522,13 @@ namespace Demiacle_SVM.OutdoorMonsters {
             int distanceX = Math.Abs( playerX - monsterX );
             int distanceY = Math.Abs( playerY - monsterY );
 
-
-            this.Halt();
+            
 
             if( distanceX + distanceY > Game1.tileSize * 10 ) {
                 return; // or do idle behavior
             }
 
-            ModEntry.modEntry.Monitor.Log( "speed is :" + this.speed + " and added is :" + this.addedSpeed );
+            //ModEntry.modEntry.Monitor.Log( "speed is :" + this.speed + " and added is :" + this.addedSpeed );
 
             //decide to move horizontal or vertical
             if( distanceX > distanceY ) {
@@ -706,66 +543,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 else
                     this.SetMovingDown( true );
             }
-            this.MovePosition( time, Game1.viewport, Game1.currentLocation );
-
-
-            /*
-            base.behaviorAtGameTick( time );
-            if( this.wasHitCounter >= 0 )
-                this.wasHitCounter = this.wasHitCounter - time.ElapsedGameTime.Milliseconds;
-            if( double.IsNaN( ( double ) this.xVelocity ) || double.IsNaN( ( double ) this.yVelocity ) || ( ( double ) this.position.X < -2000.0 || ( double ) this.position.Y < -2000.0 ) )
-                this.health = -500;
-            if( ( double ) this.position.X <= -640.0 || ( double ) this.position.Y <= -640.0 || ( ( double ) this.position.X >= ( double ) ( Game1.currentLocation.Map.Layers[ 0 ].LayerWidth * Game1.tileSize + 640 ) || ( double ) this.position.Y >= ( double ) ( Game1.currentLocation.Map.Layers[ 0 ].LayerHeight * Game1.tileSize + 640 ) ) )
-                this.health = -500;
-            if( this.focusedOnFarmers || this.withinPlayerThreshold( 6 ) || this.seenPlayer ) {
-                this.seenPlayer = true;
-                this.sprite.Animate( time, 0, 4, 80f );
-
-                if( this.invincibleCountdown > 0 ) {
-                    if( !this.name.Equals( "Lava Bat" ) )
-                        return;
-                    this.glowingColor = Color.Cyan;
-                } else {
-                    float distancFromPlayerX = ( float ) -( Game1.player.GetBoundingBox().Center.X - this.GetBoundingBox().Center.X );
-                    float distanceFromPlayerY = ( float ) ( Game1.player.GetBoundingBox().Center.Y - this.GetBoundingBox().Center.Y );
-                    float num3 = Math.Max( 1f, Math.Abs( distancFromPlayerX ) + Math.Abs( distanceFromPlayerY ) );
-                    if( ( double ) num3 < ( double ) Game1.tileSize ) {
-                        this.xVelocity = Math.Max( -5f, Math.Min( 5f, this.xVelocity * 1.05f ) );
-                        this.yVelocity = Math.Max( -5f, Math.Min( 5f, this.yVelocity * 1.05f ) );
-                    }
-                    float num4 = distancFromPlayerX / num3;
-                    float num5 = distanceFromPlayerY / num3;
-                    
-                    if( this.wasHitCounter <= 0 ) {
-                        this.targetRotation = ( float ) Math.Atan2( -( double ) num5, ( double ) num4 ) - 1.570796f;
-                        if( ( double ) Math.Abs( this.targetRotation ) - ( double ) Math.Abs( this.rotation ) > 7.0 * Math.PI / 8.0 && Game1.random.NextDouble() < 0.5 )
-                            this.turningRight = true;
-                        else if( ( double ) Math.Abs( this.targetRotation ) - ( double ) Math.Abs( this.rotation ) < Math.PI / 8.0 )
-                            this.turningRight = false;
-                        if( this.turningRight )
-                            this.rotation = this.rotation - ( float ) Math.Sign( this.targetRotation - this.rotation ) * ( ( float ) Math.PI / 64f );
-                        else
-                            this.rotation = this.rotation + ( float ) Math.Sign( this.targetRotation - this.rotation ) * ( ( float ) Math.PI / 64f );
-                        this.rotation = this.rotation % 6.283185f;
-                        this.wasHitCounter = 0;
-                    }
-                    
-                    float num6 = Math.Min( 5f, Math.Max( 1f, ( float ) ( 5.0 - ( double ) num3 / ( double ) Game1.tileSize / 2.0 ) ) );
-                    float num7 = ( float ) Math.Cos( ( double ) this.rotation + Math.PI / 2.0 );
-                    float num8 = -( float ) Math.Sin( ( double ) this.rotation + Math.PI / 2.0 );
-                    this.xVelocity = this.xVelocity + ( float ) ( -( double ) num7 * ( double ) num6 / 6.0 + ( double ) Game1.random.Next( -10, 10 ) / 100.0 );
-                    this.yVelocity = this.yVelocity + ( float ) ( -( double ) num8 * ( double ) num6 / 6.0 + ( double ) Game1.random.Next( -10, 10 ) / 100.0 );
-                    if( ( double ) Math.Abs( this.xVelocity ) > ( double ) Math.Abs( ( float ) ( -( double ) num7 * 5.0 ) ) )
-                        this.xVelocity = this.xVelocity - ( float ) ( -( double ) num7 * ( double ) num6 / 6.0 );
-                    if( ( double ) Math.Abs( this.yVelocity ) <= ( double ) Math.Abs( ( float ) ( -( double ) num8 * 5.0 ) ) )
-                        return;
-                    this.yVelocity = this.yVelocity - ( float ) ( -( double ) num8 * ( double ) num6 / 6.0 );
-                }
-            } else {
-                this.sprite.CurrentFrame = 4;
-                this.Halt();
-            }
-            */
         }
+
     }
 }

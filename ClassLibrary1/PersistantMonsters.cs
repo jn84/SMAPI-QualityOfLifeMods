@@ -75,6 +75,10 @@ namespace Demiacle_SVM
             ModEntry.Log("Day is changed");
         }
 
+        internal void onGameOneSecondTick( object sender, EventArgs e ) {
+            
+        }
+
         private void putPersistantMonstersInSave() {
             foreach( GameLocation location in Game1.locations.ToArray() ) {
                 foreach( NPC npc in location.characters.ToArray() ) {
@@ -197,9 +201,16 @@ namespace Demiacle_SVM
                         minY = 550;
                         maxY = 3750;
 
+                        
+
+                        Vector2 positionx = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                        ModEntry.Log( $"mob to test is at x:{positionx.X} y:{positionx.Y}" );
+                        characters.Add( new OutDoorShadowBrute( positionx ) );
+
                         for( int i = 0; i < amountOfFarmMobsToSpawn; i++ ) {
-                            Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
-                            characters.Add( generateRandomEasyMob( position ) );
+                            //Vector2 position = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                            //characters.Add( generateRandomEasyMob( position ) );
+                            
                         }
 
                         break;

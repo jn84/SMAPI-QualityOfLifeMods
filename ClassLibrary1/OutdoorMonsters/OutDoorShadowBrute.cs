@@ -10,38 +10,40 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Demiacle_SVM.OutdoorMonsters {
     public class OutDoorShadowBrute : OutDoorMonster {
-        private bool seenPlayer;
+        
 
         public OutDoorShadowBrute() : base() {
-
+            //moveType = MoveType.pathFinding;
         }
 
         public OutDoorShadowBrute( Vector2 position )
             : base("Shadow Brute", position) {
-            this.speed = 1;
-            this.addedSpeed = 0;
+            speed = 1;
+            addedSpeed = 0;
+            alpha = 0.5f;
+            moveSpeedExtension = MoveSpeedExtension.medium;
+            //moveType = MoveType.noCollisions;
+            moveType = MoveType.pathFinding;
 
             reloadSprite();
-            
-            //this.slipperiness = 8;
-            this.moveSpeedExtension = MoveSpeedExtension.slower;
-            //.sprite.spriteHeight = 32;
-            //this.sprite.UpdateSourceRect();
         }
 
         public override void draw( SpriteBatch b ) {
             //draw Transparently
-            base.draw( b, 0.5f );
+            base.draw( b, alpha );
         }
 
         public override void reloadSprite() {
-            this.sprite = new AnimatedSprite( Game1.content.Load<Texture2D>( "Characters\\Monsters\\Shadow Brute" ) );
-            this.sprite.spriteHeight = 32;
-            this.sprite.UpdateSourceRect();
+            sprite = new AnimatedSprite( Game1.content.Load<Texture2D>( "Characters\\Monsters\\Shadow Brute" ) );
+            sprite.spriteHeight = 32;
+            sprite.UpdateSourceRect();
         }
 
         public override int takeDamage( int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision ) {
-            this.changeMoveType( MoveType.knockback );
+            //changeMoveType( MoveType.knockback );
+            isGettingKnockedBack = true;
+            hideShadow = true;
+            amountToFadePerGameTick = 0.01f;
             return base.takeDamage( damage, xTrajectory, yTrajectory, isBomb, addedPrecision );
         }
 

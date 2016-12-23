@@ -1,0 +1,52 @@
+﻿TODO BY PRIORITY
+
+-fix pathfinding so it doesnt create loops. parents are not being reset when a shorter path is found
+
+-List of move types
+	-Teleport
+	-Jump
+	-SideStep
+	-Dodge
+	-Dash at player
+	-Lock sword/scythe minigame
+	-Interact with other monsters and/or npcs
+
+-Extended Mine
+	-Remove All Elevators and Ladders - Create elevator where ladder is
+	-make mines unique and store their data on save use player_mineData.xml
+	-
+
+-Farming
+	-Land drys out after use and MUST be fertalized to restore properties
+	-Fertalizer infused water bucket when used on crops
+		-increases yield
+		-advance a day of growth
+		-change crop type - mutate randomly or fixed
+		-some crops require or they wilt or will not grow without
+
+-Map Mods
+	-Road blocks to Mountaint Pass/mine/forest
+	-
+
+-Fishing
+	-Traps can catch fish with special bait
+	-multiple times a day?
+	-Fish and traps spawn mobs sometimes
+	-Add new fish
+	-Improve chest rewards
+	-See fish type before cought
+	-bait is used only for rare fish, otherwise not needed
+	-
+
+-UI
+	-Display luck on new day
+	-Display exp on exp updates
+	-Display location of townsfolk
+	-Display more accurate hearts
+	-Display more info of items on mouseover
+
+-Events
+	-Grash fire - must water to put out
+
+-General
+	-Offer an option to remove added game data from mob to continue playing as normal
