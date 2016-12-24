@@ -14,6 +14,8 @@ using Demiacle_SVM.OutdoorMonsters.AI;
 
 namespace Demiacle_SVM.OutdoorMonsters {
 
+    
+
     /// <summary>
     /// A layer for easily modifiable properties and types of movement to the monster class.
     /// </summary>
@@ -462,7 +464,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
         /// <summary>
         /// Decides which way a monster should move for next update
         /// </summary>
-        public override void behaviorAtGameTick( GameTime time ) {
+        public override void behaviorAtGameTick( GameTime time ) { //TODO put behaviors at different distances OBJECT ORIENTED
             moveType.updateOnEveryTick( this );
 
             //TODO this needs to be refactored

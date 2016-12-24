@@ -17,14 +17,12 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         [XmlIgnore]
         public PathFinder pathFinder;
 
-        float gamePositionOfTargetTileX = 0;
-        float gamePositionOfTargetTileY = 0;
-
-        //float distanceToTravelX = 0;
-        //float distanceToTravelY = 0;
+        float targetPositionX = 0;
+        float targetPositionY = 0;
 
         float epsilon = 2f;
 
+        // this is fired every few moments
         public override void calculateNextMovement( OutDoorMonster outDoorMonster ) {
 
             ModEntry.Log( "path finding" );
@@ -34,6 +32,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             // Move in a random direction if player is not within distance
             if( PathFinder.Node.getHardDistanceBetweenPoints( monsterPoint, targetPoint ) > outDoorMonster.distanceToFindTarget ) {
                 ModEntry.Log( "Do nothing because target is far" );
+                outDoorMonster.Halt();
                 //outDoorMonster.setRandomDirection();
                 return;
             }
@@ -48,6 +47,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 return;
             }
 
+            setGamePositionCoordinatesOfTargetTile();
+
             //ModEntry.Log( $"CurrentPosition is :X{outDoorMonster.getTileX()} :y{outDoorMonster.getTileY()}" );
             //ModEntry.Log( $"Attempting to move towards :X{pathFinder.foundPath.Peek().X} :y{pathFinder.foundPath.Peek().Y}" );
             //ModEntry.Log( $"and" );
@@ -55,7 +56,13 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             //ModEntry.Log( $"Attempting to move towards :X{pathFinder.foundPath.Peek().X * Game1.tileSize} :y{pathFinder.foundPath.Peek().Y *Game1.tileSize}" );                  
         }
 
+        private void setGamePositionCoordinatesOfTargetTile() {
+            targetPositionX = pathFinder.foundPath.Peek().X * Game1.tileSize;
+            targetPositionY = pathFinder.foundPath.Peek().Y * Game1.tileSize;
+        }
+
         public override void updateOnEveryTick( OutDoorMonster outDoorMonster ) {
+
             // Do nothing if path has not been searched for
             if( pathFinder == null )
                 return;            
@@ -64,15 +71,13 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             if( pathFinder.foundPath.Count < 1 )
                 return;
 
-            gamePositionOfTargetTileX = pathFinder.foundPath.Peek().X * Game1.tileSize;
-            gamePositionOfTargetTileY = pathFinder.foundPath.Peek().Y * Game1.tileSize;
-
-            float distanceFromCenterX = Math.Abs( outDoorMonster.position.X - gamePositionOfTargetTileX );
-            float distanceFromCenterY = Math.Abs( outDoorMonster.position.Y - gamePositionOfTargetTileY );            
+            float distanceFromCenterX = Math.Abs( outDoorMonster.position.X - targetPositionX );
+            float distanceFromCenterY = Math.Abs( outDoorMonster.position.Y - targetPositionY );            
             
-            //center of tile x is always found first
+            // Move outDoorMonster towards center of tile
+            // Horizontal axis is always calculated first
             if( distanceFromCenterX > epsilon ) {
-                if( gamePositionOfTargetTileX > outDoorMonster.position.X ) {
+                if( targetPositionX > outDoorMonster.position.X ) {
                     outDoorMonster.SetMovingOnlyRight();
                 } else {
                     outDoorMonster.SetMovingOnlyLeft();
@@ -81,7 +86,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             }
             
             if( distanceFromCenterY > epsilon ) {
-                if( gamePositionOfTargetTileY > outDoorMonster.position.Y ) {
+                if( targetPositionY > outDoorMonster.position.Y ) {
                     outDoorMonster.SetMovingOnlyDown();
                 } else {
                     outDoorMonster.SetMovingOnlyUp();
@@ -90,7 +95,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             }
             
             ModEntry.Log( "Arrived at center of tile" );
-            pathFinder.foundPath.Dequeue();            
+            pathFinder.foundPath.Dequeue();
+            setGamePositionCoordinatesOfTargetTile();        
         }
 
     }
