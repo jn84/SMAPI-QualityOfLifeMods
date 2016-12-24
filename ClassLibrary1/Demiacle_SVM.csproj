@@ -73,8 +73,12 @@
     <Compile Include="MineShaftMod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
+    <Compile Include="OutdoorMonsters\AI\HoldStill.cs" />
+    <Compile Include="OutdoorMonsters\AI\MovementType.cs" />
+    <Compile Include="OutdoorMonsters\AI\MoveTowardsTarget.cs" />
     <Compile Include="OutdoorMonsters\AI\PathFinder.cs" />
     <Compile Include="OutdoorMonsters\AI\PathFinderMap.cs" />
+    <Compile Include="OutdoorMonsters\AI\PathFinding.cs" />
     <Compile Include="OutdoorMonsters\OutDoorMonster.cs" />
     <Compile Include="OutdoorMonsters\OutDoorRockCrab.cs" />
     <Compile Include="OutdoorMonsters\OutDoorShadowBrute.cs" />

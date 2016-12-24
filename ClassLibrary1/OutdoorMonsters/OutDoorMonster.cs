@@ -18,42 +18,27 @@ namespace Demiacle_SVM.OutdoorMonsters {
     /// A layer for easily modifiable properties and types of movement to the monster class.
     /// </summary>
     public class OutDoorMonster : Monster {        
-        private Character target = Game1.player;//redundant
+        public Character target = Game1.player;
         public float defaultAlpha = 1;
         public float alpha;
         public int knockbackSpeed = 10;
         public int slideAnimationTimer = 100;
-        public  MoveType moveType;
-        private MoveType previousMoveType;
-        public float moveSpeedExtension = MoveSpeedExtension.medium;
-        private MoveType nextMoveType;
+        public MovementType moveType = new HoldStill();
+        private MovementType previousMoveType;
+        private MovementType nextMoveType;
+        public float moveSpeedExtension = MoveSpeedExtension.medium; //allows slower movement speeds
         public float amountToFadePerGameTick = 0;
         public Boolean isGettingKnockedBack = false;
         protected PathFinder pathFinder;
         public int distanceToFindTarget = 20;
 
+        public static OutDoorMonster thisMonster;
+        
+
+
         //TODO use these enums as an easy means to change behavior of how fast a monster reacts and changes course
         public enum timeToDecideNextMovement { fast, medium, slow } 
-
-
-        //needed for serialization just leave empty
-        public OutDoorMonster() : base() {
-
-        }
-
-        public OutDoorMonster( string name, Vector2 position )
-            : base( name, position ) {
-            alpha = defaultAlpha;
-            
-        }
-
-        public enum MoveType {
-            noCollisions,
-            knockback,
-            pathFinding,
-            FadeOut,
-            standingStill
-        }
+        
 
         public struct MoveSpeedExtension {
             public const float fast = 0.5f;
@@ -62,17 +47,28 @@ namespace Demiacle_SVM.OutdoorMonsters {
             public const float slower = 10; 
         }
 
+        //needed for serialization just leave empty
+        public OutDoorMonster() : base() {
+
+        }
+
+        public OutDoorMonster( string name, Vector2 position )
+            : base( name, position ) {
+            thisMonster = this;
+            alpha = defaultAlpha;
+        }
+
         public virtual void activateMonster() {
             alpha = defaultAlpha;
             isInvisible = false;
         }
 
-        public void changeMoveType( MoveType newMoveType ) {
+        public void changeMoveType( MovementType newMoveType ) {
             previousMoveType = moveType;
             moveType = newMoveType;
         }
 
-        public void changeMoveType( MoveType newMoveType, MoveType afterNewMoveType ) {
+        public void changeMoveType( MovementType newMoveType, MovementType afterNewMoveType ) {
             previousMoveType = moveType;
             moveType = newMoveType;
             nextMoveType = afterNewMoveType;
@@ -88,7 +84,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
         private void calculateAndGetKnockedBacked() {
             xTile.Dimensions.Rectangle viewport  = Game1.viewport;
             GameTime time = Game1.currentGameTime;
-            this.lastPosition = this.position;
+            GameLocation currentLocation = Game1.currentLocation;
             if( ( double ) this.xVelocity != 0.0 || ( double ) this.yVelocity != 0.0 ) {
                 if( double.IsNaN( ( double ) this.xVelocity ) || double.IsNaN( ( double ) this.yVelocity ) ) {
                     this.xVelocity = 0.0f;
@@ -153,6 +149,29 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 isGettingKnockedBack = false;
             }
         }
+
+        /// <summary>
+        /// Finds the next position. Used for boundary checks
+        /// </summary>
+        public override Microsoft.Xna.Framework.Rectangle nextPosition( int direction ) {
+            Microsoft.Xna.Framework.Rectangle boundingBox = this.GetBoundingBox();
+            int speed = Convert.ToInt32( ( this.speed + this.addedSpeed )  ); //TESTINGILAKSDJFLASDFJSFK
+            switch( direction ) {
+                case 0:
+                    boundingBox.Y -= speed; 
+                    break;
+                case 1:
+                    boundingBox.X += speed;
+                    break;
+                case 2:
+                    boundingBox.Y += speed;
+                    break;
+                case 3:
+                    boundingBox.X -= speed;
+                    break;
+            }
+            return boundingBox;
+        }
                 
         /// <summary>
         /// Moves the monster in a direction.
@@ -160,28 +179,30 @@ namespace Demiacle_SVM.OutdoorMonsters {
         /// If the monster is getting knocked back it will perform a knockback motion instead.
         /// </summary>
         public override void MovePosition( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
+
+            this.lastPosition = this.position;
+
+            //TODO make into object oriented
             if( isGettingKnockedBack ) {
                 calculateAndGetKnockedBacked();
                 return;
-            }            
+            }
 
-            //ModEntry.Log( "moving without collision" );
-            this.lastPosition = this.position;
-
-            float actualSpeed = ( float ) ( this.speed + this.addedSpeed ) / moveSpeedExtension;
-            //ModEntry.Log(" actual spee dis :" + actualSpeed);
+            int actualSpeed = Convert.ToInt32( ( this.speed + this.addedSpeed )  );  ///TESTSINGIGAN
 
             if( this.moveUp ) {
                 
                 //if next spot is open then move
+
                 if( !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
+                    //ModEntry.Log( "next location has collision" );
                     this.position.Y -= actualSpeed;
                     if( !this.ignoreMovementAnimations )
                         this.sprite.AnimateUp( time, 0, "" );
                     this.facingDirection = 0;
                     this.faceDirection( 0 );
 
-                //else slider a little left or right dependin on box collision
+                //else slide a little left or right dependin on box collision
                 } else {
                     Microsoft.Xna.Framework.Rectangle nextPosition = this.nextPosition( 0 );
                     nextPosition.Width /= 4;
@@ -193,6 +214,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     //if you are on the edge of a block you will slide over
                     if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
 
+                        ModEntry.Log( "next location has near collision is now shifting to center" );
                         float local = this.position.X;
 
                         double num1 = ( double ) local;
@@ -204,7 +226,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
                         local = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-
+                        ModEntry.Log( "next location has near collision is now shifting to center" );
                         float local = this.position.X;
 
                         double num1 = ( double ) local;
@@ -216,10 +238,10 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
                         local = ( float ) num4;
                     }
-                    if( !currentLocation.isTilePassable( this.nextPosition( 0 ), viewport ) || !this.willDestroyObjectsUnderfoot )
+                    if( !currentLocation.isTilePassable( this.nextPosition( 0 ), viewport ) || !this.willDestroyObjectsUnderfoot ) {
                         this.Halt();
-
-
+                        ModEntry.Log( "next location is unpassable and do nothing" );
+                    }
                     else if( this.willDestroyObjectsUnderfoot ) {
                         Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize ), ( float ) ( this.getStandingY() / Game1.tileSize - 1 ) );
                         if( currentLocation.characterDestroyObjectWithinRectangle( this.nextPosition( 0 ), true ) ) {
@@ -289,6 +311,9 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     if( this.onCollision != null )
                         this.onCollision( currentLocation );
                 }
+
+
+
             } else if( this.moveDown ) {
                 if( !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
                     this.position.Y += actualSpeed;
@@ -339,6 +364,9 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     if( this.onCollision != null )
                         this.onCollision( currentLocation );
                 }
+
+
+
             } else if( this.moveLeft ) {
                 if( !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
                     this.position.X -= actualSpeed;
@@ -409,6 +437,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 this.blockedInterval = 0;
             }
 
+
             //make a noise if hits the farmer
             if( this.damageToFarmer <= 0 || Game1.random.NextDouble() >= 0.000333333333333333 )
                 return;
@@ -429,40 +458,34 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 }
             }
         }
-
         
-
         /// <summary>
-        /// Finds a path to the target and sets the movement towards that path
+        /// Decides which way a monster should move for next update
         /// </summary>
-        public void setMovementPathFinding() {
-            ModEntry.Log("path finding");
-            Point monsterPoint = new Point( getTileX(), getTileY() );
-            Point targetPoint = new Point( target.getTileX(), target.getTileY() );
+        public override void behaviorAtGameTick( GameTime time ) {
+            moveType.updateOnEveryTick( this );
 
-            //Move in a random direction if player is not within distance
-            if( PathFinder.Node.getHardDistanceBetweenPoints( monsterPoint, targetPoint ) > distanceToFindTarget ) {
-                ModEntry.Log( "Moving Random Direction because target is far" );
-                moveRandomDirection();
+            //TODO this needs to be refactored
+            alpha -= amountToFadePerGameTick * time.ElapsedGameTime.Milliseconds / 1000;
+            if( alpha <= 0 ) {
+                isInvisible = true;
+            }
+
+            if( ( double ) this.timeBeforeAIMovementAgain > 0.0 ) {
+                this.timeBeforeAIMovementAgain = this.timeBeforeAIMovementAgain - ( ( float ) time.ElapsedGameTime.Milliseconds / 300 );
                 return;
             }
-            pathFinder = new PathFinder( monsterPoint, targetPoint );
-            pathFinder.FindPath();
 
-            // if a path is found and is greater than 2 nodes
-            // 1 or less nodes means the mob is on the same tile or has not found a path
-            if( pathFinder.foundPath.Count > 1 ) {
-                ModEntry.Log( "path found moving towards path" );
-                pathFinder.setNextDirection( this );
-            } else {
-                setMovementNoCollision();
-            }
+            this.timeBeforeAIMovementAgain = 1; //default is 1
+
+            Halt(); // reset movement for next movement 
+            moveType.calculateNextMovement( this );      
         }
-        
+
         /// <summary>
         /// Sets a random direction to move in
         /// </summary>
-        public void moveRandomDirection() {
+        public void setRandomDirection() {
             int chance = Game1.random.Next( 1, 4 );
             switch( chance ) {
                 case 1:
@@ -480,74 +503,6 @@ namespace Demiacle_SVM.OutdoorMonsters {
             }
         }
         
-        /// <summary>
-        /// Decides which way a monster should move for next update
-        /// </summary>
-        public override void behaviorAtGameTick( GameTime time ) {
 
-            //TODO this needs to be refactored
-            alpha -= amountToFadePerGameTick * time.ElapsedGameTime.Milliseconds / 1000;
-            if( alpha <= 0 ) {
-                isInvisible = true;
-            }
-
-            if( ( double ) this.timeBeforeAIMovementAgain > 0.0 ) {
-                this.timeBeforeAIMovementAgain = this.timeBeforeAIMovementAgain - ( ( float ) time.ElapsedGameTime.Milliseconds / 300 );
-                return;
-            }
-
-            this.timeBeforeAIMovementAgain = 1;
-            Halt(); // reset movement for next movement 
-
-            //TODO refactor into object oriented design
-            switch( this.moveType ) {
-                case MoveType.noCollisions:
-                    setMovementNoCollision();
-                    break;
-                case MoveType.pathFinding:
-                    setMovementPathFinding();
-                    break;
-                case MoveType.standingStill:
-                    Halt();
-                    break;
-                default:
-                    ModEntry.Log( "ruh roh this guy has no movement type...." );
-                    break;
-            }            
-        }
-
-        /// <summary>
-        /// Move in a direction without considering object collision
-        /// </summary>
-        public void setMovementNoCollision (){
-            Microsoft.Xna.Framework.Rectangle playerBoundingBox = Game1.player.GetBoundingBox();
-            int playerX = playerBoundingBox.Center.X;
-            int playerY = playerBoundingBox.Center.Y;
-
-            int monsterX = GetBoundingBox().Center.X;
-            int monsterY = GetBoundingBox().Center.Y;
-
-
-            int distanceX = Math.Abs( playerX - monsterX );
-            int distanceY = Math.Abs( playerY - monsterY );
-            
-            if( distanceX + distanceY > Game1.tileSize * distanceToFindTarget ) {
-                return;
-            }
-
-            //decide to move horizontal or vertical based on distance of x and y
-            if( distanceX > distanceY ) {
-                if( playerX - monsterX < 0 )
-                    this.SetMovingLeft( true );
-                else
-                    this.SetMovingRight( true );
-            } else {
-
-                if( playerY - monsterY < 0 )
-                    this.SetMovingUp( true );
-                else
-                    this.SetMovingDown( true );
-            }
-        }
     }
 }

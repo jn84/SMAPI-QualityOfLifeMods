@@ -65,6 +65,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                     //if( !( location.isTilePassable( new Location( x, y ), Game1.viewport ) ) || location.isObjectAt(  x * Game1.tileSize, y * Game1.tileSize )  ) {
                     //Tree stumps and large rocks are not found here
                     //might have to add ignore code for crop tiles
+
+                    //currently considers worm dig tiles as occupied
                     if( location.isTileOccupiedIgnoreFloors( new Vector2( x , y ) ) || !( location.isTilePassable( new Location( x, y ), Game1.viewport ) ) ) { 
                         isWalkable = false;
                     } else {
@@ -139,7 +141,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// Draws a finalized map with a path and search data to the console. Used for testing purposes
         /// </summary>
         public static void drawPathToConsole( List<Point> path, PathFinder pathFinder ) {
-            Console.WriteLine( "PATH IS" );
+            Console.WriteLine( "PATH IS" ); 
             for( int y = 0; y < pathFinder.height; y++ ) {
                 for( int x = 0; x < pathFinder.width; x++ ) {
                     Point checkingPoint = pathFinder.map[ x, y ].point;

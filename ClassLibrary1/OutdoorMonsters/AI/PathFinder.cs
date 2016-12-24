@@ -17,7 +17,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         public Node startNode;
         public Node endNode;
 
-        public List<Point> foundPath; //needs refactoring its far too coupled
+        public Queue<Point> foundPath; //needs refactoring its far too coupled
         public List<Node> openNodes = new List<Node>();
         public List<Node> closedNodes = new List<Node>();
 
@@ -26,10 +26,14 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         public int width;
         public int height;
 
+        public int searchLimit = 50;
+
+        public PathFinder() { }
+
         /// <summary>
         /// Create a new instance of PathFinder
         /// </summary>
-        public PathFinder( Point start, Point target ) {
+        public PathFinder( Point start, Point target ) { //TODO ADD A LIMITER TO HOW FAR A PATH CAN SEARCH
 
             //clone the size and nodes that are walkable from the PathFinderMap instance.
             map = PathFinderMap.Instance.clone();
@@ -43,8 +47,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
             openNodes.Add( this.startNode );
 
-            this.endNode = new Node( target.X, target.Y, true );
-            map[ target.X, target.Y ] = endNode;
+            this.endNode = new Node( target.X , target.Y, true );
+            map[ target.X , target.Y  ] = endNode;
 
             if( start.Equals( target ) ) {
                 startAndFinishAreSamePoint = true;
@@ -57,11 +61,11 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// <returns>A List of Points representing the path. If no path was found, the returned list is empty.</returns>
         public void FindPath() {
             if( startAndFinishAreSamePoint ) {
-                foundPath = new List<Point>();
+                foundPath = new Queue<Point>();
                 return;
             }
-            
-            List<Point> path = new List<Point>();
+
+            Queue<Point> path = new Queue<Point>();
 
             //becin recusive search
             bool success = Search( startNode );
@@ -70,14 +74,15 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 // If a path was found, follow the parents from the end node to build a list of points
                 Node node = this.endNode;
                 while( node.parentNode != null ) {
-                    path.Add( node.point );
+                    //node.point.X += 1; // shift for 0 indexing
+                    //node.point.Y += 1; // shift for 0 indexing
+                    path.Enqueue( node.point );
                     node = node.parentNode;
                 }
-
-                // Reverse the list so it's in the correct order
-                path.Reverse();
+                //path.Enqueue( startNode.point );
+                path = new Queue<Point>( path.Reverse() );
             }
-            //drawPathToConsole( path, this );
+            //PathFinderMap.drawPathToConsole( path.ToList(), this );
             foundPath = path; ;
         }
 
@@ -87,6 +92,11 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// <param name="currentNode">The node from which to find a path</param>
         /// <returns>True if a path to the destination has been found, otherwise false</returns>
         private bool Search( Node currentNode ) {
+
+            // fail search if it goes beyond the limit
+            if( currentNode.distanceTraveled > searchLimit ) {
+                return false;
+            }
 
             // Move the current node to Closed
             openNodes.Remove( currentNode );
@@ -207,7 +217,6 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 int deltaY = Math.Abs( otherLocation.Y - location.Y );
                 return deltaX + deltaY;
             }
-
         }
         
         /// <summary>
@@ -215,20 +224,10 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// </summary>
         /// <param name="outDoorMonster">The monster to alter movement</param>
         internal void setNextDirection( OutDoorMonster outDoorMonster ) {
-            ModEntry.Log( $"Monster is at x:{foundPath[0].X} y:{foundPath[ 0 ].Y} and next square is at x:{foundPath[ 1 ].X} y:{foundPath[ 1 ].Y}" );
-
-            if( foundPath[ 0 ].X < foundPath[ 1 ].X ) {
-                outDoorMonster.SetMovingOnlyRight();
-            } else {
-                outDoorMonster.SetMovingOnlyLeft();
-            }
-
-            if ( foundPath[ 0 ].Y > foundPath[ 1 ].Y ) {
-                outDoorMonster.SetMovingOnlyUp();
-            } else {
-                outDoorMonster.SetMovingOnlyDown();
-            }
+            
         }
+
+        
 
     }
 }

@@ -200,9 +200,10 @@ namespace Demiacle_SVM
                         minY = 550;
                         maxY = 3750;
 
-                        
 
-                        Vector2 positionx = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+
+                        //Vector2 positionx = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
+                        Vector2 positionx = new Vector2( 3294, 1034 );
                         ModEntry.Log( $"mob to test is at x:{positionx.X} y:{positionx.Y}" );
                         characters.Add( new OutDoorShadowBrute( positionx ) );
 

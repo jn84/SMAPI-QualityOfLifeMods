@@ -121,13 +121,14 @@ namespace Demiacle_SVM {
             }
 
             if( $"{e.KeyPressed}" == "N" ) {
-
+                Log( "Current getTilelocationpoint is X: " + Game1.player.position.X + " Y:" + Game1.player.position.Y );
+                /*
                 Log( "Current gettilelocation.x is X: " + Game1.player.getTileLocation().X + " Y:" + Game1.player.position.Y / Game1.tileSize );
                 Log( "Current gettilex is X: " + Game1.player.getTileX() + " Y:" + Game1.player.position.Y / Game1.tileSize );
                 Log( "Current getTilelocationpoint is X: " + Game1.player.getTileLocationPoint() + " Y:" + Game1.player.position.Y / Game1.tileSize );
 
-                Log("Map size is width: " + Game1.currentLocation.map.DisplayWidth / Game1.tileSize +" height: "+ +Game1.currentLocation.map.DisplayHeight / Game1.tileSize );
-                
+                Log("Map size is width: " + Game1.currentLocation.map.DisplayWidth / Game1.tileSize +" height: "+ +Game1.currentLocation.map.DisplayHeight / Game1.tileSize );*/
+
             }
 
 
@@ -160,7 +161,7 @@ namespace Demiacle_SVM {
         /// This allows us to save all the specific monster data between days.
         /// </summary>
         private void updateXmlSerializer( object sender, EventArgs e ) {
-            StardewValley.SaveGame.locationSerializer = new XmlSerializer( typeof( GameLocation ), new Type[ 39 ]
+            StardewValley.SaveGame.locationSerializer = new XmlSerializer( typeof( GameLocation ), new Type[ 42 ]
             {
                 typeof (Tool),
                 typeof (Crow),
@@ -200,12 +201,15 @@ namespace Demiacle_SVM {
                 typeof (SkeletonWarrior),
                 typeof (SkeletonMage),
                 typeof(ScytheDamageMod.Scythe),
+                typeof(MoveTowardsTarget),
+                typeof(PathFinding),
+                typeof(HoldStill),
                 typeof(OutDoorRockCrab)
             } );
 
             SaveGame.farmerSerializer = new XmlSerializer( typeof( Farmer ), new Type[ 2 ] { typeof( Tool ), typeof( ScytheDamageMod.Scythe ) } );
 
-            SaveGame.serializer = new XmlSerializer( typeof( SaveGame ), new Type[ 40 ]
+            SaveGame.serializer = new XmlSerializer( typeof( SaveGame ), new Type[ 43 ]
                 {
                   typeof (Tool),
                   typeof (GameLocation),
@@ -246,6 +250,9 @@ namespace Demiacle_SVM {
                   typeof (SkeletonWarrior),
                   typeof (SkeletonMage),
                   typeof(ScytheDamageMod.Scythe),
+                typeof(MoveTowardsTarget),
+                typeof(PathFinding),
+                typeof(HoldStill),
                   typeof(OutDoorRockCrab)
                 } );
         }

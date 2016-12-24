@@ -81,9 +81,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI.Tests {
         [TestCleanup()]
         public void cleanUp() {
             pathFinderMap = null;
-        }
-
-        
+        }        
 
         public Point getRandomPoint() {
             return new Point( r.Next( 1, MAP_SIZE ), r.Next( 1, MAP_SIZE ) );

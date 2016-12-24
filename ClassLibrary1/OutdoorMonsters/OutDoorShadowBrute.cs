@@ -7,6 +7,7 @@ using StardewValley.Monsters;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using Microsoft.Xna.Framework.Graphics;
+using Demiacle_SVM.OutdoorMonsters.AI;
 
 namespace Demiacle_SVM.OutdoorMonsters {
     public class OutDoorShadowBrute : OutDoorMonster {
@@ -22,7 +23,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
             alpha = 0.5f;
             moveSpeedExtension = MoveSpeedExtension.slow;
             //moveType = MoveType.noCollisions;
-            moveType = MoveType.pathFinding;
+            moveType = new PathFinding();
 
             reloadSprite();
         }
@@ -42,7 +43,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
             //changeMoveType( MoveType.knockback );
             isGettingKnockedBack = true;
             hideShadow = true;
-            amountToFadePerGameTick = 0.01f;
+            amountToFadePerGameTick = 0.2f;
             return base.takeDamage( damage, xTrajectory, yTrajectory, isBomb, addedPrecision );
         }
 
