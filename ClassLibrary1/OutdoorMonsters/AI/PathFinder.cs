@@ -82,7 +82,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 //path.Enqueue( startNode.point );
                 path = new Queue<Point>( path.Reverse() );
             }
-            //PathFinderMap.drawPathToConsole( path.ToList(), this );
+            PathFinderMap.drawPathToConsole( path.ToList(), this );
             foundPath = path; ;
         }
 
