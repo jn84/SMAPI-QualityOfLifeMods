@@ -56,10 +56,6 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             }
         }
 
-        public static Vector2 translatePositionToTile() {
-            return new Vector2();
-        }
-
         /// <summary>
         /// Updates the current map with coordinates declaring which coodinates are walkable for the current map
         /// </summary>
