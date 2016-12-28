@@ -174,16 +174,13 @@ namespace Demiacle_SVM.OutdoorMonsters {
             }
             return boundingBox;
         }
-
+                
         /// <summary>
         /// Moves the monster in a direction.
         /// If the monster is barely clipping an edge it will shift him over before moving in that direction.
         /// If the monster is getting knocked back it will perform a knockback motion instead.
         /// </summary>
         public override void MovePosition( GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation ) {
-            //isGlider = false;
-
-            // if this is charging do nothing
 
             this.lastPosition = this.position;
 
@@ -193,15 +190,13 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 return;
             }
 
-
-            //if this is to be used we must override the nextposition method to check the correct bounding box
             int actualSpeed = Convert.ToInt32( ( this.speed + this.addedSpeed )  );  ///TESTSINGIGAN
 
             if( this.moveUp ) {
                 
                 //if next spot is open then move
 
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
                     //ModEntry.Log( "next location has collision" );
                     this.position.Y -= actualSpeed;
                     if( !this.ignoreMovementAnimations )
@@ -227,11 +222,11 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num1 = ( double ) local;
                         double speed = ( double ) this.speed;
                         elapsedGameTime = time.ElapsedGameTime;
-                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0; //multiplies movement by tilesize
+                        double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 + num3;
 
-                        this.position.X = ( float ) num4; // testing this
+                        local = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
                         ModEntry.Log( "next location has near collision is now shifting to center" );
                         float local = this.position.X;
@@ -243,13 +238,11 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num3 = speed * num2;
                         double num4 = num1 - num3;
 
-                        this.position.X = ( float ) num4;
+                        local = ( float ) num4;
                     }
-
-                    // This is to decide if the tile is to be destroyed
                     if( !currentLocation.isTilePassable( this.nextPosition( 0 ), viewport ) || !this.willDestroyObjectsUnderfoot ) {
                         this.Halt();
-                        //ModEntry.Log( "next location is unpassable and do nothing" );
+                        ModEntry.Log( "next location is unpassable and do nothing" );
                     }
                     else if( this.willDestroyObjectsUnderfoot ) {
                         Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize ), ( float ) ( this.getStandingY() / Game1.tileSize - 1 ) );
@@ -270,7 +263,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
 
             } else if( this.moveRight ) {
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
                     this.position.X += actualSpeed;
                     if( !this.ignoreMovementAnimations )
                         this.sprite.AnimateRight( time, 0, "" );
@@ -292,7 +285,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 + num3;
-                        this.position.Y = ( float ) num4;
+                        local = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
                         float local = this.position.Y;
                         double num1 = ( double ) local;
@@ -301,7 +294,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 - num3;
-                        this.position.Y = ( float ) num4;
+                        local = ( float ) num4;
                     }
                     if( !currentLocation.isTilePassable( this.nextPosition( 1 ), viewport ) || !this.willDestroyObjectsUnderfoot )
                         this.Halt();
@@ -324,7 +317,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
 
             } else if( this.moveDown ) {
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this )  ) {
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 2 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
                     this.position.Y += actualSpeed;
                     if( !this.ignoreMovementAnimations )
                         this.sprite.AnimateDown( time, 0, "" );
@@ -345,7 +338,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 + num3;
-                        this.position.X = ( float ) num4;
+                        local = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
                         float local = this.position.X;
                         double num1 = ( double ) local;
@@ -354,7 +347,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 - num3;
-                        this.position.X = ( float ) num4;
+                        local = ( float ) num4;
                     }
                     if( !currentLocation.isTilePassable( this.nextPosition( 2 ), viewport ) || !this.willDestroyObjectsUnderfoot )
                         this.Halt();
@@ -377,7 +370,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
 
             } else if( this.moveLeft ) {
-                if( !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
+                if( !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) || this.isCharging ) {
                     this.position.X -= actualSpeed;
                     this.facingDirection = 3;
                     if( !this.ignoreMovementAnimations )
@@ -398,7 +391,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 + num3;
-                        this.position.Y = ( float ) num4;
+                        local = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 0 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
                         
                         float local = this.position.Y;
@@ -409,7 +402,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                         double num2 = ( double ) elapsedGameTime.Milliseconds / 64.0;
                         double num3 = speed * num2;
                         double num4 = num1 - num3;
-                        this.position.Y = ( float ) num4;
+                        local = ( float ) num4;
                     }
                     if( !currentLocation.isTilePassable( this.nextPosition( 3 ), viewport ) || !this.willDestroyObjectsUnderfoot )
                         this.Halt();
@@ -472,8 +465,6 @@ namespace Demiacle_SVM.OutdoorMonsters {
         /// Decides which way a monster should move for next update
         /// </summary>
         public override void behaviorAtGameTick( GameTime time ) { //TODO put behaviors at different distances OBJECT ORIENTED
-
-            
             moveType.updateOnEveryTick( this );
 
             //TODO this needs to be refactored
@@ -482,19 +473,12 @@ namespace Demiacle_SVM.OutdoorMonsters {
                 isInvisible = true;
             }
 
-            
-
             if( ( double ) this.timeBeforeAIMovementAgain > 0.0 ) {
                 this.timeBeforeAIMovementAgain = this.timeBeforeAIMovementAgain - ( ( float ) time.ElapsedGameTime.Milliseconds / 300 );
                 return;
             }
 
-            
-
             this.timeBeforeAIMovementAgain = 1; //default is 1
-
-            setRandomDirection();
-            return;
 
             Halt(); // reset movement for next movement 
             moveType.calculateNextMovement( this );      
@@ -504,7 +488,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
         /// Sets a random direction to move in
         /// </summary>
         public void setRandomDirection() {
-            int chance = Game1.random.Next( 1, 5 );
+            int chance = Game1.random.Next( 1, 4 );
             switch( chance ) {
                 case 1:
                     SetMovingOnlyLeft();
@@ -517,9 +501,6 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     break;
                 case 4:
                     SetMovingOnlyDown();
-                    break;
-                default:
-                    ModEntry.Log("This shouldn't ever be called check code at 522 in outdoormonster");
                     break;
             }
         }

@@ -118,7 +118,7 @@ namespace Demiacle_SVM
             }
 
             foreach (NPC npc in Game1.currentLocation.characters ) {
-                if (npc is Monster && ( (Monster) npc).isGlider ) {
+                if (npc is Monster) {
                     ((Monster)npc).isGlider = false;
                     monsterGlidersToFix.Add(((Monster)npc));
                 }
