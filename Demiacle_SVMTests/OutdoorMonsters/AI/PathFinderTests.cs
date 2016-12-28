@@ -49,12 +49,17 @@ namespace Demiacle_SVM.OutdoorMonsters.AI.Tests {
         }
 
         [TestMethod()]
-        public void FindPathTest() {            
-            for( int i = 0; i < 200; i++ ) {
+        public void FindPathTest() {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            
+            for( int i = 0; i < 10; i++ ) {
+                watch.Start();
                 Point startPoint = getRandomPoint();
                 Point targetPoint = getRandomPoint();
                 PathFinder pathFinder = new PathFinder( startPoint, targetPoint );
                 pathFinder.FindPath();
+                Console.Write( $"Path took {watch.ElapsedMilliseconds} miliseconds to find" );
+                watch.Reset();
             }            
         }
 

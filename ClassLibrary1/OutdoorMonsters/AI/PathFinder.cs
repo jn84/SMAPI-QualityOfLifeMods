@@ -26,7 +26,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         public int width;
         public int height;
 
-        public int searchLimit = 50;
+        public int searchLimit = 40;
 
         public PathFinder() { }
 
@@ -95,6 +95,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
             // fail search if it goes beyond the limit
             if( currentNode.distanceTraveled > searchLimit ) {
+                Console.Write("this should only fire once per find");
                 return false;
             }
 
@@ -116,13 +117,16 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
                 // If not, check the next set of nodes
                 } else {
-                    if( Search( nextNode ) ) // recursion
+                    if( Search( nextNode ) ) {
                         return true;
+                    } else {
+                        return false;
+                    }
                 }
             }
 
             // Return false if no path is possible
-            return false;
+            return false; // compiler complains about this .... why???
         }
 
         /// <summary>
