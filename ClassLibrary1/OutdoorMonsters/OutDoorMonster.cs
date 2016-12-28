@@ -232,7 +232,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     //if you are on the edge of a block you will slide over
                     if( flag1 && !flag2 && !currentLocation.isCollidingPosition( this.nextPosition( 1 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
 
-                        //ModEntry.Log( "next location has near collision is now shifting to center" );
+                        ModEntry.Log( "next location has near collision is now shifting to center" );
                         float local = this.position.X;
 
                         double num1 = ( double ) local;
@@ -244,7 +244,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
                         this.position.X = ( float ) num4;
                     } else if( flag2 && !flag1 && !currentLocation.isCollidingPosition( this.nextPosition( 3 ), viewport, false, this.damageToFarmer, this.isGlider, ( Character ) this ) ) {
-                        //ModEntry.Log( "next location has near collision is now shifting to center" );
+                        ModEntry.Log( "next location has near collision is now shifting to center" );
                         float local = this.position.X;
 
                         double num1 = ( double ) local;
@@ -258,7 +258,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
                     }
                     if( !currentLocation.isTilePassable( this.nextPosition( 0 ), viewport ) || !this.willDestroyObjectsUnderfoot ) {
                         this.Halt();
-                        //ModEntry.Log( "next location is unpassable and do nothing" );
+                        ModEntry.Log( "next location is unpassable and do nothing" );
                     }
                     else if( this.willDestroyObjectsUnderfoot ) {
                         Vector2 vector2 = new Vector2( ( float ) ( this.getStandingX() / Game1.tileSize ), ( float ) ( this.getStandingY() / Game1.tileSize - 1 ) );

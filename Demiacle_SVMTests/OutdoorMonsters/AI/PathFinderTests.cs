@@ -50,7 +50,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI.Tests {
 
         [TestMethod()]
         public void FindPathTest() {            
-            for( int i = 0; i < 200; i++ ) {
+            for( int i = 0; i < 2; i++ ) {
                 Point startPoint = getRandomPoint();
                 Point targetPoint = getRandomPoint();
                 PathFinder pathFinder = new PathFinder( startPoint, targetPoint );
