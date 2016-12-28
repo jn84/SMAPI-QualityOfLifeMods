@@ -56,10 +56,6 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             }
         }
 
-        public static Vector2 translatePositionToTile() {
-            return new Vector2();
-        }
-
         /// <summary>
         /// Updates the current map with coordinates declaring which coodinates are walkable for the current map
         /// </summary>
@@ -170,6 +166,11 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
                     if( pathFinder.openNodes.Exists( node => node.point.Equals( checkingPoint ) ) ) {
                         System.Console.Write( "$" );
+                        continue;
+                    }
+
+                    if( checkingPoint.Equals( pathFinder.endNode.point ) ) {
+                        System.Console.Write( "." );
                         continue;
                     }
 
