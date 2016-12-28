@@ -169,6 +169,11 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                         continue;
                     }
 
+                    if( checkingPoint.Equals( pathFinder.endNode.point ) ) {
+                        System.Console.Write( "." );
+                        continue;
+                    }
+
                     if( pathFinder.map[ x, y ].isWalkable == true ) {
                         System.Console.Write( "-" );
                     } else {
