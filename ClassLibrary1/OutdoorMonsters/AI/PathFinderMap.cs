@@ -36,7 +36,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             location = e.NewLocation;
             width = location.map.DisplayWidth / Game1.tileSize; //dependant on Game1.tileSize
             height = location.map.DisplayHeight / Game1.tileSize;
-            map = new Node[ width , height  ];
+            map = new Node[ width, height ];
             calculateWalkableTiles();
         }
 
@@ -46,6 +46,18 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         public void updatePassableTilesOnLocationObjectsChanged( object sender, EventArgsLocationObjectsChanged e ) {
             ModEntry.Log( "updateing map on Objects in map changed" );
             calculateWalkableTiles();
+        }
+
+        public static Boolean isTileWalkable( int x, int y, GameLocation location ) {
+            if( location.isTileOccupiedIgnoreFloors( new Vector2( x, y ) ) || !( location.isTilePassable( new Location( x, y ), Game1.viewport ) ) ) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        public static Vector2 translatePositionToTile() {
+            return new Vector2();
         }
 
         /// <summary>

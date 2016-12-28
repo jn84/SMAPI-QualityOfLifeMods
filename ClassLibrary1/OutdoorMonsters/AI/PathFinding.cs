@@ -25,15 +25,15 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         // this is fired every few moments
         public override void calculateNextMovement( OutDoorMonster outDoorMonster ) {
 
-            ModEntry.Log( "path finding" );
+            //ModEntry.Log( "path finding" );
             Point monsterPoint = new Point( outDoorMonster.getTileX(), outDoorMonster.getTileY() );
             Point targetPoint = new Point( outDoorMonster.target.getTileX(), outDoorMonster.target.getTileY() );
 
             // Move in a random direction if player is not within distance
             if( PathFinder.Node.getHardDistanceBetweenPoints( monsterPoint, targetPoint ) > outDoorMonster.distanceToFindTarget ) {
-                ModEntry.Log( "Do nothing because target is far" );
-                outDoorMonster.Halt();
-                //outDoorMonster.setRandomDirection();
+                //ModEntry.Log( "Do nothing because target is far" );
+                //outDoorMonster.Halt();
+                outDoorMonster.setRandomDirection();
                 return;
             }
             
@@ -41,8 +41,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             pathFinder.FindPath();            
             
             // Move in a random direction if path not found
-            if( pathFinder.foundPath.Count < 1 ) {
-                ModEntry.Log( "path not found or target is achieved" );
+            if( pathFinder.foundPath.Count <= 1 ) {
+                //ModEntry.Log( "path not found or target is achieved" );
                 outDoorMonster.setRandomDirection();
                 return;
             }
@@ -68,7 +68,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 return;            
 
             // Do nothing if no path exists
-            if( pathFinder.foundPath.Count < 1 )
+            if( pathFinder.foundPath.Count <= 1 )
                 return;
 
             float distanceFromCenterX = Math.Abs( outDoorMonster.position.X - targetPositionX );
@@ -94,7 +94,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 return;
             }
             
-            ModEntry.Log( "Arrived at center of tile" );
+            //ModEntry.Log( "Arrived at center of tile" );
             pathFinder.foundPath.Dequeue();
             setGamePositionCoordinatesOfTargetTile();        
         }
