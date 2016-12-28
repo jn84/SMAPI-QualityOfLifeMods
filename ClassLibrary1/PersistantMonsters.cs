@@ -45,7 +45,7 @@ namespace Demiacle_SVM
         public void onNewDay(object sender, EventArgsNewDay e) {
             
             if( !e.IsNewDay ) {
-                //
+
                 //this isnt late enough monsters still get saved after this call
                 ModEntry.Log("day is starting");
 
