@@ -52,7 +52,8 @@ namespace Demiacle_SVM
                 foreach( GameLocation location in Game1.locations ) {
                     foreach( NPC npc in location.characters ) {
                         if( npc is Monster ) {
-                           shiftDefaultLocation( npc, location );
+                            shiftDefaultLocation( npc, location );
+                            npc.position = npc.DefaultPosition;
                         }
                     }
                 }
@@ -79,19 +80,17 @@ namespace Demiacle_SVM
             }
         }
 
+        /// <summary>
+        /// Shifts the DefaultPosition of the monster to any of the 8 adjacent squares if that square is open
+        /// </summary>
         public void shiftDefaultLocation( NPC npc, GameLocation location ) {
-            int chance1 = Game1.random.Next( -64, 64 );
-            int chance2 = Game1.random.Next( -64, 64 );
-            float newX = npc.DefaultPosition.X + chance1;
-            float newY = npc.DefaultPosition.Y + chance2;
+            int chance1 = Game1.random.Next( -1, 2 );
+            int chance2 = Game1.random.Next( -1, 2 );
+            float newX = npc.DefaultPosition.X + ( chance1 * Game1.tileSize );
+            float newY = npc.DefaultPosition.Y + ( chance2 * Game1.tileSize );
 
             if( PathFinderMap.isTileWalkable( ( int ) newX / Game1.tileSize, ( int ) newY / Game1.tileSize, location ) ) {
-                npc.position.X = newX;
-                npc.position.Y = newY;
-
-                npc.DefaultPosition = npc.position;
-            } else {
-                npc.position = npc.DefaultPosition;
+                npc.DefaultPosition = new Vector2( newX, newY );
             }
         }
 
@@ -138,8 +137,7 @@ namespace Demiacle_SVM
         /// due to limitations of the api the only other option currently known is to render above all elements
         /// </summary>
         public void onPreRenderEvent(object sender, EventArgs e) {
-            GameLocation loc = Game1.currentLocation;
-            if ( currentLocationDrawsGliders() ) {                
+            if ( currentLocationDrawsGliders() ) { 
                 return;
             }
 
@@ -231,13 +229,13 @@ namespace Demiacle_SVM
                         maxY = 3750;
 
                         //Vector2 positionx = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
-                        amountOfFarmMobsToSpawn = 1;
+                        //amountOfFarmMobsToSpawn = 1;
 
                         for( int i = 0; i < amountOfFarmMobsToSpawn; i++ ) {
-                            Vector2 positionx = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
-                             positionx = new Vector2( 3294, 1034 );
+                            Vector2 position = generateRandomValidPosition( location );
+                             //positionx = new Vector2( 3294, 1034 );
                             //ModEntry.Log( $"mob to test is at x:{positionx.X} y:{positionx.Y}" );
-                            OutDoorShadowBrute mob = new OutDoorShadowBrute( positionx );
+                            OutDoorShadowBrute mob = new OutDoorShadowBrute( position );
                             mob.currentLocation = location;
                             characters.Add( mob );
                         }
@@ -332,7 +330,18 @@ namespace Demiacle_SVM
             
         }
 
-        
+        private Vector2 generateRandomValidPosition( GameLocation location ) {
+            int borderBuffer = 2;
+            int randomX = Game1.random.Next( borderBuffer, location.map.Layers[ 0 ].LayerWidth - borderBuffer );
+            int randomY = Game1.random.Next( borderBuffer, location.map.Layers[ 0 ].LayerHeight - borderBuffer );
+            if( PathFinderMap.isTileWalkable( randomX, randomY, location ) ) {
+                return new Vector2( randomX * Game1.tileSize, randomY * Game1.tileSize );
+            } else {
+                return generateRandomValidPosition( location );
+            }
+        }
+
+
         /// <summary>
         /// Generates an easy random mob
         /// duggy is great but when it leaves the tile gets fucked up

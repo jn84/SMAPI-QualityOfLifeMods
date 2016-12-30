@@ -33,7 +33,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// Updates data needed for pathfinding. This includes a map of [ x, y ] coordinates, the width and height and the GameLocation.
         /// </summary>
         public void updateMapOnChangeLocation( object sender, EventArgsCurrentLocationChanged e ) {
-            ModEntry.Log( "updateing map on Location changed" );
+            //ModEntry.Log( "updateing map on Location changed" );
             location = e.NewLocation;
             width = location.map.DisplayWidth / Game1.tileSize; //dependant on Game1.tileSize
             height = location.map.DisplayHeight / Game1.tileSize;
@@ -45,10 +45,11 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// Updates the current map with coordinates declaring which coodinates are walkable for the current map
         /// </summary>
         public void updatePassableTilesOnLocationObjectsChanged( object sender, EventArgsLocationObjectsChanged e ) {
-            ModEntry.Log( "updateing map on Objects in map changed" );
+            //ModEntry.Log( "updateing map on Objects in map changed" );
             calculateWalkableTiles();
         }
         
+        // TODO still a tiny bit buggy 
         /// <summary>
         /// Calculates a coordinate with the given location and determines if the tile can be walked over.
         /// </summary>

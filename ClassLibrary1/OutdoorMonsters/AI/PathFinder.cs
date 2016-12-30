@@ -44,7 +44,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
             this.startNode = new Node( start.X, start.Y, true );
             this.startNode.distanceTraveled = 0;
-
+            //ModEntry.Log( $"position is X:{start.X} Y:{start.Y} and boundary is x:{map.GetLength(0)} Y:{map.GetLength(1)}" );
             map[ start.X, start.Y ] = startNode;
 
             openNodes.Add( this.startNode );
@@ -88,7 +88,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             }
             //PathFinderMap.drawPathToConsole( path.ToList(), this );
             foundPath = path;
-            PathFinderMap.drawMapWithMinimalDataToConsole( this );
+            //PathFinderMap.drawMapWithMinimalDataToConsole( this );
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
             // fail search if it goes beyond the limit
             if( currentNode.distanceTraveled > searchLimit ) {
-                Console.Write("this should only fire once per find");
+                //Console.Write("this should only fire once per find");
                 return false;
             }
 
@@ -234,9 +234,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         /// <param name="outDoorMonster">The monster to alter movement</param>
         internal void setNextDirection( OutDoorMonster outDoorMonster ) {
             
-        }
-
-        
+        }        
 
     }
 }

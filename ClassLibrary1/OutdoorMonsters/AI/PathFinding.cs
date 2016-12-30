@@ -43,7 +43,7 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 return;
             }
             
-            // Move torwards target if close enough
+            // Ignore path and move torwards target if close enough
             if( pathFinder.foundPath.Count <= 1 ) {
                 targetPositionX = outDoorMonster.target.getTileX() * Game1.tileSize;
                 targetPositionY = outDoorMonster.target.getTileY() * Game1.tileSize;

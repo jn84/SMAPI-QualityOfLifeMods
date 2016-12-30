@@ -36,8 +36,6 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
         public static OutDoorMonster thisMonster;
         
-
-
         //TODO use these enums as an easy means to change behavior of how fast a monster reacts and changes course
         public enum timeToDecideNextMovement { fast, medium, slow } 
         
