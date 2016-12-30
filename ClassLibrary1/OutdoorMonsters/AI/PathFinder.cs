@@ -28,6 +28,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
         public int searchLimit = 40;
 
+        public Boolean pathIsFound = false;
+
         public PathFinder() { }
 
         /// <summary>
@@ -71,6 +73,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             bool success = Search( startNode );
             if( success ) {
 
+                pathIsFound = true;
+
                 // If a path was found, follow the parents from the end node to build a list of points
                 Node node = this.endNode;
                 while( node.parentNode != null ) {
@@ -83,7 +87,8 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 path = new Queue<Point>( path.Reverse() );
             }
             //PathFinderMap.drawPathToConsole( path.ToList(), this );
-            foundPath = path; ;
+            foundPath = path;
+            PathFinderMap.drawMapWithMinimalDataToConsole( this );
         }
 
         /// <summary>

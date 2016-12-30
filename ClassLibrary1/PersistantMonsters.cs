@@ -138,7 +138,8 @@ namespace Demiacle_SVM
         /// due to limitations of the api the only other option currently known is to render above all elements
         /// </summary>
         public void onPreRenderEvent(object sender, EventArgs e) {
-            if ( currentLocationDrawsGliders() ) {
+            GameLocation loc = Game1.currentLocation;
+            if ( currentLocationDrawsGliders() ) {                
                 return;
             }
 
@@ -230,13 +231,12 @@ namespace Demiacle_SVM
                         maxY = 3750;
 
                         //Vector2 positionx = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
-                        
+                        amountOfFarmMobsToSpawn = 1;
 
                         for( int i = 0; i < amountOfFarmMobsToSpawn; i++ ) {
                             Vector2 positionx = getValidRandomInsideSquare( minX, maxX, minY, maxY, location );
-                            //characters.Add( generateRandomEasyMob( position ) );
-                            //Vector2 positionx = new Vector2( 3294, 1034 );
-                            ModEntry.Log( $"mob to test is at x:{positionx.X} y:{positionx.Y}" );
+                             positionx = new Vector2( 3294, 1034 );
+                            //ModEntry.Log( $"mob to test is at x:{positionx.X} y:{positionx.Y}" );
                             OutDoorShadowBrute mob = new OutDoorShadowBrute( positionx );
                             mob.currentLocation = location;
                             characters.Add( mob );

@@ -5,6 +5,7 @@ using StardewModdingAPI.Events;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using xTile.ObjectModel;
 
 namespace Demiacle_SVM.OutdoorMonsters.AI {
 
@@ -47,22 +48,43 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
             ModEntry.Log( "updateing map on Objects in map changed" );
             calculateWalkableTiles();
         }
-
+        
+        /// <summary>
+        /// Calculates a coordinate with the given location and determines if the tile can be walked over.
+        /// </summary>
         public static Boolean isTileWalkable( int x, int y, GameLocation location ) {
-            if( location.isTileOccupiedIgnoreFloors( new Vector2( x, y ) ) || !( location.isTilePassable( new Location( x, y ), Game1.viewport ) ) ) {
-                return false;
-            } else {
+
+            // Ignore the 3 worms
+            StardewValley.Object obj = null;
+            location.objects.TryGetValue( new Vector2( x, y ), out obj );
+            if( obj != null && obj.name == "Artifact Spot" ) {
                 return true;
             }
+
+            if( !location.isTileLocationTotallyClearAndPlaceable( new Vector2( x, y ) ) ) {
+
+                // Ignore grass tiles
+                if( !( location.terrainFeatures.ContainsKey( new Vector2( x, y ) ) &&
+                    location.terrainFeatures[ new Vector2( x, y ) ] is StardewValley.TerrainFeatures.Grass ) ) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
         /// Updates the current map with coordinates declaring which coodinates are walkable for the current map
         /// </summary>
         public void calculateWalkableTiles() {
+            //int counter = 0;
+            //foreach ( KeyValuePair<Vector2,StardewValley.Object> entry in location.objects ){
+                
+            //}
+            //return;
+
             for( int x = 0; x < width; x++ ) {
                 for( int y = 0; y < height; y++ ) {
-                    bool isWalkable;
+                    bool isWalkable = true;
 
                     //isTilePassable checks for hard objects and 
                     Location tileLocation = new Location( x * Game1.tileSize, y * Game1.tileSize );
@@ -70,16 +92,42 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
                     //still not picking up trees or large rocks? some random stuff too i guess
 
-                    //if( !( location.isTilePassable( new Location( x, y ), Game1.viewport ) ) || location.isObjectAt(  x * Game1.tileSize, y * Game1.tileSize )  ) {
                     //Tree stumps and large rocks are not found here
                     //might have to add ignore code for crop tiles
 
                     //currently considers worm dig tiles as occupied
-                    if( location.isTileOccupiedIgnoreFloors( new Vector2( x , y ) ) || !( location.isTilePassable( new Location( x, y ), Game1.viewport ) ) ) { 
+
+                    //PropertyValue propertyValue = ( PropertyValue ) null;
+                    //location.map.GetLayer( "Buildings" ).Tiles[ x, y ].TileIndexProperties.TryGetValue( "TreeStump", out propertyValue );
+                    string str = location.doesTileHaveProperty( x, y, "TreeStump", "Back" );
+                    string str1 = location.doesTileHaveProperty( x, y, "Water", "Back" );
+                    Microsoft.Xna.Framework.Rectangle rect = new Microsoft.Xna.Framework.Rectangle( x  , y, 1, 1 );
+                    int test = rect.Left;
+                    int tesst = rect.Right;
+                    int tessts = rect.Top;
+
+                    int tesstss = rect.Bottom;
+
+
+                    //if( location.isTileOccupiedIgnoreFloors( new Vector2( x , y ) ) || !( location.isTilePassable( new Location( x, y ), Game1.viewport ) )  ) { 
+                    //if( !location.isAreaClear(rect) ) { works
+                    //if( location.terrainFeatures.ContainsKey( new Vector2( x, y ) )   ) {
+
+                    //}
+                    /*
+                    
+
+                    if( !location.isTileLocationTotallyClearAndPlaceable( new Vector2(x,y) ) ) {
+                        if( !( location.terrainFeatures.ContainsKey( new Vector2( x, y ) ) &&
+                            location.terrainFeatures[ new Vector2( x, y ) ] is StardewValley.TerrainFeatures.Grass )   ) {
+                            isWalkable = false;
+                        }                        
+                    }*/
+
+                    if( !isTileWalkable( x, y, location ) ) {
                         isWalkable = false;
-                    } else {
-                        isWalkable = true;
                     }
+
                     map[ x, y ] = new Node( x, y, isWalkable );
                 }
             }
@@ -116,29 +164,29 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                     Node node = map[ x, y ];
 
                     if( startNode.point.X == x && startNode.point.Y == y ) {
-                        System.Console.Write( "█ " );
+                        System.Console.Write( "█" );
                         continue;
                     }
 
                     if( openNodes.Exists( openNode => openNode.point.Equals( node.point ) ) ) {
-                        System.Console.Write( "$ " );
+                        System.Console.Write( "$" );
                         continue;
                     }
 
                     if( closedNodes.Exists( closdedNode => closdedNode.point.Equals( node.point ) ) ) {
-                        System.Console.Write( "< " );
+                        System.Console.Write( "<" );
                         continue;
                     }
 
                     if( endNode.point.X == x && endNode.point.Y == y ) {
-                        System.Console.Write( "% " );
+                        System.Console.Write( "%" );
                         continue;
                     }
 
                     if( map[ x, y ].isWalkable == true ) {
-                        System.Console.Write( "- " );
+                        System.Console.Write( "-" );
                     } else {
-                        System.Console.Write( "0 " );
+                        System.Console.Write( "0" );
                     }
                 }
                 System.Console.Write( "\n" );

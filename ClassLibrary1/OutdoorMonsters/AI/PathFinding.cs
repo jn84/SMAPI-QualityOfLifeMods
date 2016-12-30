@@ -24,26 +24,30 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
         // this is fired every few moments
         public override void calculateNextMovement( OutDoorMonster outDoorMonster ) {
-
-            //ModEntry.Log( "path finding" );
+            
             Point monsterPoint = new Point( outDoorMonster.getTileX(), outDoorMonster.getTileY() );
             Point targetPoint = new Point( outDoorMonster.target.getTileX(), outDoorMonster.target.getTileY() );
 
             // Move in a random direction if player is not within distance
             if( PathFinder.Node.getHardDistanceBetweenPoints( monsterPoint, targetPoint ) > outDoorMonster.distanceToFindTarget ) {
-                //ModEntry.Log( "Do nothing because target is far" );
-                //outDoorMonster.Halt();
                 outDoorMonster.setRandomDirection();
                 return;
             }
             
             pathFinder = new PathFinder( monsterPoint, targetPoint );
-            pathFinder.FindPath();            
-            
+            pathFinder.FindPath();
+
             // Move in a random direction if path not found
-            if( pathFinder.foundPath.Count <= 1 ) {
-                //ModEntry.Log( "path not found or target is achieved" );
+            if( pathFinder.pathIsFound == false ) {
                 outDoorMonster.setRandomDirection();
+                return;
+            }
+            
+            // Move torwards target if close enough
+            if( pathFinder.foundPath.Count <= 1 ) {
+                targetPositionX = outDoorMonster.target.getTileX() * Game1.tileSize;
+                targetPositionY = outDoorMonster.target.getTileY() * Game1.tileSize;
+               
                 return;
             }
 
@@ -57,19 +61,30 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
         }
 
         private void setGamePositionCoordinatesOfTargetTile() {
+            // Sometimes the update is fired before a path is found and this will fix... alternative is try catch
+            if( pathFinder.foundPath == null || pathFinder.foundPath.Count < 1 ) {
+                return;
+            }
+
             targetPositionX = pathFinder.foundPath.Peek().X * Game1.tileSize;
             targetPositionY = pathFinder.foundPath.Peek().Y * Game1.tileSize;
         }
 
+        // Moves the target along a valid path
         public override void updateOnEveryTick( OutDoorMonster outDoorMonster ) {
 
             // Do nothing if path has not been searched for
             if( pathFinder == null )
-                return;            
-
-            // Do nothing if no path exists
-            if( pathFinder.foundPath.Count <= 1 )
                 return;
+            
+            // Do nothing if no path exists
+            if( pathFinder.pathIsFound == false )
+                return;
+
+            // Do nothing if path is dequeued
+            if( pathFinder.foundPath.Count < 1 ) {
+                return;
+            }
 
             float distanceFromCenterX = Math.Abs( outDoorMonster.position.X - targetPositionX );
             float distanceFromCenterY = Math.Abs( outDoorMonster.position.Y - targetPositionY );            
@@ -94,7 +109,6 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
                 return;
             }
             
-            //ModEntry.Log( "Arrived at center of tile" );
             pathFinder.foundPath.Dequeue();
             setGamePositionCoordinatesOfTargetTile();        
         }
