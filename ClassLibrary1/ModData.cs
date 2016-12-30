@@ -9,6 +9,7 @@ using StardewValley;
 namespace Demiacle_SVM {
     public class ModData {
         public Boolean hasMonstersBeenCreated = false;
+        public Boolean hasMonstersBeenLoaded = false;
 
         //public Boolean usePersistantMonstersMod = true;
         //public Boolean useScytheDamageMod = true;

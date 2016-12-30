@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 using System.Threading.Tasks;
 using StardewValley.Tools;
 using System.Xml;
-using Polenter.Serialization;
+//using Polenter.Serialization;
 using System.IO;
 using Demiacle_SVM.OutdoorMonsters;
 using Demiacle_SVM.OutdoorMonsters.AI;
@@ -26,7 +26,7 @@ namespace Demiacle_SVM
     class PersistantMonsters {
         List<Monster> monsterGlidersToFix = new List<Monster>();
         public Dictionary<Monster, GameLocation> savedMonsters = new Dictionary<Monster, GameLocation>();
-        SharpSerializer serializer = new SharpSerializer();
+        //SharpSerializer serializer = new SharpSerializer();
         string saveFileLocation;
 
         private bool isFirstLoad = true;
@@ -45,7 +45,6 @@ namespace Demiacle_SVM
         public void onNewDay(object sender, EventArgsNewDay e) {
             
             if( !e.IsNewDay ) {
-                //
                 //this isnt late enough monsters still get saved after this call
                 ModEntry.Log("day is starting");
 
@@ -61,21 +60,22 @@ namespace Demiacle_SVM
                 if( !ModEntry.modData.hasMonstersBeenCreated ) {
                     ModEntry.Log( "creating persistant monsters" );
                     createAllMonsters();
-                } else {
+
+                } else if ( !ModEntry.modData.hasMonstersBeenLoaded ) {
                     ModEntry.Log( "loading persistant monsters" );
-                    savedMonsters = ( Dictionary<Monster, GameLocation> ) serializer.Deserialize( saveFileLocation );
+                    //savedMonsters = ( Dictionary<Monster, GameLocation> ) serializer.Deserialize( saveFileLocation ); // cant deserialize animatedsprite
                 }
 
                 foreach( KeyValuePair<Monster, GameLocation> entry in savedMonsters ) {
-                    entry.Value.addCharacter( entry.Key );
+                    //entry.Value.addCharacter( entry.Key );
                 }
-                savedMonsters.Clear();
+                //savedMonsters.Clear();
 
-                //remove mobs from locations so they dont save and save them in their own file
+            //remove mobs from locations so they dont save and save them in their own file
             } else {
                 ModEntry.Log( "day is ending" );
                 if( savedMonsters.Count > 0 ) {
-                    putPersistantMonstersInSave();
+                    //putPersistantMonstersInSave();
                 }
             }
         }
@@ -102,6 +102,9 @@ namespace Demiacle_SVM
             
         }
 
+        /// <summary>
+        /// Deprecated. Was used to remove monsters from locations and save them in a separate file
+        /// </summary>
         private void putPersistantMonstersInSave() {
             foreach( GameLocation location in Game1.locations.ToArray() ) {
                 foreach( NPC npc in location.characters.ToArray() ) {
@@ -110,15 +113,11 @@ namespace Demiacle_SVM
 
                         location.characters.Remove( npc );
                         savedMonsters.Add( ( Monster ) npc, location );
-                        npc.position = npc.DefaultPosition; //the position the npc was spawned at
                     }
                 }
             }
-            foreach( KeyValuePair<Monster,GameLocation> monster in savedMonsters) {
-                //ModEntry.Log( "save data has this monster : " + monster.Key.name );
-            }
 
-            serializer.Serialize( savedMonsters, saveFileLocation );
+            //serializer.Serialize( savedMonsters, saveFileLocation );
         }
 
         internal void onLocationChange( object sender, EventArgsCurrentLocationChanged e ) {
@@ -148,10 +147,10 @@ namespace Demiacle_SVM
                 }
             }            
         }
-        
+
 
         /// <summary>
-        /// Generates all the world map monsters
+        /// Generates all the world map monsters and places them into savedMonsters
         /// </summary>
         private void createAllMonsters() {
             foreach ( GameLocation location in Game1.locations ) {
@@ -326,7 +325,7 @@ namespace Demiacle_SVM
             ModEntry.Log( "Mobs finished creating" );
             ModEntry.modData.hasMonstersBeenCreated = true;
             ModEntry.updateModData();
-            putPersistantMonstersInSave();
+            //putPersistantMonstersInSave();
             
         }
 

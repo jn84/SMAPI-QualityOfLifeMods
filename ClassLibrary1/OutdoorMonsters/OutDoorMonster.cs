@@ -11,16 +11,19 @@ using xTile.Dimensions;
 using System.Threading;
 using StardewModdingAPI.Events;
 using Demiacle_SVM.OutdoorMonsters.AI;
+using System.Xml.Serialization;
 
 namespace Demiacle_SVM.OutdoorMonsters {
 
     
+    // TODO bug - When monsters are loaded (deserialized) their sprites look funky... shadows hae a box and bats have like 4 eyes
 
     /// <summary>
     /// A layer for easily modifiable properties and types of movement to the monster class.
     /// </summary>
-    public class OutDoorMonster : Monster {        
-        public Character target = Game1.player;
+    public class OutDoorMonster : Monster {  
+        [XmlIgnore]      
+        public Character target = Game1.player; // TODO refactor this into PathFinding
         public float defaultAlpha = 1;
         public float alpha;
         public int knockbackSpeed = 10;
@@ -49,7 +52,6 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
         //needed for serialization just leave empty
         public OutDoorMonster() : base() {
-
         }
 
         public OutDoorMonster( string name, Vector2 position )
@@ -494,7 +496,7 @@ namespace Demiacle_SVM.OutdoorMonsters {
 
             this.timeBeforeAIMovementAgain = 1; //default is 1
 
-            Halt(); // reset movement for next movement 
+            //Halt(); // reset movement for next movement 
             moveType.calculateNextMovement( this );      
         }
 

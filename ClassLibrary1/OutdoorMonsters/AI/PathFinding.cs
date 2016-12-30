@@ -22,9 +22,15 @@ namespace Demiacle_SVM.OutdoorMonsters.AI {
 
         float epsilon = 2f;
 
+        // TODO bug - sometimes tiles are found as unwalkable even though they are free
+        // TODO bug - sometimes mobs get stuck and are unable to move. 
+
         // this is fired every few moments
         public override void calculateNextMovement( OutDoorMonster outDoorMonster ) {
-            
+
+
+            outDoorMonster.target = Game1.player;
+
             Point monsterPoint = new Point( outDoorMonster.getTileX(), outDoorMonster.getTileY() );
             Point targetPoint = new Point( outDoorMonster.target.getTileX(), outDoorMonster.target.getTileY() );
 
