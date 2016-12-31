@@ -87,6 +87,11 @@
     <Compile Include="ScytheDamageMod.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SpeedMod.cs" />
+    <Compile Include="UiMods\UiModAccurateHearts.cs" />
+    <Compile Include="UiMods\UiModExperience.cs" />
+    <Compile Include="UiMods\UiModItemRolloverInformation.cs" />
+    <Compile Include="UiMods\UiModLocationOfTownsfolk.cs" />
+    <Compile Include="UiMods\UiModLuckOfDay.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json" />

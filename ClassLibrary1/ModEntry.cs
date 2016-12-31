@@ -18,6 +18,7 @@ using StardewValley.TerrainFeatures;
 using System.Xml.Serialization;
 using Demiacle_SVM.OutdoorMonsters;
 using Demiacle_SVM.OutdoorMonsters.AI;
+using Demiacle_SVM.UiMods;
 
 //create list of mobs
 
@@ -41,6 +42,11 @@ namespace Demiacle_SVM {
         private ScytheDamageMod scytheDamageMod;
         private SpeedMod speedMod;
         private MineShaftMod mineShaftMod;
+        private UiModLocationOfTownsfolk locationOfTownsfolk; //WIP
+        private UiModAccurateHearts accurateHearts; //WIP
+        private UiModItemRolloverInformation rolloverInformation;//WIP
+        private UiModExperience displayExperience;//WIP
+        private UiModLuckOfDay luckOfDay;//WIP
         public static ModEntry modEntry;
         public static Boolean isTesting = false;
 
@@ -51,6 +57,11 @@ namespace Demiacle_SVM {
             scytheDamageMod = new ScytheDamageMod();
             speedMod = new SpeedMod();
             mineShaftMod = new MineShaftMod();
+            locationOfTownsfolk = new UiModLocationOfTownsfolk();
+            accurateHearts = new UiModAccurateHearts();
+            rolloverInformation = new UiModItemRolloverInformation();
+            displayExperience = new UiModExperience();
+            luckOfDay = new UiModLuckOfDay();
         }
 
         internal static void Log( string log ) {
@@ -63,11 +74,11 @@ namespace Demiacle_SVM {
         }
 
         public override void Entry(IModHelper helper) {
+
             //general mods needed for all other mods
             GameEvents.GameLoaded += this.updateXmlSerializer;
             ControlEvents.KeyPressed += this.ReceiveKeyPress;
             PlayerEvents.LoadedGame += this.onLoadedGame;
-            //LocationEvents.CurrentLocationChanged += this.OnLocationChange;
 
 
             //Weapon and tool mod
@@ -82,12 +93,23 @@ namespace Demiacle_SVM {
             TimeEvents.OnNewDay += persistantMonsters.onNewDay;
             TimeEvents.DayOfMonthChanged += persistantMonsters.onDayChange;
             GameEvents.OneSecondTick += persistantMonsters.onGameOneSecondTick;
-            //LocationEvents.CurrentLocationChanged += PathFinder.onLocationChange;
             LocationEvents.LocationObjectsChanged += PathFinderMap.Instance.updatePassableTilesOnLocationObjectsChanged;
             LocationEvents.CurrentLocationChanged += PathFinderMap.Instance.updateMapOnChangeLocation;
-            //PlayerEvents.FarmerChanged += persistantMonsters.onFarmerChanged;
 
+            // Ui Mods
+            GraphicsEvents.OnPreRenderGuiEvent += locationOfTownsfolk.onPreRenderEvent;
+            GraphicsEvents.OnPostRenderGuiEvent += locationOfTownsfolk.onPostRenderEvent;
 
+            GraphicsEvents.OnPreRenderGuiEvent += accurateHearts.onPreRenderEvent;
+            GraphicsEvents.OnPostRenderGuiEvent += accurateHearts.onPostRenderEvent;
+
+            GraphicsEvents.OnPreRenderGuiEvent += rolloverInformation.onPreRenderEvent;
+            GraphicsEvents.OnPostRenderGuiEvent += rolloverInformation.onPostRenderEvent;
+
+            GraphicsEvents.OnPreRenderHudEvent += displayExperience.onPreRenderEvent;
+            GraphicsEvents.OnPostRenderHudEvent += displayExperience.onPostRenderEvent;
+
+            TimeEvents.DayOfMonthChanged += luckOfDay.onNewDayC;
 
             //minshaft mod
             //PlayerEvents.LoadedGame += mineShaftMod.onLoad;

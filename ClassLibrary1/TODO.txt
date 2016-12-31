@@ -1,6 +1,6 @@
 ﻿TODO BY PRIORITY
 
--fix pathfinding so it doesnt create loops. parents are not being reset when a shorter path is found
+COMPLETED -fix pathfinding so it doesnt create loops. parents are not being reset when a shorter path is found
 
 -List of move types
 	-Teleport
