@@ -39,7 +39,7 @@ COMPLETED -fix pathfinding so it doesnt create loops. parents are not being rese
 	-
 
 -UI
-	-Display luck on new day
+	COMPLETE -Display luck on new day
 	-Display exp on exp updates
 	-Display location of townsfolk
 	-Display more accurate hearts

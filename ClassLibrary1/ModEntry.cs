@@ -75,17 +75,17 @@ namespace Demiacle_SVM {
 
         public override void Entry(IModHelper helper) {
 
-            //general mods needed for all other mods
+            // General mods needed for all other mods
             GameEvents.GameLoaded += this.updateXmlSerializer;
             ControlEvents.KeyPressed += this.ReceiveKeyPress;
             PlayerEvents.LoadedGame += this.onLoadedGame;
 
 
-            //Weapon and tool mod
+            // Weapon and tool mod
             PlayerEvents.InventoryChanged += scytheDamageMod.onInvChange;
 
 
-            //persistantMonster mod
+            // PersistantMonster mod
             GraphicsEvents.OnPreRenderEvent += persistantMonsters.onPreRenderEvent;
             GraphicsEvents.OnPostRenderEvent += persistantMonsters.onPostRenderEvent;
             LocationEvents.CurrentLocationChanged += persistantMonsters.onLocationChange;
@@ -94,7 +94,7 @@ namespace Demiacle_SVM {
             TimeEvents.DayOfMonthChanged += persistantMonsters.onDayChange;
             GameEvents.OneSecondTick += persistantMonsters.onGameOneSecondTick;
             LocationEvents.LocationObjectsChanged += PathFinderMap.Instance.updatePassableTilesOnLocationObjectsChanged;
-            LocationEvents.CurrentLocationChanged += PathFinderMap.Instance.updateMapOnChangeLocation;
+            LocationEvents.CurrentLocationChanged += PathFinderMap.Instance.updateMapOnChangeLocation;            
 
             // Ui Mods
             GraphicsEvents.OnPreRenderGuiEvent += locationOfTownsfolk.onPreRenderEvent;
@@ -105,13 +105,13 @@ namespace Demiacle_SVM {
 
             GraphicsEvents.OnPreRenderGuiEvent += rolloverInformation.onPreRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += rolloverInformation.onPostRenderEvent;
-
+            
             GraphicsEvents.OnPreRenderHudEvent += displayExperience.onPreRenderEvent;
             GraphicsEvents.OnPostRenderHudEvent += displayExperience.onPostRenderEvent;
 
             TimeEvents.DayOfMonthChanged += luckOfDay.onNewDayC;
 
-            //minshaft mod
+            // Mineshaft mod
             //PlayerEvents.LoadedGame += mineShaftMod.onLoad;
             LocationEvents.CurrentLocationChanged += mineShaftMod.onLocationChange;
             GraphicsEvents.OnPreRenderGuiEvent += mineShaftMod.OnPreRenderGuiEvent;
