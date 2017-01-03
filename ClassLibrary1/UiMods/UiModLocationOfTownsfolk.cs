@@ -13,28 +13,22 @@ namespace Demiacle_SVM.UiMods {
     class UiModLocationOfTownsfolk {
 
         List<NPC> townsfolk = new List<NPC>();
-
-        int countTest = 0;
-        internal void onPreRenderEvent( object sender, EventArgs e ) {
-            
-
-
-                
-        }
-
+        List<NPC> townsfolkToIgnore = new List<NPC>();
+        
         internal void onPostRenderEvent( object sender, EventArgs e ) {
+            
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
                 return;
             }
 
-            GameMenu menu = (GameMenu) Game1.activeClickableMenu;
+            GameMenu currentMenu = (GameMenu) Game1.activeClickableMenu;
 
-            if(  menu.currentTab != GameMenu.mapTab ) {
+            if(  currentMenu.currentTab != GameMenu.mapTab ) {
                 return;
             }
             
 
-            //TODO this doesnt need to be populated every call PLEASE make more efficient
+            //TODO this doesnt need to be populated every call
             townsfolk.Clear();
             foreach( GameLocation location in Game1.locations ) {
                 //ModEntry.Log(location.name);
@@ -46,13 +40,18 @@ namespace Demiacle_SVM.UiMods {
             }
 
             foreach( NPC npc in townsfolk ) {
-                //npc.sprite.Texture
-                Microsoft.Xna.Framework.Rectangle rect = npc.getMugShotSourceRect();
+
+                if( townsfolkToIgnore.Contains( npc )) {
+                    return;
+                }
+
+                Rectangle rect = npc.getMugShotSourceRect();
                 rect.Height = rect.Height - 8;
 
                 int offsetX = 0;
                 int offsetY = 0;
-                //ModEntry.Log( $"Current test location is :{switchTest.name}" );
+                
+                // Set the correct position for character head mugshots
                 switch( npc.currentLocation.name ) {
 
                     case "Town":
@@ -235,13 +234,20 @@ namespace Demiacle_SVM.UiMods {
                 int positionX = Game1.activeClickableMenu.xPositionOnScreen - 180;
                 int positionY = Game1.activeClickableMenu.yPositionOnScreen - 40;
 
-
-                ClickableTextureComponent test = new ClickableTextureComponent( npc.name, new Rectangle( positionX + offsetX, positionY + offsetY, Game1.activeClickableMenu.width, Game1.tileSize ), ( string ) null, npc.name, npc.sprite.Texture, rect, ( float ) Game1.pixelZoom, false );
-                test.scale = 3f;
-                test.draw( Game1.spriteBatch );
+                ClickableTextureComponent npcMugShot = new ClickableTextureComponent( npc.name, new Rectangle( positionX + offsetX, positionY + offsetY, Game1.activeClickableMenu.width, Game1.tileSize ), ( string ) null, npc.name, npc.sprite.Texture, rect, ( float ) Game1.pixelZoom, false );
+                npcMugShot.scale = 3f;
+                npcMugShot.draw( Game1.spriteBatch );
                 
                 return;
             }
+        }
+
+        public void addToIgnoreList( NPC npc ) {
+            townsfolkToIgnore.Add( npc );
+        }
+
+        public void removeFromIgnoreList( NPC npc ) {
+            townsfolkToIgnore.Remove( npc );
         }
     }
 }
