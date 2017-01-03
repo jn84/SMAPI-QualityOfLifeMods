@@ -10,13 +10,16 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
 namespace Demiacle_SVM.UiMods {
+    /// <summary>
+    /// Displays mugshots of townsfolk on the map.
+    /// </summary>
     class UiModLocationOfTownsfolk {
 
         List<NPC> townsfolk = new List<NPC>();
         List<NPC> townsfolkToIgnore = new List<NPC>();
         
         internal void onPostRenderEvent( object sender, EventArgs e ) {
-            
+
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
                 return;
             }

@@ -100,7 +100,6 @@ namespace Demiacle_SVM {
             LocationEvents.CurrentLocationChanged += PathFinderMap.Instance.updateMapOnChangeLocation;            
 
             // Ui Mods
-            GraphicsEvents.OnPreRenderGuiEvent += locationOfTownsfolk.onPreRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += locationOfTownsfolk.onPostRenderEvent;
 
             GraphicsEvents.OnPreRenderGuiEvent += accurateHearts.onPreRenderEvent;
