@@ -110,7 +110,6 @@ namespace Demiacle_SVM {
             GraphicsEvents.OnPostRenderGuiEvent += rolloverInformation.onPostRenderEvent;
             
             GraphicsEvents.OnPreRenderHudEvent += displayExperience.onPreRenderEvent;
-            GraphicsEvents.OnPostRenderHudEvent += displayExperience.onPostRenderEvent;
             PlayerEvents.LeveledUp += displayExperience.onLevelUp;
 
             TimeEvents.DayOfMonthChanged += luckOfDay.onNewDayC;

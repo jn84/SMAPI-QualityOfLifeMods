@@ -27,29 +27,39 @@ namespace Demiacle_SVM.UiMods {
      * Luck = 5 
     */
     
-        //TODO change this so that the currently display experience bar is displayed when an experience level is raised
+    /// <summary>
+    /// The mod that shows an experienceBar and plays an animation on level up
+    /// </summary>
     class UiModExperience {
 
         private int maxBarWidth = 175;
+
         private int currentLevelIndex = 4;
+        private int levelUpIndex = 0;
         private int levelOfCurrentlyDisplayedExp = 0;
-        private static readonly int timeBeforeFade = 8000;
-        private int timer = timeBeforeFade; //TODO on item change and on item use - set timer - when timer is 0 render nothing
         float currentExp = 0;
-        Color iconColor = Color.White;
-        Color expFillColor = Color.Azure;
-        System.Timers.Timer timerToDissapear = new System.Timers.Timer();
-        private bool shouldDrawExperienceBar = true;
+
+        private static readonly int timeBeforeExperienceBarFade = 8000;
+        private int lengthOfLevelUpPause = 2000;
+
+        // New colors created to allow manipulation here
+        Color iconColor =  new Color( Color.White.ToVector4() );
+        Color expFillColor = new Color( Color.Azure.ToVector4() );        
+
+        Item previousItem = null;
+
+        private bool shouldDrawExperienceBar = false;
+        private bool shouldDrawLevelUp = false;
 
         SoundEffectInstance se;
-        Item previousItem = null;
-        private bool drawLevelUp = false;
+        Timer timerToDissapear = new Timer();
+
+        Rectangle levelUpIconRectangle;
 
         public UiModExperience() {
             Stream soundfile = TitleContainer.OpenStream( @"Mods\\Demiacle_SVM\\LevelUp.wav" );
             SoundEffect soundEffect = SoundEffect.FromStream( soundfile );
             se = soundEffect.CreateInstance();
-
             se.Volume = 1;
         }
 
@@ -59,8 +69,6 @@ namespace Demiacle_SVM.UiMods {
         }
 
         internal void onPreRenderEvent( object sender, EventArgs e ) {
-
-
             
             //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( 10, 10 ), new Rectangle( 0, 0, 10, 10 ), Color.Aqua ); DRAW A MOUSE CURSOR
             //Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( 0, 0, 64, 64 ), Color.Azure ); DRAW A RECTANGLE
@@ -72,18 +80,12 @@ namespace Demiacle_SVM.UiMods {
             //ClickableTextureComponent expBar = new ClickableTextureComponent( "T", new Rectangle( 100, 100, 14 * Game1.pixelZoom, 9 * Game1.pixelZoom ), ( string ) null, "blurb", Game1.mouseCursors, new Rectangle( 159, 338, 14, 9 ), ( float ) Game1.pixelZoom, true ) ;
             //expBar.draw( Game1.spriteBatch );
 
-            
-
-            //fill
-
-            
-            
-
             Item currentItem = Game1.player.CurrentItem;
 
             Rectangle spriteRectangle = new Rectangle( 10, 428, 10, 10 );
             int currentLevel = 0;
 
+            // Display exp type depending on item
             if( currentItem is FishingRod ) {
                 currentLevelIndex = 1;
                 spriteRectangle = new Rectangle( 20, 428, 10, 10 );
@@ -105,7 +107,8 @@ namespace Demiacle_SVM.UiMods {
                 currentLevel = Game1.player.combatLevel;
 
 
-            // display farming exp or foraging exp depending on current location
+            // If primary item is not selected
+            // Display farming exp or foraging exp depending on current location
             } else {
 
                 if( Game1.currentLocation is Farm) {
@@ -120,65 +123,64 @@ namespace Demiacle_SVM.UiMods {
             }
 
             float expRequiredToLevel = 1;
-            int expToSubtract = 0;
+            int expAlreadyEarnedFromPreviousLevels = 0;
 
             levelOfCurrentlyDisplayedExp = currentLevel;
 
+            // Sets the exp for next level and the exp that has already been obtained based on current level
             switch( levelOfCurrentlyDisplayedExp ) {
                 case 0:
                     expRequiredToLevel = 100;
-                    expToSubtract = 0;
+                    expAlreadyEarnedFromPreviousLevels = 0;
                     break;
                 case 1:
                     expRequiredToLevel = 380;
-                    expToSubtract = 100;
+                    expAlreadyEarnedFromPreviousLevels = 100;
                     break;
                 case 2:
                     expRequiredToLevel = 770;
-                    expToSubtract = 380;
+                    expAlreadyEarnedFromPreviousLevels = 380;
                     break;
                 case 3:
                     expRequiredToLevel = 1300;
-                    expToSubtract = 770;
+                    expAlreadyEarnedFromPreviousLevels = 770;
                     break;
                 case 4:
                     expRequiredToLevel = 2150;
-                    expToSubtract = 1300;
+                    expAlreadyEarnedFromPreviousLevels = 1300;
                     break;
                 case 5:
                     expRequiredToLevel = 3300;
-                    expToSubtract = 2150;
+                    expAlreadyEarnedFromPreviousLevels = 2150;
                     break;
                 case 6:
                     expRequiredToLevel = 4800;
-                    expToSubtract = 3300;
+                    expAlreadyEarnedFromPreviousLevels = 3300;
                     break;
                 case 7:
                     expRequiredToLevel = 6900;
-                    expToSubtract = 4800;
+                    expAlreadyEarnedFromPreviousLevels = 4800;
                     break;
                 case 8:
                     expRequiredToLevel = 10000;
-                    expToSubtract = 6900;
+                    expAlreadyEarnedFromPreviousLevels = 6900;
                     break;
                 case 9:
                     expRequiredToLevel = 15000;
-                    expToSubtract = 10000;
+                    expAlreadyEarnedFromPreviousLevels = 10000;
                     break;
 
                 default:
                 case 10:
-                    // max level or bug so disable showing exp
+                    // Max level or bug so disable showing exp
                     return;
             }
 
-            float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expToSubtract;
-
+            float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expAlreadyEarnedFromPreviousLevels;
             
-
-            // If exp is gained or current item is switched then display exp and start timer.
+            // If exp is gained or current item is switched then display exp and start dissapearance timer.
             if( currentExp != nextExp || previousItem != currentItem ) {
-                timerToDissapear.Interval = timeBeforeFade;
+                timerToDissapear.Interval = timeBeforeExperienceBarFade;
                 timerToDissapear.Start();
                 shouldDrawExperienceBar = true;
             }
@@ -190,10 +192,11 @@ namespace Demiacle_SVM.UiMods {
                 return;
             }
 
-
             int barWidth = Convert.ToInt32( ( currentExp / expRequiredToLevel ) * maxBarWidth );
 
             float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - 340;
+
+            //shift display if game view has black borders
             if( Game1.isOutdoorMapSmallerThanViewport() ) {
                 int currentMapSize = ( Game1.currentLocation.map.Layers[ 0 ].LayerWidth * Game1.tileSize );
                 float blackSpace = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - currentMapSize;
@@ -209,41 +212,78 @@ namespace Demiacle_SVM.UiMods {
             // Experience fill
             Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( (int) positionX + 32, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 63, barWidth, 30 ), expFillColor );
 
-            if( drawLevelUp) {
-                Game1.drawWithBorder( "Level Up", Color.DarkSlateGray, Color.PaleTurquoise, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 38, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ) );
+            //Level Up text
+            if( shouldDrawLevelUp) {
+                Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 74, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ), levelUpIconRectangle, iconColor, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
+                Game1.drawWithBorder( "Level Up", Color.DarkSlateGray, Color.PaleTurquoise, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 28, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ) );
             }
         }
 
-        [DllImport( "winmm.dll" )]
-        public static extern int waveOutSetVolume( IntPtr hwo, uint dwVolume );
-
+        /// <summary>
+        /// Pauses the game, shows Level Up text and plays a chime, and unpauses after some time;
+        /// </summary>
         internal void onLevelUp( object sender, EventArgsLevelUp e ) {
             
+            switch( e.Type ) {
+                case EventArgsLevelUp.LevelType.Combat:
+                    levelUpIconRectangle = new Rectangle( 120, 428, 10, 10 );
+                    break;
+                case EventArgsLevelUp.LevelType.Farming:
+                    levelUpIconRectangle = new Rectangle( 10, 428, 10, 10 );
+                    break;
+                case EventArgsLevelUp.LevelType.Fishing:
+                    levelUpIconRectangle = new Rectangle( 20, 428, 10, 10 );
+                    break;
+                case EventArgsLevelUp.LevelType.Foraging:
+                    levelUpIconRectangle = new Rectangle( 60, 428, 10, 10 );
+                    break;
+                case EventArgsLevelUp.LevelType.Mining:
+                    levelUpIconRectangle = new Rectangle( 30, 428, 10, 10 );
+                    break;
+            }
+
             Game1.paused = true;
-            float prevAmbientVolume = Game1.ambientPlayerVolume;
-            float prevMusicVolume = Game1.musicPlayerVolume;           
 
-            drawLevelUp = true;
+            shouldDrawLevelUp = true;
 
+            timerToDissapear.Interval = timeBeforeExperienceBarFade;
+            timerToDissapear.Start();
+            shouldDrawExperienceBar = true;
+
+
+            float prevAmbientVolume = Game1.options.ambientVolumeLevel;
+            float prevMusicVolume = Game1.options.musicVolumeLevel;
+
+            if( prevMusicVolume > 0.01f ) {
+                se.Volume = Math.Min( 1, ( prevMusicVolume + 0.3f ) );
+            } else {
+                se.Volume = 0;
+            }
+            
             Task.Factory.StartNew( () => {
-
                 System.Threading.Thread.Sleep( 100 );
-                Game1.ambientPlayerVolume = Math.Max( 0, Game1.ambientPlayerVolume - 0.4f );
-                Game1.musicPlayerVolume = Math.Max( 0, Game1.ambientPlayerVolume - 0.4f );
 
+                Game1.musicCategory.SetVolume( Math.Max( 0, Game1.options.musicVolumeLevel - 0.3f ) );
+                Game1.ambientCategory.SetVolume( Math.Max( 0, Game1.options.ambientVolumeLevel - 0.3f ) );
+                
                 se.Play();
             } );
 
             Task.Factory.StartNew( () => {
-                System.Threading.Thread.Sleep( 2000 );
+                System.Threading.Thread.Sleep( lengthOfLevelUpPause );
                 Game1.paused = false;
-                drawLevelUp = false;
-                Game1.ambientPlayerVolume = prevAmbientVolume;
-                Game1.musicPlayerVolume = prevMusicVolume;
+                shouldDrawLevelUp = false;
+
+
+                Game1.musicCategory.SetVolume( prevMusicVolume );
+                Game1.ambientCategory.SetVolume( prevAmbientVolume );
             } );
           
         }
 
+        /// <summary>
+        /// Changes the type of experience to display
+        /// </summary>
         public void changeExperienceToDisplay( int index ) {
             Farmer farmer = Game1.player;
             currentLevelIndex = index;
@@ -264,11 +304,6 @@ namespace Demiacle_SVM.UiMods {
                     levelOfCurrentlyDisplayedExp = farmer.combatLevel;
                     break;
             }
-        }
-
-
-
-        internal void onPostRenderEvent( object sender, EventArgs e ) {
         }
         
     }
