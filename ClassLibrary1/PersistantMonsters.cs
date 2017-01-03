@@ -318,9 +318,9 @@ namespace Demiacle_SVM
                 }
             }
 
-            createSafeDialogue( "It looks like this old house has some bats... great...", 4000  );
-            createSafeDialogue( "Things feel different today...", 50000 );
-            createSafeDialogue( "Its as if the world is not what it once was... odd...", 100000 );
+            DemiacleUtility.createSafeDelayedDialogue( "It looks like this old house has some bats... great...", 4000  );
+            DemiacleUtility.createSafeDelayedDialogue( "Things feel different today...", 50000 );
+            DemiacleUtility.createSafeDelayedDialogue( "Its as if the world is not what it once was... odd...", 100000 );
             
             ModEntry.Log( "Mobs finished creating" );
             ModEntry.modData.hasMonstersBeenCreated = true;
@@ -427,22 +427,7 @@ namespace Demiacle_SVM
             }
         }
 
-        /// <summary>
-        /// Creates a dialogue that only shows up if a menu is not open. And retries every second to see if menu has closed
-        /// This is needed to stop a bug of disapearing items on forced exits of menu
-        /// </summary>
-        private void createSafeDialogue( string dialogue, int timer ) {
-            Task.Factory.StartNew( () => {
-                System.Threading.Thread.Sleep( timer );
-                while( true ) {
-                    System.Threading.Thread.Sleep( 1000 );
-                    if( !(Game1.activeClickableMenu is StardewValley.Menus.GameMenu)  ) {
-                        Game1.setDialogue( dialogue, true );
-                        return;
-                    }                         
-                }
-            } );
-        }
+        
 
         /// <summary>
         /// Re-sets isGlider property of glider monsters - see onPreRenderEvent( object, EventArgs )

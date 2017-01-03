@@ -111,7 +111,7 @@ namespace Demiacle_SVM {
             GraphicsEvents.OnPreRenderHudEvent += displayExperience.onPreRenderEvent;
             PlayerEvents.LeveledUp += displayExperience.onLevelUp;
 
-            TimeEvents.DayOfMonthChanged += luckOfDay.onNewDayC;
+            TimeEvents.DayOfMonthChanged += luckOfDay.onNewDay;
 
             // Mineshaft mod
             //PlayerEvents.LoadedGame += mineShaftMod.onLoad;

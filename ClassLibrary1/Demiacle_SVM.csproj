@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DemiacleUtility.cs" />
     <Compile Include="ElevatorMenuMod.cs" />
     <Compile Include="MineShaftExtension.cs" />
     <Compile Include="MineShaftMod.cs" />
