@@ -19,6 +19,7 @@ using System.Xml.Serialization;
 using Demiacle_SVM.OutdoorMonsters;
 using Demiacle_SVM.OutdoorMonsters.AI;
 using Demiacle_SVM.UiMods;
+using Microsoft.Xna.Framework.Audio;
 
 //create list of mobs
 
@@ -51,6 +52,8 @@ namespace Demiacle_SVM {
         public static Boolean isTesting = false;
 
         public ModEntry() {
+            
+
             modEntry = this;
             //updateXmlSerializer();
             persistantMonsters = new PersistantMonsters();
@@ -108,6 +111,7 @@ namespace Demiacle_SVM {
             
             GraphicsEvents.OnPreRenderHudEvent += displayExperience.onPreRenderEvent;
             GraphicsEvents.OnPostRenderHudEvent += displayExperience.onPostRenderEvent;
+            PlayerEvents.LeveledUp += displayExperience.onLevelUp;
 
             TimeEvents.DayOfMonthChanged += luckOfDay.onNewDayC;
 

@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 using StardewModdingAPI.Events;
 using StardewValley.Tools;
 using System.Timers;
+using System.Media;
+using Microsoft.Xna.Framework.Audio;
+using System.Runtime.InteropServices;
+using System.IO;
 
 namespace Demiacle_SVM.UiMods {
 
@@ -23,6 +27,7 @@ namespace Demiacle_SVM.UiMods {
      * Luck = 5 
     */
     
+        //TODO change this so that the currently display experience bar is displayed when an experience level is raised
     class UiModExperience {
 
         private int maxBarWidth = 175;
@@ -36,10 +41,16 @@ namespace Demiacle_SVM.UiMods {
         System.Timers.Timer timerToDissapear = new System.Timers.Timer();
         private bool shouldDrawExperienceBar = true;
 
+        SoundEffectInstance se;
         Item previousItem = null;
+        private bool drawLevelUp = false;
 
         public UiModExperience() {
-            timerToDissapear.Elapsed += stopTimerAndFadeBarOut;
+            Stream soundfile = TitleContainer.OpenStream( @"Mods\\Demiacle_SVM\\LevelUp.wav" );
+            SoundEffect soundEffect = SoundEffect.FromStream( soundfile );
+            se = soundEffect.CreateInstance();
+
+            se.Volume = 1;
         }
 
         private void stopTimerAndFadeBarOut( object sender, ElapsedEventArgs e ) {
@@ -49,9 +60,8 @@ namespace Demiacle_SVM.UiMods {
 
         internal void onPreRenderEvent( object sender, EventArgs e ) {
 
-            
-            
 
+            
             //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( 10, 10 ), new Rectangle( 0, 0, 10, 10 ), Color.Aqua ); DRAW A MOUSE CURSOR
             //Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( 0, 0, 64, 64 ), Color.Azure ); DRAW A RECTANGLE
             //Game1.drawWithBorder( "test", Color.Bisque, Color.Aquamarine, new Vector2( 64,64) ); TEXT WITH BORDER
@@ -198,6 +208,40 @@ namespace Demiacle_SVM.UiMods {
 
             // Experience fill
             Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( (int) positionX + 32, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 63, barWidth, 30 ), expFillColor );
+
+            if( drawLevelUp) {
+                Game1.drawWithBorder( "Level Up", Color.DarkSlateGray, Color.PaleTurquoise, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 38, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ) );
+            }
+        }
+
+        [DllImport( "winmm.dll" )]
+        public static extern int waveOutSetVolume( IntPtr hwo, uint dwVolume );
+
+        internal void onLevelUp( object sender, EventArgsLevelUp e ) {
+            
+            Game1.paused = true;
+            float prevAmbientVolume = Game1.ambientPlayerVolume;
+            float prevMusicVolume = Game1.musicPlayerVolume;           
+
+            drawLevelUp = true;
+
+            Task.Factory.StartNew( () => {
+
+                System.Threading.Thread.Sleep( 100 );
+                Game1.ambientPlayerVolume = Math.Max( 0, Game1.ambientPlayerVolume - 0.4f );
+                Game1.musicPlayerVolume = Math.Max( 0, Game1.ambientPlayerVolume - 0.4f );
+
+                se.Play();
+            } );
+
+            Task.Factory.StartNew( () => {
+                System.Threading.Thread.Sleep( 2000 );
+                Game1.paused = false;
+                drawLevelUp = false;
+                Game1.ambientPlayerVolume = prevAmbientVolume;
+                Game1.musicPlayerVolume = prevMusicVolume;
+            } );
+          
         }
 
         public void changeExperienceToDisplay( int index ) {
@@ -221,6 +265,8 @@ namespace Demiacle_SVM.UiMods {
                     break;
             }
         }
+
+
 
         internal void onPostRenderEvent( object sender, EventArgs e ) {
         }
