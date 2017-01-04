@@ -57,13 +57,18 @@ namespace Demiacle_SVM
                     }
                 }
 
-                if( !ModEntry.modData.hasMonstersBeenCreated ) {
-                    ModEntry.Log( "creating persistant monsters" );
-                    createAllMonsters();
+                if( !ModEntry.modData.hasMonstersBeenCreated && Game1.year == 1 && Game1.dayOfMonth == 1 && Game1.currentSeason == "spring" ) {                    
+                    List<Response> choices = new List<Response>();
+                    choices.Add( new Response( "yes", "Oh yes!" )  );
+                    choices.Add( new Response( "no", "NO! NO... no thank you. Goodbye now! " ) );
+                    
+                    // Game doesn't save if you hijack the thread with a dialogue... This implementation may cause issues... beware!
+                    // Maintain a delay here
+                    Task.Factory.StartNew( () => {
+                        System.Threading.Thread.Sleep( 1200 ); 
+                        Game1.currentLocation.createQuestionDialogue( "Would you like to apply Demiacle's Second Playthrough mod to this game?", choices.ToArray(), afterQuestionDialogue );
+                    } );
 
-                } else if ( !ModEntry.modData.hasMonstersBeenLoaded ) {
-                    ModEntry.Log( "loading persistant monsters" );
-                    //savedMonsters = ( Dictionary<Monster, GameLocation> ) serializer.Deserialize( saveFileLocation ); // cant deserialize animatedsprite
                 }
 
                 foreach( KeyValuePair<Monster, GameLocation> entry in savedMonsters ) {
@@ -77,6 +82,19 @@ namespace Demiacle_SVM
                 if( savedMonsters.Count > 0 ) {
                     //putPersistantMonstersInSave();
                 }
+            }
+        }
+
+        public void afterQuestionDialogue( Farmer who, string whichAnswer ) {
+            if( whichAnswer == "yes" ) {
+                createAllMonsters();
+                // TODO allow mineshaft mod here
+                DemiacleUtility.createSafeDelayedDialogue( "It looks like this old house has some bats... great...", 3000 );
+                DemiacleUtility.createSafeDelayedDialogue( "Things definitely feel different today...", 60000 );
+            }
+
+            if( whichAnswer == "no" ) {
+                DemiacleUtility.createSafeDelayedDialogue( "This definitely feels like a normal day! Beautiful!", 3000 );
             }
         }
 
@@ -153,6 +171,7 @@ namespace Demiacle_SVM
         /// Generates all the world map monsters and places them into savedMonsters
         /// </summary>
         private void createAllMonsters() {
+            ModEntry.Log( "Pooky monsters are being created!! sooooOooo PooOOoo000oooky!" );
             foreach ( GameLocation location in Game1.locations ) {
                 //ModEntry.Log( location.ToString() );
                 List<NPC> characters = location.characters;
@@ -316,13 +335,10 @@ namespace Demiacle_SVM
 
                         break;
                 }
-            }
-
-            DemiacleUtility.createSafeDelayedDialogue( "It looks like this old house has some bats... great...", 4000  );
-            DemiacleUtility.createSafeDelayedDialogue( "Things feel different today...", 50000 );
-            DemiacleUtility.createSafeDelayedDialogue( "Its as if the world is not what it once was... odd...", 100000 );
+            }            
             
             ModEntry.Log( "Mobs finished creating" );
+
             ModEntry.modData.hasMonstersBeenCreated = true;
             ModEntry.updateModData();
             //putPersistantMonstersInSave();
