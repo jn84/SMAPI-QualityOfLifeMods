@@ -89,6 +89,7 @@
     <Compile Include="ScytheDamageMod.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SpeedMod.cs" />
+    <Compile Include="UiMods\SocialPageMod.cs" />
     <Compile Include="UiMods\UiModAccurateHearts.cs" />
     <Compile Include="UiMods\UiModExperience.cs" />
     <Compile Include="UiMods\UiModItemRolloverInformation.cs" />

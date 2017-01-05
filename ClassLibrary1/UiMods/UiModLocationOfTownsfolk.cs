@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
+using StardewModdingAPI.Events;
 
 namespace Demiacle_SVM.UiMods {
     /// <summary>
@@ -17,7 +18,7 @@ namespace Demiacle_SVM.UiMods {
 
         List<NPC> townsfolk = new List<NPC>();
         List<NPC> townsfolkToIgnore = new List<NPC>();
-        
+
         internal void onPostRenderEvent( object sender, EventArgs e ) {
 
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
@@ -30,18 +31,6 @@ namespace Demiacle_SVM.UiMods {
                 return;
             }
             
-
-            //TODO this doesnt need to be populated every call
-            townsfolk.Clear();
-            foreach( GameLocation location in Game1.locations ) {
-                //ModEntry.Log(location.name);
-                foreach( NPC npc in location.characters ) {
-                    if( Game1.player.friendships.ContainsKey( npc.name ) ) {
-                        townsfolk.Add( npc );
-                    }
-                }
-            }
-
             foreach( NPC npc in townsfolk ) {
 
                 if( townsfolkToIgnore.Contains( npc )) {
@@ -242,6 +231,24 @@ namespace Demiacle_SVM.UiMods {
                 npcMugShot.draw( Game1.spriteBatch );
                 
                 return;
+            }
+        }
+
+        /// <summary>
+        /// Resets and populates the list of townsfolk to display every time the game menu is called
+        /// </summary>
+        internal void onMenuChange( object sender, EventArgsClickableMenuChanged e ) {
+            if( !( Game1.activeClickableMenu is GameMenu ) ) {
+                return;
+            }
+
+            townsfolk.Clear();
+            foreach( GameLocation location in Game1.locations ) {
+                foreach( NPC npc in location.characters ) {
+                    if( Game1.player.friendships.ContainsKey( npc.name ) ) {
+                        townsfolk.Add( npc );
+                    }
+                }
             }
         }
 

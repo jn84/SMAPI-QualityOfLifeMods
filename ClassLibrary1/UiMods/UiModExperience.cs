@@ -38,6 +38,7 @@ namespace Demiacle_SVM.UiMods {
         private int levelUpIndex = 0;
         private int levelOfCurrentlyDisplayedExp = 0;
         float currentExp = 0;
+        
 
         private static readonly int timeBeforeExperienceBarFade = 8000;
         private int lengthOfLevelUpPause = 2000;
@@ -280,6 +281,8 @@ namespace Demiacle_SVM.UiMods {
             } );
           
         }
+
+        
 
         /// <summary>
         /// Changes the type of experience to display

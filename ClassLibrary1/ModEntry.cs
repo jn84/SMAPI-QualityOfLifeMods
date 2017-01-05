@@ -83,10 +83,8 @@ namespace Demiacle_SVM {
             ControlEvents.KeyPressed += this.ReceiveKeyPress;
             PlayerEvents.LoadedGame += this.onLoadedGame;
 
-
             // Weapon and tool mod
             PlayerEvents.InventoryChanged += scytheDamageMod.onInvChange;
-
 
             // PersistantMonster mod
             GraphicsEvents.OnPreRenderEvent += persistantMonsters.onPreRenderEvent;
@@ -101,8 +99,9 @@ namespace Demiacle_SVM {
 
             // Ui Mods
             GraphicsEvents.OnPostRenderGuiEvent += locationOfTownsfolk.onPostRenderEvent;
+            MenuEvents.MenuChanged += locationOfTownsfolk.onMenuChange;
 
-            GraphicsEvents.OnPreRenderGuiEvent += accurateHearts.onPreRenderEvent;
+            MenuEvents.MenuChanged += accurateHearts.onMenuChange;
             GraphicsEvents.OnPostRenderGuiEvent += accurateHearts.onPostRenderEvent;
 
             GraphicsEvents.OnPreRenderGuiEvent += rolloverInformation.onPreRenderEvent;
