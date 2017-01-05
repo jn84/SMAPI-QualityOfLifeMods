@@ -155,7 +155,7 @@ namespace Demiacle_SVM.UiMods {
                 var fieldToCopy = field.GetValue( socialPage );
                 field.SetValue( this, fieldToCopy );
             }
-        }        
+        }              
 
     }
 }

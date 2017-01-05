@@ -11,7 +11,7 @@ using System.Reflection;
 namespace Demiacle_SVM.UiMods {
 
     /// <summary>
-    /// SocialPage overwriting handler. Necessary because the SocialPageMod cannot instantiate itself... maybe with a static method... hmmm
+    /// SocialPage overwriting handler. Also holds data between menu calls
     /// </summary>
     class UiModAccurateHearts {
         
