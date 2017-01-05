@@ -44,9 +44,9 @@ namespace Demiacle_SVM {
         private SpeedMod speedMod;
         private MineShaftMod mineShaftMod;
         private UiModLocationOfTownsfolk locationOfTownsfolk; //WIP
-        private UiModAccurateHearts accurateHearts; //WIP
+        private UiModAccurateHearts uiModAccurateHearts; //WIP
         private UiModItemRolloverInformation rolloverInformation;//WIP
-        private UiModExperience displayExperience;//WIP
+        private UiModExperience uiModExperience;//WIP
         private UiModLuckOfDay luckOfDay;//WIP
         public static ModEntry modEntry;
         public static Boolean isTesting = false;
@@ -60,10 +60,10 @@ namespace Demiacle_SVM {
             scytheDamageMod = new ScytheDamageMod();
             speedMod = new SpeedMod();
             mineShaftMod = new MineShaftMod();
-            locationOfTownsfolk = new UiModLocationOfTownsfolk();
-            accurateHearts = new UiModAccurateHearts();
+            uiModAccurateHearts = new UiModAccurateHearts();
+            locationOfTownsfolk = new UiModLocationOfTownsfolk( uiModAccurateHearts );
             rolloverInformation = new UiModItemRolloverInformation();
-            displayExperience = new UiModExperience();
+            uiModExperience = new UiModExperience();
             luckOfDay = new UiModLuckOfDay();
         }
 
@@ -101,14 +101,13 @@ namespace Demiacle_SVM {
             GraphicsEvents.OnPostRenderGuiEvent += locationOfTownsfolk.onPostRenderEvent;
             MenuEvents.MenuChanged += locationOfTownsfolk.onMenuChange;
 
-            MenuEvents.MenuChanged += accurateHearts.onMenuChange;
-            GraphicsEvents.OnPostRenderGuiEvent += accurateHearts.onPostRenderEvent;
+            MenuEvents.MenuChanged += uiModAccurateHearts.onMenuChange;
 
             GraphicsEvents.OnPreRenderGuiEvent += rolloverInformation.onPreRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += rolloverInformation.onPostRenderEvent;
             
-            GraphicsEvents.OnPreRenderHudEvent += displayExperience.onPreRenderEvent;
-            PlayerEvents.LeveledUp += displayExperience.onLevelUp;
+            GraphicsEvents.OnPreRenderHudEvent += uiModExperience.onPreRenderEvent;
+            PlayerEvents.LeveledUp += uiModExperience.onLevelUp;
 
             TimeEvents.DayOfMonthChanged += luckOfDay.onNewDay;
 

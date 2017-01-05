@@ -59,6 +59,11 @@ namespace Demiacle_SVM.UiMods {
                 OptionsCheckbox checkbox = new OptionsCheckbox( "", optionIndex );
                 socialPage.checkboxes.Add( checkbox );
 
+                if( !(Game1.player.friendships.ContainsKey( friend.name )) ) {
+                        checkbox.greyedOut = true;
+                        checkbox.isChecked = false;
+                }
+
                 if( savedData.ContainsKey( optionIndex ) ) {
                     checkbox.isChecked = savedData[ optionIndex ];
                 }

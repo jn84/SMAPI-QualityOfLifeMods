@@ -17,7 +17,12 @@ namespace Demiacle_SVM.UiMods {
     class UiModLocationOfTownsfolk {
 
         List<NPC> townsfolk = new List<NPC>();
-        List<NPC> townsfolkToIgnore = new List<NPC>();
+
+        private UiModAccurateHearts uiModAccurateHearts;
+
+        public UiModLocationOfTownsfolk( UiModAccurateHearts uiModAccurateHearts ) {
+            this.uiModAccurateHearts = uiModAccurateHearts;
+        }
 
         internal void onPostRenderEvent( object sender, EventArgs e ) {
 
@@ -33,9 +38,17 @@ namespace Demiacle_SVM.UiMods {
             
             foreach( NPC npc in townsfolk ) {
 
-                if( townsfolkToIgnore.Contains( npc )) {
-                    return;
+                int key = npc.name.GetHashCode();
+
+                // If doesn't contain a key from social page then dont display anything
+                if( !( uiModAccurateHearts.savedData.ContainsKey( key ) ) ) {
+                    continue;
+
+                // If key exists and value is false dont display anything
+                } else if ( uiModAccurateHearts.savedData[ key ] == false ) {
+                    continue;
                 }
+                
 
                 Rectangle rect = npc.getMugShotSourceRect();
                 rect.Height = rect.Height - 8;
@@ -252,12 +265,5 @@ namespace Demiacle_SVM.UiMods {
             }
         }
 
-        public void addToIgnoreList( NPC npc ) {
-            townsfolkToIgnore.Add( npc );
-        }
-
-        public void removeFromIgnoreList( NPC npc ) {
-            townsfolkToIgnore.Remove( npc );
-        }
     }
 }

@@ -18,7 +18,7 @@ namespace Demiacle_SVM.UiMods {
 
         public List<ClickableTextureComponent> friendNames;
         public List<OptionsCheckbox> checkboxes = new List<OptionsCheckbox>();
-        public Dictionary<int, bool> savedData;
+        public Dictionary<int, bool> savedData = new Dictionary<int, bool>();
 
         int panelWidth = 180;
         int panel1X = 144;
@@ -108,8 +108,7 @@ namespace Demiacle_SVM.UiMods {
                  { 0, 1, 1, 1, 0, },
                  { 0, 0, 1, 0, 0, }
             };
-
-            amountOfPixelsToFill = 10;
+            
             // Draw the squares from bottom to top and left to right
             for( int row = 3; row >= 0; row-- ) {
                 for( int column = 0; column < 5; column++ ) {
@@ -126,7 +125,7 @@ namespace Demiacle_SVM.UiMods {
         }
 
         /// <summary>
-        /// Updates the value of the checkbox when clicked
+        /// Updates the value of the checkbox when clicked and saves its state to be used with the mapMod
         /// </summary>
         public override void receiveLeftClick( int x, int y, bool playSound = true ) {
             base.receiveLeftClick( x, y, playSound );
