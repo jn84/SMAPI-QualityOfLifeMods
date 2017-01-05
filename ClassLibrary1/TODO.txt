@@ -42,11 +42,11 @@ COMPLETED -fix pathfinding so it doesnt create loops. parents are not being rese
 	COMPLETE -Display luck on new day
 	COMPLETE -Display exp on exp updates
 	Complete -Display location of townsfolk
-	-Display more accurate hearts
+	COMPLETE -Display more accurate hearts
 	-Display more info of items on mouseover
 
 -Events
-	-Grash fire - must water to put out
+	-Grass fire - must water to put out
 
 -General
-	-Offer an option to remove added game data from mob to continue playing as normal
+	-Add options page for game mods
