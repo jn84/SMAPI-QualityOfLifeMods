@@ -89,7 +89,10 @@
     <Compile Include="ScytheDamageMod.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SpeedMod.cs" />
+    <Compile Include="UiMods\InventoryPageMod.cs" />
+    <Compile Include="UiMods\ItemGrabMenuMod.cs" />
     <Compile Include="UiMods\SocialPageMod.cs" />
+    <Compile Include="UiMods\ToolbarMod.cs" />
     <Compile Include="UiMods\UiModAccurateHearts.cs" />
     <Compile Include="UiMods\UiModExperience.cs" />
     <Compile Include="UiMods\UiModItemRolloverInformation.cs" />
@@ -107,6 +110,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\Demiacle\Downloads\export\Stardew Valley\Stardew Valley.csproj">
+      <Project>{fd3c9503-1330-4ffb-965a-b22a39c1a77e}</Project>
+      <Name>Stardew Valley</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.1.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.1.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" />

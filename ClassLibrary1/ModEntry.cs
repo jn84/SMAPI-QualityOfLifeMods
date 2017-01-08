@@ -102,9 +102,9 @@ namespace Demiacle_SVM {
             MenuEvents.MenuChanged += locationOfTownsfolk.onMenuChange;
 
             MenuEvents.MenuChanged += uiModAccurateHearts.onMenuChange;
-
-            GraphicsEvents.OnPreRenderGuiEvent += rolloverInformation.onPreRenderEvent;
+            
             GraphicsEvents.OnPostRenderGuiEvent += rolloverInformation.onPostRenderEvent;
+            MenuEvents.MenuChanged += rolloverInformation.onMenuChange;
             
             GraphicsEvents.OnPreRenderHudEvent += uiModExperience.onPreRenderEvent;
             PlayerEvents.LeveledUp += uiModExperience.onLevelUp;

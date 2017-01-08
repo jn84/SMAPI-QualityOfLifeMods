@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,5 +25,22 @@ namespace Demiacle_SVM {
                 }
             } );
         }
+
+        /// <summary>
+        /// Uses reflection to copy fields from one object to the other. This allows greater extendibility
+        /// </summary>
+        /// <param name="objectToCopyTo"></param>
+        /// <param name="objectToCopyFrom"></param>
+        public static void copyFields( object objectToCopyTo, object objectToCopyFrom ) {
+            Type typeToUse = objectToCopyFrom.GetType();
+
+            FieldInfo[] fields = typeToUse.GetFields( BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public );
+
+            foreach( FieldInfo field in fields ) {
+                var fieldToCopy = field.GetValue( objectToCopyFrom );
+                field.SetValue( objectToCopyTo, fieldToCopy );
+            }
+        }
+
     }
 }

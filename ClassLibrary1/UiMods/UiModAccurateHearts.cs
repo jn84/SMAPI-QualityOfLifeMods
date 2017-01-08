@@ -28,6 +28,7 @@ namespace Demiacle_SVM.UiMods {
                 return;
             }
             
+            
             // Get pages from GameMenu            
             List<IClickableMenu> pages = ( List<IClickableMenu> ) typeof( GameMenu ).GetField( "pages", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( Game1.activeClickableMenu );
             
@@ -48,6 +49,7 @@ namespace Demiacle_SVM.UiMods {
                     pages[ k ] = socialPage;
 
                 }
+                
             }
 
             socialPage.checkboxes.Clear();
@@ -60,14 +62,13 @@ namespace Demiacle_SVM.UiMods {
                 socialPage.checkboxes.Add( checkbox );
 
                 if( !(Game1.player.friendships.ContainsKey( friend.name )) ) {
-                        checkbox.greyedOut = true;
-                        checkbox.isChecked = false;
+                    checkbox.greyedOut = true;
+                    checkbox.isChecked = false;
                 }
 
                 if( savedData.ContainsKey( optionIndex ) ) {
                     checkbox.isChecked = savedData[ optionIndex ];
                 }
-
             }
         }
     }
