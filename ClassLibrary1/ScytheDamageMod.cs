@@ -32,8 +32,8 @@ namespace Demiacle_SVM {
 
         public class Scythe : MeleeWeapon{
             public Scythe() : base( 47 ) {
-                minDamage = 100;
                 maxDamage = 200;
+                minDamage = 100;
                 //name = "SuperScythe"; this fails because crucial game code has checks against the name Scythe
                 description = "Not your ordinary everyday scythe.";
             }
