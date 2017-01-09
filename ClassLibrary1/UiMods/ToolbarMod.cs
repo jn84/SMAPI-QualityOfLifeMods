@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,33 +22,67 @@ namespace Demiacle_SVM.UiMods {
             base.draw( b );
             performHoverAction( Game1.getMouseX(), Game1.getMouseY() );
 
-            Item hoverItem = ( Item ) GetType().BaseType.GetField( "hoverItem", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( this );
+            Item hoverItem = GetType().BaseType.GetField( "hoverItem", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( this ) as Item;
 
             if( hoverItem == null ) {
                 return;
             }
             
-            string sellForAmount = "";
-            string totalStackSellsFor = "";
+            string sellForAmount = "";;
             
             if( hoverItem.salePrice() > 0 ) {
-                sellForAmount = "    " + hoverItem.salePrice();
+                sellForAmount = "\n  " + hoverItem.salePrice();
 
                 if( hoverItem.canStackWith( hoverItem ) && hoverItem.getStack() > 1) {
                     sellForAmount += $" ({hoverItem.salePrice() * hoverItem.getStack()})";
                 }
             }
 
-            ;
-            
-            IClickableMenu.drawToolTip( b, hoverItem.getDescription() + totalStackSellsFor, hoverItem.Name + sellForAmount, hoverItem, false, -1, 0, -1, -1, null, -1 );
-            
+            //GetType().BaseType.GetField( "hoverItem", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( this );
 
+            if( hoverItem is StardewValley.Object && ( (StardewValley.Object) hoverItem).type == "Seeds" ) {
+                Crop crop = new Crop( hoverItem.parentSheetIndex, 0, 0 );
+                Debris debris = new Debris( crop.indexOfHarvest, Game1.player.position, Game1.player.position );
+                StardewValley.Object item = new StardewValley.Object( Vector2.Zero, debris.chunkType, false );
+                sellForAmount += $"    {item.price}";
+            }
+            
+            IClickableMenu.drawToolTip( b, hoverItem.getDescription(), hoverItem.Name + sellForAmount, hoverItem, false, -1, 0, -1, -1, null, -1 );
+            
             // Draw coin
             if( sellForAmount != "") {
-                b.Draw( Game1.debrisSpriteSheet, new Vector2( Game1.getMousePosition().X + 84 + Game1.dialogueFont.MeasureString( hoverItem.Name ).X, Game1.getMousePosition().Y + 72 ), new Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.debrisSpriteSheet, 8, 16, 16 ) ), Color.White, 0f, new Vector2( 8f, 8f ), ( float ) Game1.pixelZoom, SpriteEffects.None, 0.95f );
 
+                // yPositionOnScreen is a new private field for this class... who knows why
+                int yPositionOnScreen = (int) typeof( Toolbar ).GetField( "yPositionOnScreen", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( this );
+                int yOffsetForBottom = ( yPositionOnScreen > 200 ) ? ( int ) Game1.smallFont.MeasureString( hoverItem.getDescription() ).Y + Game1.tileSize : 0;
+
+                float iconPositionX = Game1.getMousePosition().X + 78;
+                float iconPositionY = 0;
+
+                float fixTopX = 0;
+
+                // If Toolbar is on the bottom
+                if( yPositionOnScreen > 200 ) {
+                    iconPositionY = yPositionOnScreen - Game1.smallFont.MeasureString( hoverItem.getDescription() ).Y - 89;
+
+                // If Toolbar is on the Top
+                } else {
+                    iconPositionY = Game1.getMousePosition().Y + 112;
+                    fixTopX = 16;
+
+                }
+
+                b.Draw( Game1.debrisSpriteSheet, new Vector2( iconPositionX - fixTopX, iconPositionY ), new Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.debrisSpriteSheet, 8, 16, 16 ) ), Color.White, 0f, new Vector2( 8f, 8f ), ( float ) Game1.pixelZoom, SpriteEffects.None, 0.95f );
+
+
+                // Draw harvest icon
+                if(  hoverItem is StardewValley.Object && ( ( StardewValley.Object ) hoverItem ).type == "Seeds" ) {
+                    Rectangle spriteRectangle = new Rectangle( 60, 428, 10, 10 );
+                    Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( Game1.getMousePosition().X + Game1.dialogueFont.MeasureString( sellForAmount ).X - 19 - fixTopX, iconPositionY - 20 ), spriteRectangle, Color.White, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
+                }
             }
+
+            
         }
 
 

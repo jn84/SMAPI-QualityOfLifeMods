@@ -218,6 +218,9 @@ namespace Demiacle_SVM.UiMods {
                 Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 74, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ), levelUpIconRectangle, iconColor, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
                 Game1.drawWithBorder( "Level Up", Color.DarkSlateGray, Color.PaleTurquoise, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 28, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ) );
             }
+
+
+
         }
 
         /// <summary>

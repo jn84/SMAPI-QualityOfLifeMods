@@ -143,7 +143,10 @@ namespace Demiacle_SVM {
             }
 
             if( $"{e.KeyPressed}" == "N" ) {
-                Log( "Current getTilelocationpoint is X: " + Game1.player.getTileX() + " Y:" + Game1.player.getTileY() );
+                //Log( "Current getTilelocationpoint is X: " + Game1.player.getTileX() + " Y:" + Game1.player.getTileY() );
+
+                Game1.performTenMinuteClockUpdate();
+
                 /*
                 Log( "Current gettilelocation.x is X: " + Game1.player.getTileLocation().X + " Y:" + Game1.player.position.Y / Game1.tileSize );
                 Log( "Current gettilex is X: " + Game1.player.getTileX() + " Y:" + Game1.player.position.Y / Game1.tileSize );
