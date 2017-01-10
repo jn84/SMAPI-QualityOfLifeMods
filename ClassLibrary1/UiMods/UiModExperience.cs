@@ -38,6 +38,8 @@ namespace Demiacle_SVM.UiMods {
         private int levelUpIndex = 0;
         private int levelOfCurrentlyDisplayedExp = 0;
         float currentExp = 0;
+
+        List<ExpPointDisplay> expPointDisplays = new List<ExpPointDisplay>();
         
 
         private static readonly int timeBeforeExperienceBarFade = 8000;
@@ -172,18 +174,25 @@ namespace Demiacle_SVM.UiMods {
                     break;
 
                 default:
+                // Max level or bug so disable showing exp
                 case 10:
-                    // Max level or bug so disable showing exp
                     return;
             }
 
             float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expAlreadyEarnedFromPreviousLevels;
-            
+
             // If exp is gained or current item is switched then display exp and start dissapearance timer.
-            if( currentExp != nextExp || previousItem != currentItem ) {
-                timerToDissapear.Interval = timeBeforeExperienceBarFade;
-                timerToDissapear.Start();
-                shouldDrawExperienceBar = true;
+
+
+
+            // Only show experience bar if items change
+            if( previousItem != currentItem ) {
+                displayExperienceBar();
+
+            // Create an experience point display above characters head and show experience bar on exp gain
+            } else if( currentExp != nextExp ) {
+                displayExperienceBar();
+                expPointDisplays.Add( new ExpPointDisplay( nextExp - currentExp, Game1.player.getLocalPosition( Game1.viewport ) ) );
             }
 
             previousItem = currentItem;
@@ -197,14 +206,14 @@ namespace Demiacle_SVM.UiMods {
 
             float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - 340;
 
-            //shift display if game view has black borders
+            // Shift display if game view has black borders
             if( Game1.isOutdoorMapSmallerThanViewport() ) {
                 int currentMapSize = ( Game1.currentLocation.map.Layers[ 0 ].LayerWidth * Game1.tileSize );
                 float blackSpace = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - currentMapSize;
                 positionX = positionX - ( blackSpace / 2 );
             }
 
-            //border
+            // Border
             Game1.drawDialogueBox( (int) positionX, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 160, 240, 160, false, true );
 
             // Icon
@@ -213,14 +222,33 @@ namespace Demiacle_SVM.UiMods {
             // Experience fill
             Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( (int) positionX + 32, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 63, barWidth, 30 ), expFillColor );
 
-            //Level Up text
+            // Level Up display
             if( shouldDrawLevelUp) {
+
+                // Icon
                 Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 74, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ), levelUpIconRectangle, iconColor, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
+                // Text
                 Game1.drawWithBorder( "Level Up", Color.DarkSlateGray, Color.PaleTurquoise, new Vector2( Game1.player.getLocalPosition( Game1.viewport ).X - 28, Game1.player.getLocalPosition( Game1.viewport ).Y - 130 ) );
             }
 
+            foreach( ExpPointDisplay experienceDisplay in expPointDisplays ) {
+                experienceDisplay.draw();
+            }
 
+            for( int i = expPointDisplays.Count - 1; i >= 0; i-- ) {
+                if( expPointDisplays[i].isInvisible() ) {
+                    expPointDisplays.RemoveAt( i );
+                } else {
+                    expPointDisplays[ i ].draw();
+                }
 
+            }
+        }
+
+        private void displayExperienceBar() {
+            timerToDissapear.Interval = timeBeforeExperienceBarFade;
+            timerToDissapear.Start();
+            shouldDrawExperienceBar = true;
         }
 
         /// <summary>

@@ -110,6 +110,9 @@ namespace Demiacle_SVM {
             PlayerEvents.LeveledUp += uiModExperience.onLevelUp;
 
             TimeEvents.DayOfMonthChanged += luckOfDay.onNewDay;
+            LocationEvents.CurrentLocationChanged += luckOfDay.onLocationChange;
+            GraphicsEvents.OnPreRenderHudEvent += luckOfDay.onPreRender;
+            GraphicsEvents.OnPostRenderHudEvent += luckOfDay.onPostRender;
 
             // Mineshaft mod
             //PlayerEvents.LoadedGame += mineShaftMod.onLoad;
@@ -120,6 +123,8 @@ namespace Demiacle_SVM {
             PlayerEvents.InventoryChanged += speedMod.onInvChange;
             GameEvents.SecondUpdateTick += speedMod.checkTileForRoad;
             GameEvents.QuarterSecondTick += speedMod.forcePlayerToSpeed;
+
+
         }
 
         private void ReceiveKeyPress(object sender, EventArgsKeyPressed e){

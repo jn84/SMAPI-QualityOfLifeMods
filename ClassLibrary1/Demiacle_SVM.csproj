@@ -93,6 +93,7 @@
     <Compile Include="ScytheDamageMod.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SpeedMod.cs" />
+    <Compile Include="UiMods\ExpPointDisplay.cs" />
     <Compile Include="UiMods\InventoryPageMod.cs" />
     <Compile Include="UiMods\ItemGrabMenuMod.cs" />
     <Compile Include="UiMods\SocialPageMod.cs" />

@@ -26,6 +26,30 @@ namespace Demiacle_SVM {
             } );
         }
 
+        public static float getWidthInPlayArea() {
+            if( Game1.isOutdoorMapSmallerThanViewport() ) {
+                float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
+                int currentMapSize = ( Game1.currentLocation.map.Layers[ 0 ].LayerWidth * Game1.tileSize );
+                float blackSpace = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - currentMapSize;
+                positionX = positionX - ( blackSpace / 2 );
+                return positionX;
+            } else {
+                return Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
+            }
+        }
+
+        public static float getWidthInPlayArea( GameLocation location) {
+            if( Game1.isOutdoorMapSmallerThanViewport() ) {
+                float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
+                int currentMapSize = ( location.map.Layers[ 0 ].LayerWidth * Game1.tileSize );
+                float blackSpace = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - currentMapSize;
+                positionX = positionX - ( blackSpace / 2 );
+                return positionX;
+            } else {
+                return Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
+            }
+        }
+
         /// <summary>
         /// Uses reflection to copy fields from one object to the other. This allows greater extendibility
         /// </summary>

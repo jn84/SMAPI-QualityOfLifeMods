@@ -43,7 +43,7 @@ COMPLETED -fix pathfinding so it doesnt create loops. parents are not being rese
 	COMPLETE -Display exp on exp updates
 	Complete -Display location of townsfolk
 	COMPLETE -Display more accurate hearts
-	-Display more info of items on mouseover
+	COMPLETE -Display more info of items on mouseover
 
 -Events
 	-Grass fire - must water to put out
