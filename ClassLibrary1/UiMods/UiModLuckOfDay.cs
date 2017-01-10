@@ -49,7 +49,7 @@ namespace Demiacle_SVM.UiMods {
         }
 
         internal void onLocationChange( object sender, EventArgsCurrentLocationChanged e ) {
-            icon = new ClickableTextureComponent( "", new Rectangle( ( int ) DemiacleUtility.getWidthInPlayArea(  ) - 134, 260, 10 * Game1.pixelZoom, 14 * Game1.pixelZoom ), "", "hoverText", Game1.mouseCursors, new Rectangle( 50, 428, 10, 14 ), Game1.pixelZoom );
+            icon = new ClickableTextureComponent( "", new Rectangle( ( int ) DemiacleUtility.getWidthInPlayArea(  ) - 134, 260, 10 * Game1.pixelZoom, 14 * Game1.pixelZoom ), "", "", Game1.mouseCursors, new Rectangle( 50, 428, 10, 14 ), Game1.pixelZoom );
         }
 
         internal void onPostRender( object sender, EventArgs e ) {

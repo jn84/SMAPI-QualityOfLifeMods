@@ -35,7 +35,6 @@ namespace Demiacle_SVM.UiMods {
         private int maxBarWidth = 175;
 
         private int currentLevelIndex = 4;
-        private int levelUpIndex = 0;
         private int levelOfCurrentlyDisplayedExp = 0;
         float currentExp = 0;
 
@@ -53,6 +52,8 @@ namespace Demiacle_SVM.UiMods {
 
         private bool shouldDrawExperienceBar = false;
         private bool shouldDrawLevelUp = false;
+        ClickableTextureComponent test;
+        private string hoverText;
 
         SoundEffectInstance se;
         Timer timerToDissapear = new Timer();
@@ -64,6 +65,8 @@ namespace Demiacle_SVM.UiMods {
             SoundEffect soundEffect = SoundEffect.FromStream( soundfile );
             se = soundEffect.CreateInstance();
             se.Volume = 1;
+            timerToDissapear.Elapsed += stopTimerAndFadeBarOut;
+
         }
 
         private void stopTimerAndFadeBarOut( object sender, ElapsedEventArgs e ) {
@@ -180,7 +183,7 @@ namespace Demiacle_SVM.UiMods {
             }
 
             float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expAlreadyEarnedFromPreviousLevels;
-
+            
             // If exp is gained or current item is switched then display exp and start dissapearance timer.
 
 
@@ -221,6 +224,15 @@ namespace Demiacle_SVM.UiMods {
 
             // Experience fill
             Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( (int) positionX + 32, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 63, barWidth, 30 ), expFillColor );
+
+            // Hacky way to handle a mouseover
+            test = new ClickableTextureComponent( "", new Rectangle( ( int ) positionX - 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 80, 260, 100 ), "", "", Game1.mouseCursors, new Rectangle( 0, 0, 0, 0 ), Game1.pixelZoom );
+            if( test.containsPoint( Game1.getMouseX(), Game1.getMouseY() ) ) {
+               // Game1.spriteBatch.DrawString( Game1.dialogueFont, $"{currentExp - expAlreadyEarnedFromPreviousLevels} / {  expRequiredToLevel -expAlreadyEarnedFromPreviousLevels}", new Vector2( positionX + 20, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 110 ), Color.White );
+                Game1.drawWithBorder( $"{currentExp - expAlreadyEarnedFromPreviousLevels} / {  expRequiredToLevel - expAlreadyEarnedFromPreviousLevels}", Color.Black, Color.White, new Vector2( positionX + 20, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 114 ) );
+            }
+
+
 
             // Level Up display
             if( shouldDrawLevelUp) {
