@@ -38,13 +38,16 @@ namespace Demiacle_SVM.UiMods {
                 }
             }
 
-            //GetType().BaseType.GetField( "hoverItem", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( this );
-
-            if( hoverItem is StardewValley.Object && ( (StardewValley.Object) hoverItem).type == "Seeds" ) {
-                Crop crop = new Crop( hoverItem.parentSheetIndex, 0, 0 );
-                Debris debris = new Debris( crop.indexOfHarvest, Game1.player.position, Game1.player.position );
-                StardewValley.Object item = new StardewValley.Object( Vector2.Zero, debris.chunkType, false );
-                sellForAmount += $"    {item.price}";
+            bool isDrawingHarvestPrice = false;
+            // Adds the price of the fully grown crop to the display text
+            if( hoverItem is StardewValley.Object && ( (StardewValley.Object) hoverItem).type == "Seeds" && sellForAmount != "" ) {
+                if( hoverItem.Name != "Mixed Seeds" || hoverItem.Name != "Winter Seeds" ) {
+                    Crop crop = new Crop( hoverItem.parentSheetIndex, 0, 0 );
+                    Debris debris = new Debris( crop.indexOfHarvest, Game1.player.position, Game1.player.position );
+                    StardewValley.Object item = new StardewValley.Object( Vector2.Zero, debris.chunkType, false );
+                    sellForAmount += $"    {item.price}";
+                    isDrawingHarvestPrice = true;
+                }
             }
             
             IClickableMenu.drawToolTip( b, hoverItem.getDescription(), hoverItem.Name + sellForAmount, hoverItem, false, -1, 0, -1, -1, null, -1 );
@@ -76,7 +79,7 @@ namespace Demiacle_SVM.UiMods {
 
 
                 // Draw harvest icon
-                if(  hoverItem is StardewValley.Object && ( ( StardewValley.Object ) hoverItem ).type == "Seeds" ) {
+                if( isDrawingHarvestPrice ) {
                     Rectangle spriteRectangle = new Rectangle( 60, 428, 10, 10 );
                     Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( Game1.getMousePosition().X + Game1.dialogueFont.MeasureString( sellForAmount ).X - 19 - fixTopX, iconPositionY - 20 ), spriteRectangle, Color.White, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
                 }
