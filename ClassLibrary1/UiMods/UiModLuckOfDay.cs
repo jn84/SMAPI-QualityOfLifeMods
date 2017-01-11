@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Menus;
 
 namespace Demiacle_SVM.UiMods {
-    class UiModLuckOfDay {
+    class UiModLuckOfDay : ToggleUiOption{
 
         private ClickableTextureComponent icon;
         private string hoverText = "";
@@ -65,6 +65,10 @@ namespace Demiacle_SVM.UiMods {
                 IClickableMenu.drawHoverText( Game1.spriteBatch, hoverText, Game1.dialogueFont );
                 //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
             }
+        }
+
+        public void toggleOption( string theOption ) {
+            throw new NotImplementedException();
         }
     }
 }

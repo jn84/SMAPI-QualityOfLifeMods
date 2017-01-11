@@ -20,6 +20,9 @@ using Demiacle_SVM.OutdoorMonsters;
 using Demiacle_SVM.OutdoorMonsters.AI;
 using Demiacle_SVM.UiMods;
 using Microsoft.Xna.Framework.Audio;
+using Polenter.Serialization;
+using System.IO;
+using System.Reflection;
 
 //create list of mobs
 
@@ -38,45 +41,44 @@ namespace Demiacle_SVM {
     public class ModEntry : Mod {
 
         public static ModData modData;
-        private static string saveFilePostfix = "_modData";
-        private PersistantMonsters persistantMonsters;
-        private ScytheDamageMod scytheDamageMod;
-        private SpeedMod speedMod;
-        private MineShaftMod mineShaftMod;
-        private UiModLocationOfTownsfolk locationOfTownsfolk; //WIP
-        private UiModAccurateHearts uiModAccurateHearts; //WIP
-        private UiModItemRolloverInformation rolloverInformation;//WIP
-        private UiModExperience uiModExperience;//WIP
-        private UiModLuckOfDay luckOfDay;//WIP
+        public static string modDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_SVM\\";
+        private static string saveFilePostfix = "_modData.xml";
         public static ModEntry modEntry;
         public static Boolean isTesting = false;
+        private static SharpSerializer serializer = new SharpSerializer();
             
         public override void Entry(IModHelper helper) {
 
+            serializer.PropertyProvider.AttributesToIgnore.Clear();
+            serializer.PropertyProvider.AttributesToIgnore.Add( typeof( XmlIgnoreAttribute ) );
+                
+
             modEntry = this;
+            modData = new ModData();
 
             // General mods needed for all other mods
-            GameEvents.GameLoaded += this.updateXmlSerializer;
-            ControlEvents.KeyPressed += this.ReceiveKeyPress;
-            PlayerEvents.LoadedGame += this.onLoadedGame;
+            GameEvents.GameLoaded += overrideXMLSerializer;
+            ControlEvents.KeyPressed += ReceiveKeyPress;
+            PlayerEvents.LoadedGame += loadModData;
 
             MenuEvents.MenuChanged += SkipIntro.onMenuChange;
 
             //updateXmlSerializer();
-            persistantMonsters = new PersistantMonsters();
-            scytheDamageMod = new ScytheDamageMod();
-            speedMod = new SpeedMod();
-            mineShaftMod = new MineShaftMod();
-            uiModAccurateHearts = new UiModAccurateHearts();
-            locationOfTownsfolk = new UiModLocationOfTownsfolk( uiModAccurateHearts );
-            rolloverInformation = new UiModItemRolloverInformation();
-            uiModExperience = new UiModExperience();
-            luckOfDay = new UiModLuckOfDay();
-            OptionsPage optionPage = new OptionsPage( modData );
+            PersistantMonsters persistantMonsters = new PersistantMonsters();
+            ScytheDamageMod scytheDamageMod = new ScytheDamageMod();
+            SpeedMod speedMod = new SpeedMod();
+            MineShaftMod mineShaftMod = new MineShaftMod();
 
+            UiModAccurateHearts uiModAccurateHearts = new UiModAccurateHearts();
+            UiModLocationOfTownsfolk uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk( uiModAccurateHearts );
+            UiModItemRolloverInformation uiModItemrolloverInformation = new UiModItemRolloverInformation();
+            UiModExperience uiModExperience = new UiModExperience();
+            UiModLuckOfDay uiModluckOfDay = new UiModLuckOfDay();
+
+            OptionsPage optionPage = new OptionsPage( modData, uiModAccurateHearts, uiModLocationOfTownsfolk, uiModItemrolloverInformation, uiModExperience, uiModluckOfDay );
 
         }
-        
+
         internal static void Log( string log ) {
             if( isTesting ) {
                 System.Console.WriteLine( log );
@@ -87,15 +89,14 @@ namespace Demiacle_SVM {
         }
 
         private void ReceiveKeyPress(object sender, EventArgsKeyPressed e){
+
             if( Game1.currentLocation.name == null) {
                 return;
             }
-            //this.Monitor.Log( $"Player pressed {e.KeyPressed} and is currently in {Game1.currentLocation.name} at location {Game1.player.position} and color is {Game1.outdoorLight}" );
+
             foreach (NPC npc in Game1.currentLocation.characters) {
                 //this.Monitor.Log("char list after " + npc.name);
             }
-
-            
 
             if ( $"{e.KeyPressed}" == "Q" ) {
                 List<NPC> characters = Game1.currentLocation.characters;
@@ -108,7 +109,9 @@ namespace Demiacle_SVM {
 
             if( $"{e.KeyPressed}" == "N" ) {
 
-                
+                updateModData();
+                //serializer.Serialize( modData.uiOptions, modDirectory + Game1.player.name + saveFilePostfix );
+
                 //Log( "Current getTilelocationpoint is X: " + Game1.player.getTileX() + " Y:" + Game1.player.getTileY() );
 
                 //Game1.performTenMinuteClockUpdate();
@@ -122,36 +125,34 @@ namespace Demiacle_SVM {
 
             }
 
-
         }
 
         /// <summary>
         /// Loads mod specific data
         /// </summary>
-        internal void onLoadedGame( object sender, EventArgsLoadedGameChanged e ) {
-            this.Monitor.Log( "On Farmer Changed is being called" );
+        internal void loadModData( object sender, EventArgsLoadedGameChanged e ) {
 
             string playerName = Game1.player.name;
-            this.Monitor.Log( "Current farmer loaded: " + playerName );
 
-            // file \Mods\Demiacle_SVM\playerName.xml
+            // File: \Mods\Demiacle_SVM\playerName_modData.xml
             // load file 
-            if( Serializer.FileExists( playerName + saveFilePostfix ) ) {
-                this.Monitor.Log( "Mod file already exists for this player.... loading" );
-                Serializer.ReadFromXmlFile( out modData, playerName + saveFilePostfix );
-                // create file and ModData
+            if( File.Exists( modDirectory + playerName + saveFilePostfix ) ) {
+                this.Monitor.Log( $"Mod data already exists for this {playerName}.... loading" );
+                Serializer.ReadFromXmlFile( out modData, playerName );    
+
+            // create file and ModData
             } else {
-                this.Monitor.Log( "Mod file does not exist for this player... creating file" );
-                modData = new ModData();
+                this.Monitor.Log( $"Mod data does not exist for this {playerName}... creating file" );
                 updateModData();
             }
+
         }
 
         /// <summary>
         /// Updates the XmlSerializer to allow specific monster types.
         /// This allows us to save all the specific monster data between days.
         /// </summary>
-        private void updateXmlSerializer( object sender, EventArgs e ) {
+        private void overrideXMLSerializer( object sender, EventArgs e ) {
             StardewValley.SaveGame.locationSerializer = new XmlSerializer( typeof( GameLocation ), new Type[ 42 ]
             {
                 typeof (Tool),
@@ -252,7 +253,8 @@ namespace Demiacle_SVM {
         /// Overwrites the current modData to file
         /// </summary>
         internal static void updateModData() {
-            Serializer.WriteToXmlFile( modData, Game1.player.name + saveFilePostfix );
+            Serializer.WriteToXmlFile( modData, Game1.player.name );
         }
+
     }
 }

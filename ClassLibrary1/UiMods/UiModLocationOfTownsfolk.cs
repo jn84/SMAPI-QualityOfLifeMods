@@ -14,7 +14,7 @@ namespace Demiacle_SVM.UiMods {
     /// <summary>
     /// Displays mugshots of townsfolk on the map.
     /// </summary>
-    class UiModLocationOfTownsfolk {
+    class UiModLocationOfTownsfolk : ToggleUiOption {
 
         List<NPC> townsfolk = new List<NPC>();
 
@@ -267,5 +267,8 @@ namespace Demiacle_SVM.UiMods {
             }
         }
 
+        public void toggleOption( string theOption ) {
+            throw new NotImplementedException();
+        }
     }
 }

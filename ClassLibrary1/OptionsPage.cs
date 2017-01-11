@@ -8,68 +8,78 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Demiacle_SVM.UiMods;
 
 namespace Demiacle_SVM {
     class OptionsPage {
 
         private ModData modData;
+
         private static readonly int WIDTH = 800;
         private static readonly int HEIGHT = 800;
 
         private ModOptionMenu optionMenu;
-        private bool shouldDraw = false;
+        private UiModAccurateHearts uiModAccurateHearts;
+        private UiModLocationOfTownsfolk uiModLocationOfTownsfolk;
+        private UiModItemRolloverInformation uiModItemrolloverInformation;
+        private UiModExperience uiModExperience;
+        private UiModLuckOfDay uiModluckOfDay;
+        private List<ToggleUiOption> optionMods = new List<ToggleUiOption>();
 
         public OptionsPage( ModData modData ) {
-            ControlEvents.KeyPressed += onKeyPress;
             this.modData = modData;
-            GraphicsEvents.OnPreRenderGuiEvent += onPreRenderEvent;
-            PlayerEvents.LoadedGame += onLoadedGame;
+            PlayerEvents.LoadedGame += initialize;
         }
 
-        private void onLoadedGame( object sender, EventArgsLoadedGameChanged e ) {
-            optionMenu = new ModOptionMenu( Game1.viewport.Width / 2 - WIDTH / 2, Game1.viewport.Height / 2 - HEIGHT / 2, WIDTH, HEIGHT );
+        public OptionsPage( ModData modData, UiModAccurateHearts uiModAccurateHearts, UiModLocationOfTownsfolk uiModLocationOfTownsfolk, UiModItemRolloverInformation uiModItemrolloverInformation, UiModExperience uiModExperience, UiModLuckOfDay uiModluckOfDay ) : this( modData ) {
+            optionMods.Add( uiModAccurateHearts );
+            optionMods.Add( uiModLocationOfTownsfolk );
+            optionMods.Add( uiModItemrolloverInformation);
+            optionMods.Add( uiModExperience );
+            optionMods.Add( uiModluckOfDay );
         }
 
-        private void onPreRenderEvent( object sender, EventArgs e ) {
-           // if( shouldDraw ) {
-             //   optionMenu.draw( Game1.spriteBatch );
-            //}
+        private void initialize( object sender, EventArgsLoadedGameChanged e ) {
+            optionMenu = new ModOptionMenu( Game1.viewport.Width / 2 - WIDTH / 2, Game1.viewport.Height / 2 - HEIGHT / 2, WIDTH, HEIGHT, optionMods );
+            ControlEvents.KeyPressed += onKeyPress;
         }
+
 
         private void onKeyPress( object sender, EventArgsKeyPressed e ) {
 
-
-            if( !Game1.player.canMove && Game1.activeClickableMenu == null ) {
+            if( !Game1.player.canMove ) {
                 return;
             }
 
             if( $"{e.KeyPressed}" == "N" ) {
                 if( Game1.activeClickableMenu != null && Game1.activeClickableMenu == optionMenu ) {
                     Game1.activeClickableMenu = null;
+                    ModEntry.updateModData();
                 } else {
-                    //Game1.paused = !Game1.paused;
-                    //shouldDraw = !shouldDraw;
                     Game1.activeClickableMenu = optionMenu;
                 }
-               // GraphicsEvents.OnPreRenderGuiEvent += onPreRenderEvent;
-
             }
+
         }
 
         internal class ModOptionMenu : IClickableMenu {
 
             private List<OptionsElement> options = new List<OptionsElement>();
             private readonly int OPTION_HEIGHT = ( int ) Game1.dialogueFont.MeasureString( "t" ).Y + 40;
+            private List<ToggleUiOption> optionMods = new List<ToggleUiOption>();
 
-            internal ModOptionMenu( int x, int y, int width, int height ) : base( x, y, width, height ) {
+
+            internal ModOptionMenu( int x, int y, int width, int height, List<ToggleUiOption> optionMods ) : base( x, y, width, height ) {
+
                 int count = 0;
                 int positionOfCheckboxesX = this.xPositionOnScreen + 40;
-                options.Add( new OptionsCheckbox( "Show luck icon", 9990, positionOfCheckboxesX, this.yPositionOnScreen + count++ * OPTION_HEIGHT ) );
-                options.Add( new OptionsCheckbox( "Show experience bar", 9990, positionOfCheckboxesX, this.yPositionOnScreen + count++ * OPTION_HEIGHT  ) );
-                options.Add( new OptionsCheckbox( "Experience bar always invisible", 9990, positionOfCheckboxesX, this.yPositionOnScreen + count++ * OPTION_HEIGHT  ) );
-                options.Add( new OptionsCheckbox( "Show heart fills", 9990, positionOfCheckboxesX, this.yPositionOnScreen + count++ * OPTION_HEIGHT  ) );
-                options.Add( new OptionsCheckbox( "Show npcs on map", 9990, positionOfCheckboxesX, this.yPositionOnScreen + count++ * OPTION_HEIGHT  ) );
-                options.Add( new OptionsCheckbox( "Show extra item information", 9990, positionOfCheckboxesX, this.yPositionOnScreen + count++ * OPTION_HEIGHT  ) );
+
+                foreach( KeyValuePair<string,bool> uiOptionData in ModEntry.modData.uiOptions ) {
+                    OptionsCheckbox box = new OptionsCheckbox( uiOptionData.Key, uiOptionData.Key.GetHashCode(), positionOfCheckboxesX, this.yPositionOnScreen + count++ * OPTION_HEIGHT );
+                    options.Add( box );
+                    box.isChecked = uiOptionData.Value;
+                }
+
             }
 
             public override void draw( SpriteBatch b ) {
@@ -80,7 +90,6 @@ namespace Demiacle_SVM {
                 }
                 Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
 
-                //base.draw( b );
             }
 
             public override void receiveLeftClick( int x, int y, bool playSound = true ) {
@@ -88,11 +97,14 @@ namespace Demiacle_SVM {
 
                 foreach( OptionsCheckbox checkBox in options ) {
                     if( checkBox.bounds.Contains( x, y ) ) {
-
                         checkBox.receiveLeftClick( x, y );
-                        //mod
+                        ModEntry.modData.uiOptions[ checkBox.label ] = checkBox.isChecked;
+                        foreach( ToggleUiOption mod in optionMods ) {
+                            mod.toggleOption( checkBox.label );
+                        }
                     }
                 }
+
             }
 
             public override void receiveRightClick( int x, int y, bool playSound = true ) {

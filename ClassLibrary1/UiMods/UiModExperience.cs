@@ -30,7 +30,7 @@ namespace Demiacle_SVM.UiMods {
     /// <summary>
     /// The mod that shows an experienceBar and plays an animation on level up
     /// </summary>
-    class UiModExperience {
+    class UiModExperience : ToggleUiOption{
 
         private int maxBarWidth = 175;
 
@@ -355,6 +355,15 @@ namespace Demiacle_SVM.UiMods {
                     break;
             }
         }
-        
+
+        public void toggleOption( string theOption ) {
+            if( theOption == ModData.EXPERIENCE_BAR_ALWAYS_VISIBLE ) {
+
+            }
+
+            if( theOption == ModData.SHOW_EXPERIENCE_BAR ) {
+
+            }
+        }
     }
 }

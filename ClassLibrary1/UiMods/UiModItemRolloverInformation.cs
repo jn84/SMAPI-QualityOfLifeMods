@@ -13,7 +13,7 @@ namespace Demiacle_SVM.UiMods {
     /// <summary>
     /// Handler that overrides Toolbar and InventoryMenu
     /// </summary>
-    class UiModItemRolloverInformation {
+    class UiModItemRolloverInformation :ToggleUiOption {
 
         public UiModItemRolloverInformation() {
             GraphicsEvents.OnPostRenderGuiEvent += onPostRenderEvent;
@@ -66,6 +66,10 @@ namespace Demiacle_SVM.UiMods {
                 DemiacleUtility.copyFields( itemGrabMenuMod, gameMenu );
                 Game1.activeClickableMenu = itemGrabMenuMod;
             }
+        }
+
+        public void toggleOption( string theOption ) {
+            throw new NotImplementedException();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Demiacle_SVM.UiMods {
     /// <summary>
     /// SocialPage overwriting handler. Also holds data between menu calls
     /// </summary>
-    class UiModAccurateHearts {
+    class UiModAccurateHearts : ToggleUiOption {
         
         SocialPageMod socialPage;
 
@@ -76,6 +76,10 @@ namespace Demiacle_SVM.UiMods {
                     checkbox.isChecked = savedData[ optionIndex ];
                 }
             }
+        }
+
+        public void toggleOption( string theOption ) {
+            throw new NotImplementedException();
         }
     }
 }

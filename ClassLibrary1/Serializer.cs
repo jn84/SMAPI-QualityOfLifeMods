@@ -12,7 +12,8 @@ namespace Demiacle_SVM {
     /// This class handles file saving and loading for ModData.cs
     /// </summary>
     class Serializer {
-        public static string fileToWrite = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_SVM\\";
+        private static readonly string FILE_TO_WRITE = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_SVM\\";
+        private static readonly string POST_FIX = "_modData.xml";
 
         /// <summary>
         /// Writes the given object instance to an XML file.
@@ -29,7 +30,7 @@ namespace Demiacle_SVM {
 
             try {
                 var serializer = new XmlSerializer( typeof( T ) );
-                writer = new StreamWriter( fileToWrite + playerName + ".xml", append);
+                writer = new StreamWriter( FILE_TO_WRITE + playerName + POST_FIX, append);
                 serializer.Serialize( writer, objectToWrite );
             } finally {
                 if ( writer != null )
@@ -48,7 +49,7 @@ namespace Demiacle_SVM {
             TextReader reader = null;
             try {
                 var serializer = new XmlSerializer(typeof(T));
-                reader = new StreamReader( fileToWrite + playerName + ".xml" );
+                reader = new StreamReader( FILE_TO_WRITE + playerName + POST_FIX );
                 objectTypeToRead = ( T)serializer.Deserialize(reader);
             } finally {
                 if (reader != null)
@@ -56,8 +57,5 @@ namespace Demiacle_SVM {
             }
         }
 
-        internal static bool FileExists( string fileName ) {
-            return File.Exists( Serializer.fileToWrite + fileName + ".xml" );
-        }
     }
 }
