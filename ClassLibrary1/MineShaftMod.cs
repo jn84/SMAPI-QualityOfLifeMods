@@ -11,6 +11,9 @@ namespace Demiacle_SVM {
         private Boolean hasIntreceptedMineShaft = false;
 
         public MineShaftMod() {
+            
+            LocationEvents.CurrentLocationChanged += onLocationChange;
+            GraphicsEvents.OnPreRenderGuiEvent += OnPreRenderGuiEvent;
         }
 
         internal void onLocationChange( object sender, EventArgs e ) {

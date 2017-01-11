@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Tools;
@@ -28,29 +29,36 @@ namespace Demiacle_SVM.UiMods {
                 return;
             }
             
-            string sellForAmount = "";;
+            string sellForAmount = "";
+            string harvestPrice = "";
             
             if( hoverItem.salePrice() > 0 ) {
-                sellForAmount = "\n  " + hoverItem.salePrice();
+                sellForAmount = "\n  " + hoverItem.salePrice() / 2;
 
                 if( hoverItem.canStackWith( hoverItem ) && hoverItem.getStack() > 1) {
-                    sellForAmount += $" ({hoverItem.salePrice() * hoverItem.getStack()})";
+                    sellForAmount += $" ({ hoverItem.salePrice() / 2 * hoverItem.getStack() })";
                 }
             }
 
             bool isDrawingHarvestPrice = false;
-            // Adds the price of the fully grown crop to the display text
+
+            // Adds the price of the fully grown crop to the display text only if it is a seed
             if( hoverItem is StardewValley.Object && ( (StardewValley.Object) hoverItem).type == "Seeds" && sellForAmount != "" ) {
                 if( hoverItem.Name != "Mixed Seeds" || hoverItem.Name != "Winter Seeds" ) {
                     Crop crop = new Crop( hoverItem.parentSheetIndex, 0, 0 );
                     Debris debris = new Debris( crop.indexOfHarvest, Game1.player.position, Game1.player.position );
-                    StardewValley.Object item = new StardewValley.Object( Vector2.Zero, debris.chunkType, false );
-                    sellForAmount += $"    {item.price}";
+                    //StardewValley.Object item = new StardewValley.Object( Vector2.Zero, debris.chunkType, false );
+                    StardewValley.Object item = new StardewValley.Object( debris.chunkType, 1);
+                    //string str;
+                    //Game1.bigCraftablesInformation.TryGetValue( debris.chunkType, out str );
+                    //string[] strArray = str.Split( '/' );
+                    harvestPrice += $"    { item.price }";
                     isDrawingHarvestPrice = true;
                 }
             }
             
-            IClickableMenu.drawToolTip( b, hoverItem.getDescription(), hoverItem.Name + sellForAmount, hoverItem, false, -1, 0, -1, -1, null, -1 );
+            IClickableMenu.drawToolTip( b, hoverItem.getDescription(), hoverItem.Name + sellForAmount + harvestPrice, hoverItem, false, -1, 0, -1, -1, null, -1 );
+            string test = hoverItem.getDescription();
             
             // Draw coin
             if( sellForAmount != "") {
@@ -66,7 +74,24 @@ namespace Demiacle_SVM.UiMods {
 
                 // If Toolbar is on the bottom
                 if( yPositionOnScreen > 200 ) {
-                    iconPositionY = yPositionOnScreen - Game1.smallFont.MeasureString( hoverItem.getDescription() ).Y - 89;
+                    int offsetAdditionalItemInfo = 0;
+
+                    // Offset health and stamina display
+                    if( ( hoverItem as StardewValley.Object ).edibility != -300 ) {
+                        offsetAdditionalItemInfo += 36 * 2;
+
+                        // Offset displayed buffs
+                        if( Game1.objectInformation[ ( hoverItem as StardewValley.Object ).parentSheetIndex ].Split( '/' ).Length >= 7 ) {
+                            string[] buffIconsToDisplay = Game1.objectInformation[ ( hoverItem as StardewValley.Object ).parentSheetIndex ].Split( '/' )[ 6 ].Split( ' ' );
+                            for( int i = 0; i < buffIconsToDisplay.Count(); i++ ) {
+                                if( buffIconsToDisplay[ i ] != "0" ) {
+                                    offsetAdditionalItemInfo += 36;
+                                }
+                            }
+                        }
+                    }
+
+                    iconPositionY = yPositionOnScreen - Game1.smallFont.MeasureString( hoverItem.getDescription() ).Y - 89 - offsetAdditionalItemInfo;
 
                 // If Toolbar is on the Top
                 } else {
@@ -81,7 +106,7 @@ namespace Demiacle_SVM.UiMods {
                 // Draw harvest icon
                 if( isDrawingHarvestPrice ) {
                     Rectangle spriteRectangle = new Rectangle( 60, 428, 10, 10 );
-                    Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( Game1.getMousePosition().X + Game1.dialogueFont.MeasureString( sellForAmount ).X - 19 - fixTopX, iconPositionY - 20 ), spriteRectangle, Color.White, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
+                    Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( iconPositionX + Game1.dialogueFont.MeasureString( sellForAmount ).X - 10 - fixTopX, iconPositionY - 20 ), spriteRectangle, Color.White, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
                 }
             }
 

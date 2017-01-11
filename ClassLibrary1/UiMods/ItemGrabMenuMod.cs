@@ -20,6 +20,7 @@ namespace Demiacle_SVM.UiMods {
         }
 
         public override void draw( SpriteBatch b ) {
+
             //typeof( MenuWithInventory ).GetField( "hoveredItem", BindingFlags.NonPublic | BindingFlags.Instance ).SetValue( this, null );
             //this.hoveredItem = null;
             ( ( Action<SpriteBatch> ) base.draw )( b );

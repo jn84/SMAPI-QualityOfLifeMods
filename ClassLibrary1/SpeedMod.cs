@@ -25,6 +25,9 @@ namespace Demiacle_SVM {
         
 
         public SpeedMod() {
+            PlayerEvents.InventoryChanged += onInvChange;
+            GameEvents.SecondUpdateTick += checkTileForRoad;
+            GameEvents.QuarterSecondTick += forcePlayerToSpeed;
         }
 
         /// <summary>

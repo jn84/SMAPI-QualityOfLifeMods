@@ -50,11 +50,18 @@ namespace Demiacle_SVM {
         private UiModLuckOfDay luckOfDay;//WIP
         public static ModEntry modEntry;
         public static Boolean isTesting = false;
-
-        public ModEntry() {
             
+        public override void Entry(IModHelper helper) {
 
             modEntry = this;
+
+            // General mods needed for all other mods
+            GameEvents.GameLoaded += this.updateXmlSerializer;
+            ControlEvents.KeyPressed += this.ReceiveKeyPress;
+            PlayerEvents.LoadedGame += this.onLoadedGame;
+
+            MenuEvents.MenuChanged += SkipIntro.onMenuChange;
+
             //updateXmlSerializer();
             persistantMonsters = new PersistantMonsters();
             scytheDamageMod = new ScytheDamageMod();
@@ -65,8 +72,10 @@ namespace Demiacle_SVM {
             rolloverInformation = new UiModItemRolloverInformation();
             uiModExperience = new UiModExperience();
             luckOfDay = new UiModLuckOfDay();
-        }
 
+
+        }
+        
         internal static void Log( string log ) {
             if( isTesting ) {
                 System.Console.WriteLine( log );
@@ -74,57 +83,6 @@ namespace Demiacle_SVM {
             }
 
             modEntry.Monitor.Log( log );
-        }
-
-        public override void Entry(IModHelper helper) {
-
-            // General mods needed for all other mods
-            GameEvents.GameLoaded += this.updateXmlSerializer;
-            ControlEvents.KeyPressed += this.ReceiveKeyPress;
-            PlayerEvents.LoadedGame += this.onLoadedGame;
-
-            // Weapon and tool mod
-            PlayerEvents.InventoryChanged += scytheDamageMod.onInvChange;
-
-            // PersistantMonster mod
-            GraphicsEvents.OnPreRenderEvent += persistantMonsters.onPreRenderEvent;
-            GraphicsEvents.OnPostRenderEvent += persistantMonsters.onPostRenderEvent;
-            LocationEvents.CurrentLocationChanged += persistantMonsters.onLocationChange;
-            PlayerEvents.LoadedGame += persistantMonsters.onLoadedGame;
-            TimeEvents.OnNewDay += persistantMonsters.onNewDay;
-            TimeEvents.DayOfMonthChanged += persistantMonsters.onDayChange;
-            GameEvents.OneSecondTick += persistantMonsters.onGameOneSecondTick;
-            LocationEvents.LocationObjectsChanged += PathFinderMap.Instance.updatePassableTilesOnLocationObjectsChanged;
-            LocationEvents.CurrentLocationChanged += PathFinderMap.Instance.updateMapOnChangeLocation;            
-
-            // Ui Mods
-            GraphicsEvents.OnPostRenderGuiEvent += locationOfTownsfolk.onPostRenderEvent;
-            MenuEvents.MenuChanged += locationOfTownsfolk.onMenuChange;
-
-            MenuEvents.MenuChanged += uiModAccurateHearts.onMenuChange;
-            
-            GraphicsEvents.OnPostRenderGuiEvent += rolloverInformation.onPostRenderEvent;
-            MenuEvents.MenuChanged += rolloverInformation.onMenuChange;
-            
-            GraphicsEvents.OnPreRenderHudEvent += uiModExperience.onPreRenderEvent;
-            PlayerEvents.LeveledUp += uiModExperience.onLevelUp;
-
-            TimeEvents.DayOfMonthChanged += luckOfDay.onNewDay;
-            LocationEvents.CurrentLocationChanged += luckOfDay.onLocationChange;
-            GraphicsEvents.OnPreRenderHudEvent += luckOfDay.onPreRender;
-            GraphicsEvents.OnPostRenderHudEvent += luckOfDay.onPostRender;
-
-            // Mineshaft mod
-            //PlayerEvents.LoadedGame += mineShaftMod.onLoad;
-            LocationEvents.CurrentLocationChanged += mineShaftMod.onLocationChange;
-            GraphicsEvents.OnPreRenderGuiEvent += mineShaftMod.OnPreRenderGuiEvent;
-
-            //speed mod
-            PlayerEvents.InventoryChanged += speedMod.onInvChange;
-            GameEvents.SecondUpdateTick += speedMod.checkTileForRoad;
-            GameEvents.QuarterSecondTick += speedMod.forcePlayerToSpeed;
-
-
         }
 
         private void ReceiveKeyPress(object sender, EventArgsKeyPressed e){

@@ -22,6 +22,8 @@ namespace Demiacle_SVM.UiMods {
 
         public UiModLocationOfTownsfolk( UiModAccurateHearts uiModAccurateHearts ) {
             this.uiModAccurateHearts = uiModAccurateHearts;
+            GraphicsEvents.OnPostRenderGuiEvent += onPostRenderEvent;
+            MenuEvents.MenuChanged += onMenuChange;
         }
 
         internal void onPostRenderEvent( object sender, EventArgs e ) {

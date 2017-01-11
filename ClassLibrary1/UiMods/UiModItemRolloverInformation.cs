@@ -15,6 +15,11 @@ namespace Demiacle_SVM.UiMods {
     /// </summary>
     class UiModItemRolloverInformation {
 
+        public UiModItemRolloverInformation() {
+            GraphicsEvents.OnPostRenderGuiEvent += onPostRenderEvent;
+            MenuEvents.MenuChanged += onMenuChange;
+        }
+
         //Change to on menu change
         internal void onPostRenderEvent( object sender, EventArgs e ) {
             

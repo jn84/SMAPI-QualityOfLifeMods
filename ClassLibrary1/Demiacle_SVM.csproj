@@ -96,6 +96,7 @@
     <Compile Include="UiMods\ExpPointDisplay.cs" />
     <Compile Include="UiMods\InventoryPageMod.cs" />
     <Compile Include="UiMods\ItemGrabMenuMod.cs" />
+    <Compile Include="UiMods\SkipIntro.cs" />
     <Compile Include="UiMods\SocialPageMod.cs" />
     <Compile Include="UiMods\ToolbarMod.cs" />
     <Compile Include="UiMods\UiModAccurateHearts.cs" />

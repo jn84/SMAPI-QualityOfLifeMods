@@ -6,6 +6,7 @@ namespace Demiacle_SVM {
     public class ScytheDamageMod {
 
         public ScytheDamageMod() {
+            PlayerEvents.InventoryChanged += onInvChange;
         }
 
         /// <summary>
@@ -36,7 +37,15 @@ namespace Demiacle_SVM {
                 minDamage = 100;
                 //name = "SuperScythe"; this fails because crucial game code has checks against the name Scythe
                 description = "Not your ordinary everyday scythe.";
+                //salePrice(0);
+                //( this as MeleeWeapon).price = 0;
+                
             }
+
+            public override int salePrice() {
+                return 0;
+            }
+
             public override void leftClick( Farmer who ) {
                 base.leftClick( who );
                 if( !who.UsingTool ) {

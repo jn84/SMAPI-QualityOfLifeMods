@@ -15,6 +15,13 @@ namespace Demiacle_SVM.UiMods {
         private ClickableTextureComponent icon;
         private string hoverText = "";
 
+        public UiModLuckOfDay() {
+            TimeEvents.DayOfMonthChanged += onNewDay;
+            LocationEvents.CurrentLocationChanged += onLocationChange;
+            GraphicsEvents.OnPreRenderHudEvent += onPreRender;
+            GraphicsEvents.OnPostRenderHudEvent += onPostRender;
+        }
+
         internal void onNewDay( object sender, EventArgsIntChanged e ) {
             /*
             string dialogue = "Nobody is sure whats going to happen today...";

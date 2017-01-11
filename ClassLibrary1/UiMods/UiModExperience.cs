@@ -61,6 +61,10 @@ namespace Demiacle_SVM.UiMods {
         Rectangle levelUpIconRectangle;
 
         public UiModExperience() {
+
+            GraphicsEvents.OnPreRenderHudEvent += onPreRenderEvent;
+            PlayerEvents.LeveledUp += onLevelUp;
+
             Stream soundfile = TitleContainer.OpenStream( @"Mods\\Demiacle_SVM\\LevelUp.wav" );
             SoundEffect soundEffect = SoundEffect.FromStream( soundfile );
             se = soundEffect.CreateInstance();

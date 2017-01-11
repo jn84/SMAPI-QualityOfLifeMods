@@ -19,10 +19,12 @@ namespace Demiacle_SVM.UiMods {
 
         public Dictionary<int, bool> savedData = new Dictionary<int, bool>();
         
-        // test 
-// Test
-// test
+        public UiModAccurateHearts() {
 
+            MenuEvents.MenuChanged += onMenuChange;
+        }
+        
+        
         /// <summary>
         /// Overwrites the SocialPage with my SocialPageMod and creates and initiates checkboxes.
         /// </summary>

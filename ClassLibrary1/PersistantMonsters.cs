@@ -36,7 +36,17 @@ namespace Demiacle_SVM
         /// Also makes mines persistant instead of respawn randomized, adds elevator every level of mine, and makes all mines dark.
         /// Also expands the dark forest area.
         /// </summary>
-        public PersistantMonsters() { }
+        public PersistantMonsters() {
+            GraphicsEvents.OnPreRenderEvent += onPreRenderEvent;
+            GraphicsEvents.OnPostRenderEvent += onPostRenderEvent;
+            LocationEvents.CurrentLocationChanged += onLocationChange;
+            PlayerEvents.LoadedGame += onLoadedGame;
+            TimeEvents.OnNewDay += onNewDay;
+            TimeEvents.DayOfMonthChanged += onDayChange;
+            GameEvents.OneSecondTick += onGameOneSecondTick;
+            LocationEvents.LocationObjectsChanged += PathFinderMap.Instance.updatePassableTilesOnLocationObjectsChanged;
+            LocationEvents.CurrentLocationChanged += PathFinderMap.Instance.updateMapOnChangeLocation;
+        }
 
         /// <summary>
         /// Creates all the monsters if they havent been created
