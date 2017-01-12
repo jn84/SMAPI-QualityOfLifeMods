@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
     class ToolbarMod : Toolbar {
 
         /// <summary>

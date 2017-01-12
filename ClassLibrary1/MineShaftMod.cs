@@ -6,7 +6,7 @@ using StardewValley.Menus;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Demiacle_SVM {
+namespace DemiacleSvm {
     internal class MineShaftMod {
         private Boolean hasIntreceptedMineShaft = false;
 

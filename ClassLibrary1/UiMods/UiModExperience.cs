@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework.Audio;
 using System.Runtime.InteropServices;
 using System.IO;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
 
     /* Experience point indexes
      * 
@@ -30,7 +30,7 @@ namespace Demiacle_SVM.UiMods {
     /// <summary>
     /// The mod that shows an experienceBar and plays an animation on level up
     /// </summary>
-    class UiModExperience : ToggleUiOption{
+    class UiModExperience : UiModWithOptions{
 
         private int maxBarWidth = 175;
 
@@ -38,10 +38,9 @@ namespace Demiacle_SVM.UiMods {
         private int levelOfCurrentlyDisplayedExp = 0;
         float currentExp = 0;
 
-        List<ExpPointDisplay> expPointDisplays = new List<ExpPointDisplay>();
-        
+        List<ExpPointDisplay> expPointDisplays = new List<ExpPointDisplay>();        
 
-        private static readonly int timeBeforeExperienceBarFade = 8000;
+        private const int TIME_BEFORE_EXPERIENCE_BAR_FADE = 8000;
         private int lengthOfLevelUpPause = 2000;
 
         // New colors created to allow manipulation here
@@ -61,6 +60,7 @@ namespace Demiacle_SVM.UiMods {
         Rectangle levelUpIconRectangle;
 
         public UiModExperience() {
+            options.Add( ModData.SHOW_EXPERIENCE_BAR, setShowExperienceBar );
 
             GraphicsEvents.OnPreRenderHudEvent += onPreRenderEvent;
             PlayerEvents.LeveledUp += onLevelUp;
@@ -86,7 +86,7 @@ namespace Demiacle_SVM.UiMods {
 
 
             //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) ( num5 + num113 - Game1.pixelZoom  ), ( float ) ( num4 ) ), new Rectangle?( new Rectangle( 145, 338, 14, 9 ) ), Color.Black * 0.35f, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.87f );
-            //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - 200, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom -52 ), new Rectangle?( new Rectangle( 159, 338, 14, 9 ) ), Color.White * ( 1f ), 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.87f );
+            //Game1.spriteBatch.Draw( Game1.mouseCursors, netoggleOptionw Vector2( Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - 200, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom -52 ), new Rectangle?( new Rectangle( 159, 338, 14, 9 ) ), Color.White * ( 1f ), 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.87f );
             //ClickableTextureComponent expBar = new ClickableTextureComponent( "T", new Rectangle( 100, 100, 14 * Game1.pixelZoom, 9 * Game1.pixelZoom ), ( string ) null, "blurb", Game1.mouseCursors, new Rectangle( 159, 338, 14, 9 ), ( float ) Game1.pixelZoom, true ) ;
             //expBar.draw( Game1.spriteBatch );
 
@@ -262,7 +262,11 @@ namespace Demiacle_SVM.UiMods {
         }
 
         private void displayExperienceBar() {
-            timerToDissapear.Interval = timeBeforeExperienceBarFade;
+            if( ModEntry.modData.uiOptions[ ModData.SHOW_EXPERIENCE_BAR ] == true ) {
+                return;
+            }
+
+            timerToDissapear.Interval = TIME_BEFORE_EXPERIENCE_BAR_FADE;
             timerToDissapear.Start();
             shouldDrawExperienceBar = true;
         }
@@ -294,7 +298,7 @@ namespace Demiacle_SVM.UiMods {
 
             shouldDrawLevelUp = true;
 
-            timerToDissapear.Interval = timeBeforeExperienceBarFade;
+            timerToDissapear.Interval = TIME_BEFORE_EXPERIENCE_BAR_FADE;
             timerToDissapear.Start();
             shouldDrawExperienceBar = true;
 
@@ -356,14 +360,9 @@ namespace Demiacle_SVM.UiMods {
             }
         }
 
-        public void toggleOption( string theOption ) {
-            if( theOption == ModData.EXPERIENCE_BAR_ALWAYS_VISIBLE ) {
 
-            }
+        public void setShowExperienceBar( bool setting ) {
 
-            if( theOption == ModData.SHOW_EXPERIENCE_BAR ) {
-
-            }
         }
     }
 }

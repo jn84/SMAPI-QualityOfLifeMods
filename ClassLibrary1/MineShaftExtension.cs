@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using xTile;
 using xTile.ObjectModel;
 
-namespace Demiacle_SVM {
+namespace DemiacleSvm {
     class MineShaftExtension : MineShaft{
         FieldInfo isMonsterArea = typeof( MineShaftExtension ).BaseType.GetField( "isMonsterArea", BindingFlags.Instance | BindingFlags.NonPublic );
         FieldInfo isSlimeArea = typeof( MineShaftExtension ).BaseType.GetField( "isSlimeArea", BindingFlags.Instance | BindingFlags.NonPublic );

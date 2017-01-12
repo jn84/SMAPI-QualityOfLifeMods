@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demiacle_SVM.OutdoorMonsters.AI {
+namespace DemiacleSvm.OutdoorMonsters.AI {
 
     /// <summary>
     /// Move in a direction without considering object collision

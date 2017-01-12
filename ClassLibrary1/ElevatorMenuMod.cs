@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demiacle_SVM {
+namespace DemiacleSvm {
     public class ElevatorMenuMod : IClickableMenu {
 
         public List<ClickableComponent> elevators = new List<ClickableComponent>();

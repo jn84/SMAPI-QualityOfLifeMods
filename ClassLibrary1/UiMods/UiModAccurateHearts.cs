@@ -8,27 +8,22 @@ using System.Threading.Tasks;
 using StardewModdingAPI.Events;
 using System.Reflection;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
 
     /// <summary>
     /// SocialPage overwriting handler. Also holds data between menu calls
     /// </summary>
-    class UiModAccurateHearts : ToggleUiOption {
+    class UiModAccurateHearts : UiModWithOptions {
         
         SocialPageMod socialPage;
 
-        public Dictionary<int, bool> savedData = new Dictionary<int, bool>();
-        
         public UiModAccurateHearts() {
-
-            MenuEvents.MenuChanged += onMenuChange;
         }
-        
         
         /// <summary>
         /// Overwrites the SocialPage with my SocialPageMod and creates and initiates checkboxes.
         /// </summary>
-        internal void onMenuChange( object sender, EventArgsClickableMenuChanged e ) {
+        internal void OnMenuChange( object sender, EventArgsClickableMenuChanged e ) {
 
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
                 return;
@@ -36,7 +31,7 @@ namespace Demiacle_SVM.UiMods {
             
             
             // Get pages from GameMenu            
-            List<IClickableMenu> pages = ( List<IClickableMenu> ) typeof( GameMenu ).GetField( "pages", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( Game1.activeClickableMenu );
+            var pages = ( List<IClickableMenu> ) typeof( GameMenu ).GetField( "pages", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( Game1.activeClickableMenu );
             
             // Override socialPage with a fresh socialPageMod
             for( int k = 0; k < pages.Count; k++ ) {
@@ -48,8 +43,6 @@ namespace Demiacle_SVM.UiMods {
 
                     socialPage.Copy( ( SocialPage ) pages[ k ] );
 
-                    socialPage.savedData = this.savedData;
-                    
                     socialPage.friendNames = ( List<ClickableTextureComponent> ) typeof( SocialPage ).GetField( "friendNames", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( socialPage );
                     
                     pages[ k ] = socialPage;
@@ -64,22 +57,32 @@ namespace Demiacle_SVM.UiMods {
 
                 int optionIndex = friend.name.GetHashCode();
 
-                OptionsCheckbox checkbox = new OptionsCheckbox( "", optionIndex );
+                var checkbox = new OptionsCheckbox( "", optionIndex );
                 socialPage.checkboxes.Add( checkbox );
 
+                // Disable checkbox if player has not talked to npc yet
                 if( !(Game1.player.friendships.ContainsKey( friend.name )) ) {
                     checkbox.greyedOut = true;
                     checkbox.isChecked = false;
                 }
 
-                if( savedData.ContainsKey( optionIndex ) ) {
-                    checkbox.isChecked = savedData[ optionIndex ];
+                // Ensure an entry exists
+                if(  ModEntry.modData.locationOfTownsfolkOptions.ContainsKey( optionIndex  ) == false ) {
+                    ModEntry.modData.locationOfTownsfolkOptions.Add( optionIndex, false );
                 }
+
+                checkbox.isChecked = ModEntry.modData.locationOfTownsfolkOptions[ optionIndex ];
             }
         }
 
-        public void toggleOption( string theOption ) {
-            throw new NotImplementedException();
+        public void ToggleOption( string theOption, bool setting ) {
+
+            if( setting ) {
+                MenuEvents.MenuChanged += OnMenuChange;
+            } else {
+                MenuEvents.MenuChanged -= OnMenuChange;
+            }
+
         }
     }
 }

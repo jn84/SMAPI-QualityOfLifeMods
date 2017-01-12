@@ -10,20 +10,18 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
     /// <summary>
     /// Displays mugshots of townsfolk on the map.
     /// </summary>
-    class UiModLocationOfTownsfolk : ToggleUiOption {
+    class UiModLocationOfTownsfolk : UiModWithOptions {
 
         List<NPC> townsfolk = new List<NPC>();
 
-        private UiModAccurateHearts uiModAccurateHearts;
+        private readonly UiModAccurateHearts uiModAccurateHearts;
 
         public UiModLocationOfTownsfolk( UiModAccurateHearts uiModAccurateHearts ) {
             this.uiModAccurateHearts = uiModAccurateHearts;
-            GraphicsEvents.OnPostRenderGuiEvent += onPostRenderEvent;
-            MenuEvents.MenuChanged += onMenuChange;
         }
 
         internal void onPostRenderEvent( object sender, EventArgs e ) {
@@ -43,11 +41,11 @@ namespace Demiacle_SVM.UiMods {
                 int key = npc.name.GetHashCode();
 
                 // If doesn't contain a key from social page then dont display anything
-                if( !( uiModAccurateHearts.savedData.ContainsKey( key ) ) ) {
+                if( !( ModEntry.modData.locationOfTownsfolkOptions.ContainsKey( key ) ) ) {
                     continue;
 
                 // If key exists and value is false dont display anything
-                } else if ( uiModAccurateHearts.savedData[ key ] == false ) {
+                } else if ( ModEntry.modData.locationOfTownsfolkOptions[ key ] == false ) {
                     continue;
                 }
                 
@@ -253,6 +251,7 @@ namespace Demiacle_SVM.UiMods {
         /// Resets and populates the list of townsfolk to display every time the game menu is called
         /// </summary>
         internal void onMenuChange( object sender, EventArgsClickableMenuChanged e ) {
+
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
                 return;
             }
@@ -267,8 +266,16 @@ namespace Demiacle_SVM.UiMods {
             }
         }
 
-        public void toggleOption( string theOption ) {
-            throw new NotImplementedException();
+        public void ToggleOption( string theOption, bool setting ) {
+
+            if( setting ) {
+                GraphicsEvents.OnPostRenderGuiEvent += onPostRenderEvent;
+                MenuEvents.MenuChanged += onMenuChange;
+            } else {
+                GraphicsEvents.OnPostRenderGuiEvent -= onPostRenderEvent;
+                MenuEvents.MenuChanged -= onMenuChange;
+            }
+
         }
     }
 }

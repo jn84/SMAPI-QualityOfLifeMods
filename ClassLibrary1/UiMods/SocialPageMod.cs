@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using StardewValley;
 using System.Reflection;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
 
     /// <summary>
     /// The SocialPage with added features that fills hearts depending on friendship level and also holds the data to display map location of townsfolk

@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 using System.Reflection;
 using StardewValley.Tools;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
     class ItemGrabMenuMod : ItemGrabMenu {
 
         private string newLine = "";

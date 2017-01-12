@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using StardewValley;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
     internal class ExpPointDisplay {
         private float experiencePoints;
         private Vector2 position;

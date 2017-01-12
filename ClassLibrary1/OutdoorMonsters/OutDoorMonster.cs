@@ -10,10 +10,10 @@ using Microsoft.Xna.Framework.Graphics;
 using xTile.Dimensions;
 using System.Threading;
 using StardewModdingAPI.Events;
-using Demiacle_SVM.OutdoorMonsters.AI;
+using DemiacleSvm.OutdoorMonsters.AI;
 using System.Xml.Serialization;
 
-namespace Demiacle_SVM.OutdoorMonsters {
+namespace DemiacleSvm.OutdoorMonsters {
 
     
     // TODO bug - When monsters are loaded (deserialized) their sprites look funky... shadows hae a box and bats have like 4 eyes

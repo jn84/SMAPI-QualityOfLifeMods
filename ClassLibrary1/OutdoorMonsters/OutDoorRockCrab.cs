@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demiacle_SVM.OutdoorMonsters {
+namespace DemiacleSvm.OutdoorMonsters {
     public class OutDoorRockCrab : Monster {
         private int shellHealth = 5;
         private bool leftDrift;

@@ -78,9 +78,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary1\Demiacle_SVM.csproj">
+    <ProjectReference Include="..\ClassLibrary1\DemiacleSVM.csproj">
       <Project>{40D249C8-810B-48FE-ADE4-24819BBBD5FB}</Project>
-      <Name>Demiacle_SVM</Name>
+      <Name>DemiacleSVM</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

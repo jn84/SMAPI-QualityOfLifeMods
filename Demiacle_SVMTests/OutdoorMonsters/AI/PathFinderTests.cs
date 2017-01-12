@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Demiacle_SVM.OutdoorMonsters.AI;
+using DemiacleSvm.OutdoorMonsters.AI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
 
-namespace Demiacle_SVM.OutdoorMonsters.AI.Tests {
+namespace DemiacleSvm.OutdoorMonsters.AI.Tests {
     [TestClass()]
     public class PathFinderTests {
 

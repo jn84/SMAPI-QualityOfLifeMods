@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demiacle_SVM.OutdoorMonsters.AI {
+namespace DemiacleSvm.OutdoorMonsters.AI {
     public class MovementType {
 
         public virtual void calculateNextMovement( OutDoorMonster outDoorMonster  ) {

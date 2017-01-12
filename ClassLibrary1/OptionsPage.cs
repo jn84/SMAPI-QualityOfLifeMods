@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Demiacle_SVM.UiMods;
+using DemiacleSvm.UiMods;
 
-namespace Demiacle_SVM {
+namespace DemiacleSvm {
     class OptionsPage {
 
         private ModData modData;
@@ -19,12 +19,7 @@ namespace Demiacle_SVM {
         private static readonly int HEIGHT = 800;
 
         private ModOptionMenu optionMenu;
-        private UiModAccurateHearts uiModAccurateHearts;
-        private UiModLocationOfTownsfolk uiModLocationOfTownsfolk;
-        private UiModItemRolloverInformation uiModItemrolloverInformation;
-        private UiModExperience uiModExperience;
-        private UiModLuckOfDay uiModluckOfDay;
-        private List<ToggleUiOption> optionMods = new List<ToggleUiOption>();
+        private readonly List<UiModWithOptions> optionMods = new List<UiModWithOptions>();
 
         public OptionsPage( ModData modData ) {
             this.modData = modData;
@@ -37,6 +32,17 @@ namespace Demiacle_SVM {
             optionMods.Add( uiModItemrolloverInformation);
             optionMods.Add( uiModExperience );
             optionMods.Add( uiModluckOfDay );
+
+            // Set each option to its value
+            foreach( UiModWithOptions mod in optionMods ) {
+                foreach( var option in mod.options ) {
+                    Action<bool> method = option.Value;
+                    SerializableDictionary<string, bool> uiOptions = ModEntry.modData.uiOptions;
+
+                    method.Invoke( uiOptions[ option.Key ] );
+                }
+            }
+
         }
 
         private void initialize( object sender, EventArgsLoadedGameChanged e ) {
@@ -66,10 +72,10 @@ namespace Demiacle_SVM {
 
             private List<OptionsElement> options = new List<OptionsElement>();
             private readonly int OPTION_HEIGHT = ( int ) Game1.dialogueFont.MeasureString( "t" ).Y + 40;
-            private List<ToggleUiOption> optionMods = new List<ToggleUiOption>();
+            private List<UiModWithOptions> optionMods = new List<UiModWithOptions>();
 
 
-            internal ModOptionMenu( int x, int y, int width, int height, List<ToggleUiOption> optionMods ) : base( x, y, width, height ) {
+            internal ModOptionMenu( int x, int y, int width, int height, List<UiModWithOptions> optionMods ) : base( x, y, width, height ) {
 
                 int count = 0;
                 int positionOfCheckboxesX = this.xPositionOnScreen + 40;
@@ -99,8 +105,8 @@ namespace Demiacle_SVM {
                     if( checkBox.bounds.Contains( x, y ) ) {
                         checkBox.receiveLeftClick( x, y );
                         ModEntry.modData.uiOptions[ checkBox.label ] = checkBox.isChecked;
-                        foreach( ToggleUiOption mod in optionMods ) {
-                            mod.toggleOption( checkBox.label );
+                        foreach( UiModWithOptions mod in optionMods ) {
+                            mod.ToggleOption( checkBox.label, checkBox.isChecked );
                         }
                     }
                 }

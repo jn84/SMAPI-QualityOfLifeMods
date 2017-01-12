@@ -6,7 +6,7 @@ using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
 
-namespace Demiacle_SVM {
+namespace DemiacleSvm {
 
     //TODO Speed mod interferes with buffs atm... we need to make it work WITH buffs
     internal class SpeedMod {

@@ -16,9 +16,9 @@ using StardewValley.Objects;
 using StardewValley.Quests;
 using StardewValley.TerrainFeatures;
 using System.Xml.Serialization;
-using Demiacle_SVM.OutdoorMonsters;
-using Demiacle_SVM.OutdoorMonsters.AI;
-using Demiacle_SVM.UiMods;
+using DemiacleSvm.OutdoorMonsters;
+using DemiacleSvm.OutdoorMonsters.AI;
+using DemiacleSvm.UiMods;
 using Microsoft.Xna.Framework.Audio;
 using Polenter.Serialization;
 using System.IO;
@@ -37,7 +37,7 @@ using System.Reflection;
 //load persistant mobs and rocks and ladder if previously visited
 
 
-namespace Demiacle_SVM {
+namespace DemiacleSvm {
     public class ModEntry : Mod {
 
         public static ModData modData;

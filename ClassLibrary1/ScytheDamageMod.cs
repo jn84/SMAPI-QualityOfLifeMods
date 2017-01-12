@@ -2,7 +2,7 @@
 using StardewValley;
 using StardewValley.Tools;
 
-namespace Demiacle_SVM {
+namespace DemiacleSvm {
     public class ScytheDamageMod {
 
         public ScytheDamageMod() {

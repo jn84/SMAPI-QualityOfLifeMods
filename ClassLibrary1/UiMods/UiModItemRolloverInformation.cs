@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using StardewModdingAPI.Events;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
 
     /// <summary>
     /// Handler that overrides Toolbar and InventoryMenu
     /// </summary>
-    class UiModItemRolloverInformation :ToggleUiOption {
+    class UiModItemRolloverInformation :UiModWithOptions {
 
         public UiModItemRolloverInformation() {
             GraphicsEvents.OnPostRenderGuiEvent += onPostRenderEvent;
@@ -68,7 +68,7 @@ namespace Demiacle_SVM.UiMods {
             }
         }
 
-        public void toggleOption( string theOption ) {
+        public void ToggleOption( string theOption, bool setting ) {
             throw new NotImplementedException();
         }
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
-namespace Demiacle_SVM.OutdoorMonsters.AI {
+namespace DemiacleSvm.OutdoorMonsters.AI {
 
     /// <summary>
     /// Finds a path to the target and sets the movement towards that path

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using xTile.Dimensions;
 
-namespace Demiacle_SVM.OutdoorMonsters.AI {
+namespace DemiacleSvm.OutdoorMonsters.AI {
 
     public class PathFinder {
         

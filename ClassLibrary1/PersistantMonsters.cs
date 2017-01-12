@@ -14,14 +14,14 @@ using StardewValley.Tools;
 using System.Xml;
 //using Polenter.Serialization;
 using System.IO;
-using Demiacle_SVM.OutdoorMonsters;
-using Demiacle_SVM.OutdoorMonsters.AI;
+using DemiacleSvm.OutdoorMonsters;
+using DemiacleSvm.OutdoorMonsters.AI;
 
 
 //TODO will have to save persistant monsters to its own xml and place inside mod
 
 
-namespace Demiacle_SVM
+namespace DemiacleSvm
 {
     class PersistantMonsters {
         List<Monster> monsterGlidersToFix = new List<Monster>();

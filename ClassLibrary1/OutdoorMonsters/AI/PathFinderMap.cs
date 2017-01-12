@@ -1,13 +1,13 @@
 ﻿using StardewValley;
 using xTile.Dimensions;
-using static Demiacle_SVM.OutdoorMonsters.AI.PathFinder;
+using static DemiacleSvm.OutdoorMonsters.AI.PathFinder;
 using StardewModdingAPI.Events;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using xTile.ObjectModel;
 
-namespace Demiacle_SVM.OutdoorMonsters.AI {
+namespace DemiacleSvm.OutdoorMonsters.AI {
 
     /// <summary>
     /// A singleton class holding map data of walkable/unwalkable tiles.

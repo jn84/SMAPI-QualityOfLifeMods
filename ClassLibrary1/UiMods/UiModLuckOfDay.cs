@@ -9,27 +9,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Menus;
 
-namespace Demiacle_SVM.UiMods {
-    class UiModLuckOfDay : ToggleUiOption{
+namespace DemiacleSvm.UiMods {
+    class UiModLuckOfDay : UiModWithOptions{
 
         private ClickableTextureComponent icon;
         private string hoverText = "";
 
         public UiModLuckOfDay() {
-            TimeEvents.DayOfMonthChanged += onNewDay;
-            LocationEvents.CurrentLocationChanged += onLocationChange;
-            GraphicsEvents.OnPreRenderHudEvent += onPreRender;
-            GraphicsEvents.OnPostRenderHudEvent += onPostRender;
-        }
-
-        internal void onNewDay( object sender, EventArgsIntChanged e ) {
-            /*
-            string dialogue = "Nobody is sure whats going to happen today...";
-                dialogue = $"You feel like you should go out and buy a lottery ticket... if that was your thing";
-                dialogue = $"Good things are going to happen today!... but probably not great things...";
-                dialogue = $"You get the feeling you shouldn't take any risks today";
-                dialogue = $"You should probably just stay home today...";
-            */    
         }
 
         internal void onPreRender( object sender, EventArgs e ) {
@@ -59,16 +45,25 @@ namespace Demiacle_SVM.UiMods {
             icon = new ClickableTextureComponent( "", new Rectangle( ( int ) DemiacleUtility.getWidthInPlayArea(  ) - 134, 260, 10 * Game1.pixelZoom, 14 * Game1.pixelZoom ), "", "", Game1.mouseCursors, new Rectangle( 50, 428, 10, 14 ), Game1.pixelZoom );
         }
 
-        internal void onPostRender( object sender, EventArgs e ) {
+        internal void OnPostRender( object sender, EventArgs e ) {
             // If cursor is highlighting dice, display hover text and redraw mouse
             if( icon.containsPoint( Game1.oldMouseState.X, Game1.oldMouseState.Y ) ) {
                 IClickableMenu.drawHoverText( Game1.spriteBatch, hoverText, Game1.dialogueFont );
-                //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
             }
         }
 
-        public void toggleOption( string theOption ) {
-            throw new NotImplementedException();
+        public void ToggleOption( string theOption, bool setting ) {
+
+            if( setting ) {
+                LocationEvents.CurrentLocationChanged += onLocationChange;
+                GraphicsEvents.OnPreRenderHudEvent += onPreRender;
+                GraphicsEvents.OnPostRenderHudEvent += OnPostRender;
+            } else {
+                LocationEvents.CurrentLocationChanged -= onLocationChange;
+                GraphicsEvents.OnPreRenderHudEvent -= onPreRender;
+                GraphicsEvents.OnPostRenderHudEvent -= OnPostRender;
+            }
+
         }
     }
 }

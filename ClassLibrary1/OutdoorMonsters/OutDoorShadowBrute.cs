@@ -7,9 +7,9 @@ using StardewValley.Monsters;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using Microsoft.Xna.Framework.Graphics;
-using Demiacle_SVM.OutdoorMonsters.AI;
+using DemiacleSvm.OutdoorMonsters.AI;
 
-namespace Demiacle_SVM.OutdoorMonsters {
+namespace DemiacleSvm.OutdoorMonsters {
     public class OutDoorShadowBrute : OutDoorMonster {
         
         //needed for serialization

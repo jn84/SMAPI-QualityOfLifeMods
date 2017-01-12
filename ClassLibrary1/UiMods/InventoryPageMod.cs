@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Demiacle_SVM.UiMods {
+namespace DemiacleSvm.UiMods {
     class InventoryPageMod : InventoryPage {
 
         public InventoryPageMod( int x, int y, int width, int height ) : base( x, y, width, height ) {
