@@ -54,14 +54,14 @@ namespace DemiacleSvm {
             
             // Mods
             var uiModAccurateHearts = new UiModAccurateHearts();
-            //UiModLocationOfTownsfolk uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk( uiModAccurateHearts );
+            var uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk();
             var uiModItemrolloverInformation = new UiModItemRolloverInformation();
             var uiModExperience = new UiModExperience();
             var uiModluckOfDay = new UiModLuckOfDay();
 
             var uiMods = new List<UiModWithOptions>();
             uiMods.Add( uiModAccurateHearts );
-            //uiMods.Add( uiModLocationOfTownsfolk );
+            uiMods.Add( uiModLocationOfTownsfolk );
             uiMods.Add( uiModItemrolloverInformation );
             uiMods.Add( uiModExperience );
             uiMods.Add( uiModluckOfDay );

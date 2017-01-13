@@ -89,7 +89,7 @@ namespace DemiacleSvm.UiMods {
 
                 drawEachIndividualSquare( friendshipLevel, friendshipPoints,  yPosition );
                 
-                // Draw the mouse
+                // ReDraw the mouse
                 Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
 
             }
