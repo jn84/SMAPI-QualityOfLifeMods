@@ -20,15 +20,17 @@ namespace DemiacleSvm.UiMods {
     /// </summary>
     class UiModLocationOfTownsfolk : UiModWithOptions {
 
-        private List<ClickableTextureComponent> friendNames;
         private SocialPage socialPage;
-        List<NPC> townsfolk = new List<NPC>();
+
+        private List<ClickableTextureComponent> friendNames;
+        private List<NPC> townsfolk = new List<NPC>();
+        private List<OptionsCheckbox> checkboxes = new List<OptionsCheckbox>();
+
         public const string SHOW_NPCS_ON_MAP = "Show npcs on map";
 
         private int socialPanelWidth = 190;
         private int socialPanelOffsetX = 160;
 
-        private List<OptionsCheckbox> checkboxes = new List<OptionsCheckbox>();
 
         public UiModLocationOfTownsfolk() {
             addOption( SHOW_NPCS_ON_MAP, toggleShowNPCLocationOnMap );
@@ -338,10 +340,11 @@ namespace DemiacleSvm.UiMods {
                 }
             }
 
-            foreach( var location in Game1.locations ) {
-                foreach( var npc in location.characters ) {
-                    if() {
-
+            townsfolk.Clear();
+            foreach( GameLocation location in Game1.locations ) {
+                foreach( NPC npc in location.characters ) {
+                    if( Game1.player.friendships.ContainsKey( npc.name ) ) {
+                        townsfolk.Add( npc );
                     }
                 }
             }
