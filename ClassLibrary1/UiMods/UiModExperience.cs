@@ -17,6 +17,8 @@ using System.IO;
 
 namespace DemiacleSvm.UiMods {
 
+    //TODO This class is not efficient at all and is really really messy... if bored or have time please cleanup...
+
     /* Experience point indexes
      * 
      * Farming = 0
@@ -38,7 +40,8 @@ namespace DemiacleSvm.UiMods {
         private int levelOfCurrentlyDisplayedExp = 0;
         float currentExp = 0;
 
-        List<ExpPointDisplay> expPointDisplays = new List<ExpPointDisplay>();        
+        List<ExpPointDisplay> expPointDisplays = new List<ExpPointDisplay>();
+        GameLocation currentLocation = new GameLocation();
 
         private const int TIME_BEFORE_EXPERIENCE_BAR_FADE = 8000;
         private int lengthOfLevelUpPause = 2000;
@@ -52,7 +55,6 @@ namespace DemiacleSvm.UiMods {
         private bool shouldDrawExperienceBar = false;
         private bool shouldDrawLevelUp = false;
         ClickableTextureComponent test;
-        private string hoverText;
 
         SoundEffectInstance se;
         Timer timerToDissapear = new Timer();
@@ -60,10 +62,15 @@ namespace DemiacleSvm.UiMods {
         Rectangle levelUpIconRectangle;
 
         public UiModExperience() {
-            options.Add( ModData.SHOW_EXPERIENCE_BAR, setShowExperienceBar );
+            
 
             GraphicsEvents.OnPreRenderHudEvent += onPreRenderEvent;
-            PlayerEvents.LeveledUp += onLevelUp;
+            LocationEvents.CurrentLocationChanged += removeAllExpPointDisplays;
+
+            addOption( ModData.SHOW_EXPERIENCE_BAR, ( doNothing ) => { } );
+            addOption( ModData.ALLOW_EXPERIENCE_BAR_TO_FADE_OUT, setFadeOut );
+            addOption( ModData.SHOW_EXP_GAIN, ( doNothing ) => { } );
+            addOption( ModData.SHOW_LEVEL_UP_ANIMATION, togglLevelUpAnimation );
 
             Stream soundfile = TitleContainer.OpenStream( @"Mods\\Demiacle_SVM\\LevelUp.wav" );
             SoundEffect soundEffect = SoundEffect.FromStream( soundfile );
@@ -73,13 +80,34 @@ namespace DemiacleSvm.UiMods {
 
         }
 
+        private void removeAllExpPointDisplays( object sender, EventArgsCurrentLocationChanged e ) {
+            expPointDisplays.Clear();
+        }
+
+        private void setFadeOut( bool setting ) {
+            displayExperienceBar();
+        }
+
+        private void togglLevelUpAnimation( bool setting ) {
+
+            if( setting ) {
+                PlayerEvents.LeveledUp -= onLevelUp;
+                PlayerEvents.LeveledUp += onLevelUp;
+            } else {
+               PlayerEvents.LeveledUp -= onLevelUp;
+            }
+
+        }
+
         private void stopTimerAndFadeBarOut( object sender, ElapsedEventArgs e ) {
             timerToDissapear.Stop();
             shouldDrawExperienceBar = false;
         }
 
         internal void onPreRenderEvent( object sender, EventArgs e ) {
+
             
+
             //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( 10, 10 ), new Rectangle( 0, 0, 10, 10 ), Color.Aqua ); DRAW A MOUSE CURSOR
             //Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( 0, 0, 64, 64 ), Color.Azure ); DRAW A RECTANGLE
             //Game1.drawWithBorder( "test", Color.Bisque, Color.Aquamarine, new Vector2( 64,64) ); TEXT WITH BORDER
@@ -132,85 +160,38 @@ namespace DemiacleSvm.UiMods {
                 }
             }
 
-            float expRequiredToLevel = 1;
-            int expAlreadyEarnedFromPreviousLevels = 0;
-
             levelOfCurrentlyDisplayedExp = currentLevel;
 
             // Sets the exp for next level and the exp that has already been obtained based on current level
-            switch( levelOfCurrentlyDisplayedExp ) {
-                case 0:
-                    expRequiredToLevel = 100;
-                    expAlreadyEarnedFromPreviousLevels = 0;
-                    break;
-                case 1:
-                    expRequiredToLevel = 380;
-                    expAlreadyEarnedFromPreviousLevels = 100;
-                    break;
-                case 2:
-                    expRequiredToLevel = 770;
-                    expAlreadyEarnedFromPreviousLevels = 380;
-                    break;
-                case 3:
-                    expRequiredToLevel = 1300;
-                    expAlreadyEarnedFromPreviousLevels = 770;
-                    break;
-                case 4:
-                    expRequiredToLevel = 2150;
-                    expAlreadyEarnedFromPreviousLevels = 1300;
-                    break;
-                case 5:
-                    expRequiredToLevel = 3300;
-                    expAlreadyEarnedFromPreviousLevels = 2150;
-                    break;
-                case 6:
-                    expRequiredToLevel = 4800;
-                    expAlreadyEarnedFromPreviousLevels = 3300;
-                    break;
-                case 7:
-                    expRequiredToLevel = 6900;
-                    expAlreadyEarnedFromPreviousLevels = 4800;
-                    break;
-                case 8:
-                    expRequiredToLevel = 10000;
-                    expAlreadyEarnedFromPreviousLevels = 6900;
-                    break;
-                case 9:
-                    expRequiredToLevel = 15000;
-                    expAlreadyEarnedFromPreviousLevels = 10000;
-                    break;
-
-                default:
-                // Max level or bug so disable showing exp
-                case 10:
-                    return;
-            }
+            
+            int expRequiredToLevel = getExperienceRequiredToLevel( levelOfCurrentlyDisplayedExp );
+            int expAlreadyEarnedFromPreviousLevels = getExperienceGainedFromPreviousLevels( levelOfCurrentlyDisplayedExp );
 
             float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expAlreadyEarnedFromPreviousLevels;
-            
-            // If exp is gained or current item is switched then display exp and start dissapearance timer.
 
 
-
-            // Only show experience bar if items change
+            // Show experience bar if item has changed
             if( previousItem != currentItem ) {
                 displayExperienceBar();
 
-            // Create an experience point display above characters head and show experience bar on exp gain
+            // Show experience bar and exp gain if exp is gained
             } else if( currentExp != nextExp ) {
                 displayExperienceBar();
-                expPointDisplays.Add( new ExpPointDisplay( nextExp - currentExp, Game1.player.getLocalPosition( Game1.viewport ) ) );
+
+                if( ModEntry.modData.uiOptions[ ModData.SHOW_EXP_GAIN ] != false && ( nextExp - currentExp ) > 0 ) {
+                    expPointDisplays.Add( new ExpPointDisplay( nextExp - currentExp, Game1.player.getLocalPosition( Game1.viewport ) ) );
+                }
+
             }
 
             previousItem = currentItem;
             currentExp = nextExp;
 
-            if( shouldDrawExperienceBar == false ) {
+            if( ModEntry.modData.uiOptions[ ModData.SHOW_EXPERIENCE_BAR ] == false || shouldDrawExperienceBar == false ) {
                 return;
             }
 
             int barWidth = Convert.ToInt32( ( currentExp / expRequiredToLevel ) * maxBarWidth );
-
             float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - 340;
 
             // Shift display if game view has black borders
@@ -232,11 +213,8 @@ namespace DemiacleSvm.UiMods {
             // Hacky way to handle a mouseover
             test = new ClickableTextureComponent( "", new Rectangle( ( int ) positionX - 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 80, 260, 100 ), "", "", Game1.mouseCursors, new Rectangle( 0, 0, 0, 0 ), Game1.pixelZoom );
             if( test.containsPoint( Game1.getMouseX(), Game1.getMouseY() ) ) {
-               // Game1.spriteBatch.DrawString( Game1.dialogueFont, $"{currentExp - expAlreadyEarnedFromPreviousLevels} / {  expRequiredToLevel -expAlreadyEarnedFromPreviousLevels}", new Vector2( positionX + 20, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 110 ), Color.White );
                 Game1.drawWithBorder( $"{currentExp - expAlreadyEarnedFromPreviousLevels} / {  expRequiredToLevel - expAlreadyEarnedFromPreviousLevels}", Color.Black, Color.White, new Vector2( positionX + 20, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 114 ) );
             }
-
-
 
             // Level Up display
             if( shouldDrawLevelUp) {
@@ -261,20 +239,54 @@ namespace DemiacleSvm.UiMods {
             }
         }
 
+        private int getExperienceRequiredToLevel( int levelOfCurrentlyDisplayedExp ) {
+            switch( levelOfCurrentlyDisplayedExp ) {
+                case 0:
+                    return 100;
+                case 1:
+                    return 380;
+                case 2:
+                    return 770;
+                case 3:
+                    return 1300;
+                case 4:
+                    return 2150;
+                case 5:
+                    return 3300;
+                case 6:
+                    return 4800;
+                case 7:
+                    return 6900;
+                case 8:
+                    return 10000;
+                case 9:
+                    return 15000;
+                default:
+                // Max level or bug so disable showing exp
+                case 10:
+                    return 0;
+            }; 
+        }
+
         private void displayExperienceBar() {
-            if( ModEntry.modData.uiOptions[ ModData.SHOW_EXPERIENCE_BAR ] == true ) {
-                return;
+            if( ModEntry.modData.uiOptions[ ModData.ALLOW_EXPERIENCE_BAR_TO_FADE_OUT ] == true ) {
+                timerToDissapear.Interval = TIME_BEFORE_EXPERIENCE_BAR_FADE;
+                timerToDissapear.Start();
+                shouldDrawExperienceBar = true;
+            } else {
+                timerToDissapear.Stop();
+                shouldDrawExperienceBar = true;
             }
 
-            timerToDissapear.Interval = TIME_BEFORE_EXPERIENCE_BAR_FADE;
-            timerToDissapear.Start();
-            shouldDrawExperienceBar = true;
         }
 
         /// <summary>
         /// Pauses the game, shows Level Up text and plays a chime, and unpauses after some time;
         /// </summary>
         internal void onLevelUp( object sender, EventArgsLevelUp e ) {
+            if( ModEntry.modData.uiOptions[ ModData.SHOW_LEVEL_UP_ANIMATION ] == false ) {
+                return;
+            }
             
             switch( e.Type ) {
                 case EventArgsLevelUp.LevelType.Combat:
@@ -333,36 +345,50 @@ namespace DemiacleSvm.UiMods {
           
         }
 
-        
+        private int getExperienceGainedFromPreviousLevels( int currentLevel ) {
 
-        /// <summary>
-        /// Changes the type of experience to display
-        /// </summary>
-        public void changeExperienceToDisplay( int index ) {
-            Farmer farmer = Game1.player;
-            currentLevelIndex = index;
-            switch( index ) {
+            int expAlreadyEarnedFromPreviousLevels = 0;
+
+            switch( currentLevel ) {
                 case 0:
-                    levelOfCurrentlyDisplayedExp = farmer.farmingLevel;
+                    expAlreadyEarnedFromPreviousLevels = 0;
                     break;
                 case 1:
-                    levelOfCurrentlyDisplayedExp = farmer.fishingLevel;
+                    expAlreadyEarnedFromPreviousLevels = 100;
                     break;
                 case 2:
-                    levelOfCurrentlyDisplayedExp = farmer.foragingLevel;
+                    expAlreadyEarnedFromPreviousLevels = 380;
                     break;
                 case 3:
-                    levelOfCurrentlyDisplayedExp = farmer.miningLevel;
+                    expAlreadyEarnedFromPreviousLevels = 770;
                     break;
                 case 4:
-                    levelOfCurrentlyDisplayedExp = farmer.combatLevel;
+                    expAlreadyEarnedFromPreviousLevels = 1300;
                     break;
+                case 5:
+                    expAlreadyEarnedFromPreviousLevels = 2150;
+                    break;
+                case 6:
+                    expAlreadyEarnedFromPreviousLevels = 3300;
+                    break;
+                case 7:
+                    expAlreadyEarnedFromPreviousLevels = 4800;
+                    break;
+                case 8:
+                    expAlreadyEarnedFromPreviousLevels = 6900;
+                    break;
+                case 9:
+                    expAlreadyEarnedFromPreviousLevels = 10000;
+                    break;
+
+                default:
+                // Max level or bug so disable showing exp
+                case 10:
+                    return 0;
             }
+
+            return expAlreadyEarnedFromPreviousLevels;
         }
 
-
-        public void setShowExperienceBar( bool setting ) {
-
-        }
     }
 }

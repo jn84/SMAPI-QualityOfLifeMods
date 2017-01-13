@@ -79,7 +79,7 @@
     <Compile Include="MineShaftMod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
-    <Compile Include="OptionsPage.cs" />
+    <Compile Include="UiMods\OptionsPage.cs" />
     <Compile Include="OutdoorMonsters\AI\HoldStill.cs" />
     <Compile Include="OutdoorMonsters\AI\MovementType.cs" />
     <Compile Include="OutdoorMonsters\AI\MoveTowardsTarget.cs" />

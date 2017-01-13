@@ -16,10 +16,17 @@ namespace DemiacleSvm.UiMods {
         private string hoverText = "";
 
         public UiModLuckOfDay() {
+            addOption( ModData.SHOW_LUCK_ICON, toggleOption );
         }
 
-        internal void onPreRender( object sender, EventArgs e ) {
+        internal void setHoverTextAndDiceColoer() {
+
+        }
+
+        internal void drawDiceIcon( object sender, EventArgs e ) {
+            //TODO refactor this into new day
             Color color = new Color( Color.White.ToVector4() );
+
             if( Game1.dailyLuck > 0.04d ) {
                 hoverText = "You're feelin' lucky!!";
                 color.B = 155;
@@ -41,29 +48,37 @@ namespace DemiacleSvm.UiMods {
             icon.draw( Game1.spriteBatch, color, 1 );
         }
 
-        internal void onLocationChange( object sender, EventArgsCurrentLocationChanged e ) {
-            icon = new ClickableTextureComponent( "", new Rectangle( ( int ) DemiacleUtility.getWidthInPlayArea(  ) - 134, 260, 10 * Game1.pixelZoom, 14 * Game1.pixelZoom ), "", "", Game1.mouseCursors, new Rectangle( 50, 428, 10, 14 ), Game1.pixelZoom );
+        
+        internal void adjustIconXToBlackBorder( object sender, EventArgsCurrentLocationChanged e ) {
+            icon = new ClickableTextureComponent( "", new Rectangle( ( int ) DemiacleUtility.getWidthInPlayArea() - 134, 260, 10 * Game1.pixelZoom, 14 * Game1.pixelZoom ), "", "", Game1.mouseCursors, new Rectangle( 50, 428, 10, 14 ), Game1.pixelZoom );
         }
 
-        internal void OnPostRender( object sender, EventArgs e ) {
-            // If cursor is highlighting dice, display hover text and redraw mouse
+        internal void drawHoverTextOverEverything( object sender, EventArgs e ) {
+
             if( icon.containsPoint( Game1.oldMouseState.X, Game1.oldMouseState.Y ) ) {
                 IClickableMenu.drawHoverText( Game1.spriteBatch, hoverText, Game1.dialogueFont );
             }
+
         }
 
-        public void ToggleOption( string theOption, bool setting ) {
+        public void toggleOption( bool setting ) {
 
             if( setting ) {
-                LocationEvents.CurrentLocationChanged += onLocationChange;
-                GraphicsEvents.OnPreRenderHudEvent += onPreRender;
-                GraphicsEvents.OnPostRenderHudEvent += OnPostRender;
+                LocationEvents.CurrentLocationChanged -= adjustIconXToBlackBorder;
+                GraphicsEvents.OnPreRenderHudEvent -= drawDiceIcon;
+                GraphicsEvents.OnPostRenderHudEvent -= drawHoverTextOverEverything;
+
+                adjustIconXToBlackBorder( null, null );
+                LocationEvents.CurrentLocationChanged += adjustIconXToBlackBorder;
+                GraphicsEvents.OnPreRenderHudEvent += drawDiceIcon;
+                GraphicsEvents.OnPostRenderHudEvent += drawHoverTextOverEverything;
             } else {
-                LocationEvents.CurrentLocationChanged -= onLocationChange;
-                GraphicsEvents.OnPreRenderHudEvent -= onPreRender;
-                GraphicsEvents.OnPostRenderHudEvent -= OnPostRender;
+                LocationEvents.CurrentLocationChanged -= adjustIconXToBlackBorder;
+                GraphicsEvents.OnPreRenderHudEvent -= drawDiceIcon;
+                GraphicsEvents.OnPostRenderHudEvent -= drawHoverTextOverEverything;
             }
 
         }
+
     }
 }

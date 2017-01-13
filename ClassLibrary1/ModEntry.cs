@@ -41,17 +41,12 @@ namespace DemiacleSvm {
     public class ModEntry : Mod {
 
         public static ModData modData;
-        public static string modDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_SVM\\";
-        private static string saveFilePostfix = "_modData.xml";
+        private readonly string modDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_SVM\\";
+        private const string saveFilePostfix = "_modData.xml";
         public static ModEntry modEntry;
         public static Boolean isTesting = false;
-        private static SharpSerializer serializer = new SharpSerializer();
             
         public override void Entry(IModHelper helper) {
-
-            serializer.PropertyProvider.AttributesToIgnore.Clear();
-            serializer.PropertyProvider.AttributesToIgnore.Add( typeof( XmlIgnoreAttribute ) );
-                
 
             modEntry = this;
             modData = new ModData();
@@ -60,22 +55,29 @@ namespace DemiacleSvm {
             GameEvents.GameLoaded += overrideXMLSerializer;
             ControlEvents.KeyPressed += ReceiveKeyPress;
             PlayerEvents.LoadedGame += loadModData;
-
+            
+            // Mods
             MenuEvents.MenuChanged += SkipIntro.onMenuChange;
 
-            //updateXmlSerializer();
-            PersistantMonsters persistantMonsters = new PersistantMonsters();
-            ScytheDamageMod scytheDamageMod = new ScytheDamageMod();
-            SpeedMod speedMod = new SpeedMod();
-            MineShaftMod mineShaftMod = new MineShaftMod();
+            var persistantMonsters = new PersistantMonsters();
+            var scytheDamageMod = new ScytheDamageMod();
+            var speedMod = new SpeedMod();
+            var mineShaftMod = new MineShaftMod();
 
-            UiModAccurateHearts uiModAccurateHearts = new UiModAccurateHearts();
-            UiModLocationOfTownsfolk uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk( uiModAccurateHearts );
+            //UiModAccurateHearts uiModAccurateHearts = new UiModAccurateHearts();
+            //UiModLocationOfTownsfolk uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk( uiModAccurateHearts );
             UiModItemRolloverInformation uiModItemrolloverInformation = new UiModItemRolloverInformation();
             UiModExperience uiModExperience = new UiModExperience();
             UiModLuckOfDay uiModluckOfDay = new UiModLuckOfDay();
 
-            OptionsPage optionPage = new OptionsPage( modData, uiModAccurateHearts, uiModLocationOfTownsfolk, uiModItemrolloverInformation, uiModExperience, uiModluckOfDay );
+            List<UiModWithOptions> uiMods = new List<UiModWithOptions>();
+            //uiMods.Add( uiModAccurateHearts );
+            //uiMods.Add( uiModLocationOfTownsfolk );
+            uiMods.Add( uiModItemrolloverInformation );
+            uiMods.Add( uiModExperience );
+            uiMods.Add( uiModluckOfDay );
+
+            var optionPage = new OptionsPage( uiMods );
 
         }
 
@@ -109,12 +111,12 @@ namespace DemiacleSvm {
 
             if( $"{e.KeyPressed}" == "N" ) {
 
-                updateModData();
+                //updateModData();
                 //serializer.Serialize( modData.uiOptions, modDirectory + Game1.player.name + saveFilePostfix );
 
                 //Log( "Current getTilelocationpoint is X: " + Game1.player.getTileX() + " Y:" + Game1.player.getTileY() );
 
-                //Game1.performTenMinuteClockUpdate();
+                Game1.performTenMinuteClockUpdate();
 
                 /*
                 Log( "Current gettilelocation.x is X: " + Game1.player.getTileLocation().X + " Y:" + Game1.player.position.Y / Game1.tileSize );
@@ -138,7 +140,17 @@ namespace DemiacleSvm {
             // load file 
             if( File.Exists( modDirectory + playerName + saveFilePostfix ) ) {
                 this.Monitor.Log( $"Mod data already exists for this {playerName}.... loading" );
-                Serializer.ReadFromXmlFile( out modData, playerName );    
+                ModData loadedData = new ModData();
+                Serializer.ReadFromXmlFile( out loadedData, playerName );
+
+                // Only load options valid for this build
+                foreach( var data in loadedData.uiOptions ) {
+                    if( modData.uiOptions.ContainsKey( data.Key ) ) {
+                        modData.uiOptions[ data.Key ] = loadedData.uiOptions[ data.Key ];
+                    }
+                }
+                    
+                // If need to add more options create object here and merge with loaded data
 
             // create file and ModData
             } else {

@@ -14,8 +14,10 @@ namespace DemiacleSvm {
         public Boolean hasMonstersBeenLoaded = false;
 
         public const string SHOW_LUCK_ICON = "Show luck icon";
+        public const string ALLOW_EXPERIENCE_BAR_TO_FADE_OUT = "Allow experience bar to fade out";
         public const string SHOW_EXPERIENCE_BAR = "Show experience bar";
-        public const string EXPERIENCE_BAR_ALWAYS_VISIBLE = "Experience bar always invisible";
+        public const string SHOW_EXP_GAIN = "Show experience gain";
+        public const string SHOW_LEVEL_UP_ANIMATION = "Show level up animation";
         public const string SHOW_HEART_FILLS = "Show heart fills";
         public const string SHOW_NPCS_ON_MAP = "Show npcs on map";
         public const string SHOW_EXTRA_ITEM_INFORMATION = "Show extra item information";
@@ -25,13 +27,16 @@ namespace DemiacleSvm {
         public SerializableDictionary<int, bool> locationOfTownsfolkOptions = new SerializableDictionary<int, bool>();
 
         // Dictionary of string => bool is used for easy creating and loading of checkboxes programatically
+        // Look at UiModWithOptions for details
         public SerializableDictionary<string, bool> uiOptions = new SerializableDictionary<string, bool>(){
-            { SHOW_LUCK_ICON, true },
-            { SHOW_EXPERIENCE_BAR, true }, 
-            { EXPERIENCE_BAR_ALWAYS_VISIBLE, false },
-            { SHOW_HEART_FILLS, true},
-            { SHOW_NPCS_ON_MAP, true},
-            { SHOW_EXTRA_ITEM_INFORMATION, true}
+            //{ SHOW_LUCK_ICON, true },
+            //{ SHOW_EXPERIENCE_BAR, true }, 
+            //{ EXPERIENCE_BAR_ALWAYS_VISIBLE, false },
+            //{ SHOW_EXP_GAIN, true },
+            //{ SHOW_LEVEL_UP_ANIMATION, true },
+            //{ SHOW_HEART_FILLS, true},
+            //{ SHOW_NPCS_ON_MAP, true},
+            //{ SHOW_EXTRA_ITEM_INFORMATION, true}
         };
 
     }
