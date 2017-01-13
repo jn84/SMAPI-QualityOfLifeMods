@@ -76,7 +76,6 @@
     <Compile Include="DemiacleUtility.cs" />
     <Compile Include="ElevatorMenuMod.cs" />
     <Compile Include="MineShaftExtension.cs" />
-    <Compile Include="MineShaftMod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
     <Compile Include="UiMods\OptionsPage.cs" />
