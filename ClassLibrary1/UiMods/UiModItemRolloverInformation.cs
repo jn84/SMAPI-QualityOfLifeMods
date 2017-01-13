@@ -17,10 +17,13 @@ namespace DemiacleSvm.UiMods {
     /// </summary>
     class UiModItemRolloverInformation :UiModWithOptions {
 
+
+        public const string SHOW_EXTRA_ITEM_INFORMATION = "Show extra tooltip information";
+
         Item hoverItem;
 
         public UiModItemRolloverInformation() {
-            addOption( "Show more tooltip information", toggleOption );
+            addOption( SHOW_EXTRA_ITEM_INFORMATION, toggleOption );
         }
 
         private void toggleOption( bool setting ) {

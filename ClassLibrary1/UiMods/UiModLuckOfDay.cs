@@ -14,9 +14,10 @@ namespace DemiacleSvm.UiMods {
 
         private ClickableTextureComponent icon;
         private string hoverText = "";
+        public const string SHOW_LUCK_ICON = "Show luck icon";
 
         public UiModLuckOfDay() {
-            addOption( ModData.SHOW_LUCK_ICON, toggleOption );
+            addOption( SHOW_LUCK_ICON, toggleOption );
         }
 
         internal void setHoverTextAndDiceColoer() {

@@ -17,11 +17,13 @@ namespace DemiacleSvm.UiMods {
     class UiModLocationOfTownsfolk : UiModWithOptions {
 
         List<NPC> townsfolk = new List<NPC>();
+        public const string SHOW_NPCS_ON_MAP = "Show npcs on map";
 
         private readonly UiModAccurateHearts uiModAccurateHearts;
 
         public UiModLocationOfTownsfolk( UiModAccurateHearts uiModAccurateHearts ) {
             this.uiModAccurateHearts = uiModAccurateHearts;
+            addOption( SHOW_NPCS_ON_MAP, toggleShowNPCLocationOnMap );
         }
 
         internal void onPostRenderEvent( object sender, EventArgs e ) {
@@ -30,7 +32,7 @@ namespace DemiacleSvm.UiMods {
                 return;
             }
 
-            GameMenu currentMenu = (GameMenu) Game1.activeClickableMenu;
+            var currentMenu = (GameMenu) Game1.activeClickableMenu;
 
             if(  currentMenu.currentTab != GameMenu.mapTab ) {
                 return;
@@ -266,9 +268,12 @@ namespace DemiacleSvm.UiMods {
             }
         }
 
-        public void ToggleOption( string theOption, bool setting ) {
+        public void toggleShowNPCLocationOnMap( bool setting ) {
 
             if( setting ) {
+                GraphicsEvents.OnPostRenderGuiEvent -= onPostRenderEvent;
+                MenuEvents.MenuChanged -= onMenuChange;
+
                 GraphicsEvents.OnPostRenderGuiEvent += onPostRenderEvent;
                 MenuEvents.MenuChanged += onMenuChange;
             } else {

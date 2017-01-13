@@ -34,6 +34,12 @@ namespace DemiacleSvm.UiMods {
     /// </summary>
     class UiModExperience : UiModWithOptions{
 
+
+        public const string ALLOW_EXPERIENCE_BAR_TO_FADE_OUT = "Allow experience bar to fade out";
+        public const string SHOW_EXPERIENCE_BAR = "Show experience bar";
+        public const string SHOW_EXP_GAIN = "Show experience gain";
+        public const string SHOW_LEVEL_UP_ANIMATION = "Show level up animation";
+
         private int maxBarWidth = 175;
 
         private int currentLevelIndex = 4;
@@ -67,10 +73,10 @@ namespace DemiacleSvm.UiMods {
             GraphicsEvents.OnPreRenderHudEvent += onPreRenderEvent;
             LocationEvents.CurrentLocationChanged += removeAllExpPointDisplays;
 
-            addOption( ModData.SHOW_EXPERIENCE_BAR, ( doNothing ) => { } );
-            addOption( ModData.ALLOW_EXPERIENCE_BAR_TO_FADE_OUT, setFadeOut );
-            addOption( ModData.SHOW_EXP_GAIN, ( doNothing ) => { } );
-            addOption( ModData.SHOW_LEVEL_UP_ANIMATION, togglLevelUpAnimation );
+            addOption( SHOW_EXPERIENCE_BAR, ( doNothing ) => { } );
+            addOption( ALLOW_EXPERIENCE_BAR_TO_FADE_OUT, setFadeOut );
+            addOption( SHOW_EXP_GAIN, ( doNothing ) => { } );
+            addOption( SHOW_LEVEL_UP_ANIMATION, togglLevelUpAnimation );
 
             Stream soundfile = TitleContainer.OpenStream( @"Mods\\Demiacle_SVM\\LevelUp.wav" );
             SoundEffect soundEffect = SoundEffect.FromStream( soundfile );

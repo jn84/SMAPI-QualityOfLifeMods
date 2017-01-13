@@ -24,13 +24,12 @@ namespace DemiacleSvm.UiMods {
         int panel1X = 144;
 
         public SocialPageMod( int x, int y, int width, int height ) : base( x, y, width, height ) {            
-
+            
         }
 
         public override void draw( SpriteBatch b ) {
             base.draw( b );            
 
-            // Keep just in case
             // Draw Tabs
             // Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( this.xPositionOnScreen - panel1X + 60, this.yPositionOnScreen + 20 ), new Rectangle( 1 * 16, 368, 16, 16 ), Color.White, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f );
             

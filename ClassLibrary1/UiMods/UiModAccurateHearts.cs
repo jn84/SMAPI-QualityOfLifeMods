@@ -16,8 +16,10 @@ namespace DemiacleSvm.UiMods {
     class UiModAccurateHearts : UiModWithOptions {
         
         SocialPageMod socialPage;
+        public const string SHOW_HEART_FILLS = "Show heart fills and npc locations";
 
         public UiModAccurateHearts() {
+            addOption( SHOW_HEART_FILLS, toggleVisibleHearts );
         }
         
         /// <summary>
@@ -28,7 +30,6 @@ namespace DemiacleSvm.UiMods {
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
                 return;
             }
-            
             
             // Get pages from GameMenu            
             var pages = ( List<IClickableMenu> ) typeof( GameMenu ).GetField( "pages", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( Game1.activeClickableMenu );
@@ -75,14 +76,16 @@ namespace DemiacleSvm.UiMods {
             }
         }
 
-        public void ToggleOption( string theOption, bool setting ) {
+        public void toggleVisibleHearts( bool setting ) {
 
             if( setting ) {
+                MenuEvents.MenuChanged -= OnMenuChange;
                 MenuEvents.MenuChanged += OnMenuChange;
             } else {
                 MenuEvents.MenuChanged -= OnMenuChange;
             }
 
         }
+
     }
 }

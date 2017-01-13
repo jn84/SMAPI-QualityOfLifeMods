@@ -77,26 +77,13 @@
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
     <Compile Include="UiMods\OptionsPage.cs" />
-    <Compile Include="OutdoorMonsters\AI\HoldStill.cs" />
-    <Compile Include="OutdoorMonsters\AI\MovementType.cs" />
-    <Compile Include="OutdoorMonsters\AI\MoveTowardsTarget.cs" />
-    <Compile Include="OutdoorMonsters\AI\PathFinder.cs" />
-    <Compile Include="OutdoorMonsters\AI\PathFinderMap.cs" />
-    <Compile Include="OutdoorMonsters\AI\PathFinding.cs" />
-    <Compile Include="OutdoorMonsters\OutDoorMonster.cs" />
-    <Compile Include="OutdoorMonsters\OutDoorRockCrab.cs" />
-    <Compile Include="OutdoorMonsters\OutDoorShadowBrute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PersistantMonsters.cs" />
-    <Compile Include="ScytheDamageMod.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Serializer.cs" />
-    <Compile Include="SpeedMod.cs" />
     <Compile Include="UiMods\UiModWithOptions.cs" />
     <Compile Include="UiMods\ExpPointDisplay.cs" />
     <Compile Include="UiMods\InventoryPageMod.cs" />
     <Compile Include="UiMods\ItemGrabMenuMod.cs" />
-    <Compile Include="UiMods\IOptionMethod.cs" />
     <Compile Include="UiMods\SkipIntro.cs" />
     <Compile Include="UiMods\SocialPageMod.cs" />
     <Compile Include="UiMods\ToolbarMod.cs" />
@@ -107,6 +94,7 @@
     <Compile Include="UiMods\UiModLuckOfDay.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="manifest.json" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
