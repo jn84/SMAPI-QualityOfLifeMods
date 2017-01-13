@@ -85,7 +85,6 @@
     <Compile Include="UiMods\InventoryPageMod.cs" />
     <Compile Include="UiMods\ItemGrabMenuMod.cs" />
     <Compile Include="UiMods\SkipIntro.cs" />
-    <Compile Include="UiMods\SocialPageMod.cs" />
     <Compile Include="UiMods\ToolbarMod.cs" />
     <Compile Include="UiMods\UiModAccurateHearts.cs" />
     <Compile Include="UiMods\UiModExperience.cs" />
@@ -100,6 +99,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="LevelUp.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>

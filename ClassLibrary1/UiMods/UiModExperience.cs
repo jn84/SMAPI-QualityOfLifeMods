@@ -184,7 +184,7 @@ namespace DemiacleSvm.UiMods {
             } else if( currentExp != nextExp ) {
                 displayExperienceBar();
 
-                if( ModEntry.modData.uiOptions[ ModData.SHOW_EXP_GAIN ] != false && ( nextExp - currentExp ) > 0 ) {
+                if( ModEntry.modData.uiOptions[ SHOW_EXP_GAIN ] != false && ( nextExp - currentExp ) > 0 ) {
                     expPointDisplays.Add( new ExpPointDisplay( nextExp - currentExp, Game1.player.getLocalPosition( Game1.viewport ) ) );
                 }
 
@@ -193,7 +193,7 @@ namespace DemiacleSvm.UiMods {
             previousItem = currentItem;
             currentExp = nextExp;
 
-            if( ModEntry.modData.uiOptions[ ModData.SHOW_EXPERIENCE_BAR ] == false || shouldDrawExperienceBar == false ) {
+            if( ModEntry.modData.uiOptions[ SHOW_EXPERIENCE_BAR ] == false || shouldDrawExperienceBar == false ) {
                 return;
             }
 
@@ -275,7 +275,7 @@ namespace DemiacleSvm.UiMods {
         }
 
         private void displayExperienceBar() {
-            if( ModEntry.modData.uiOptions[ ModData.ALLOW_EXPERIENCE_BAR_TO_FADE_OUT ] == true ) {
+            if( ModEntry.modData.uiOptions[ ALLOW_EXPERIENCE_BAR_TO_FADE_OUT ] == true ) {
                 timerToDissapear.Interval = TIME_BEFORE_EXPERIENCE_BAR_FADE;
                 timerToDissapear.Start();
                 shouldDrawExperienceBar = true;
@@ -290,7 +290,7 @@ namespace DemiacleSvm.UiMods {
         /// Pauses the game, shows Level Up text and plays a chime, and unpauses after some time;
         /// </summary>
         internal void onLevelUp( object sender, EventArgsLevelUp e ) {
-            if( ModEntry.modData.uiOptions[ ModData.SHOW_LEVEL_UP_ANIMATION ] == false ) {
+            if( ModEntry.modData.uiOptions[ SHOW_LEVEL_UP_ANIMATION ] == false ) {
                 return;
             }
             

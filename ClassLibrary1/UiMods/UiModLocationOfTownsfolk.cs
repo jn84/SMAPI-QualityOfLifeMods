@@ -23,7 +23,7 @@ namespace DemiacleSvm.UiMods {
 
         public UiModLocationOfTownsfolk( UiModAccurateHearts uiModAccurateHearts ) {
             this.uiModAccurateHearts = uiModAccurateHearts;
-            addOption( SHOW_NPCS_ON_MAP, toggleShowNPCLocationOnMap );
+            //addOption( SHOW_NPCS_ON_MAP, toggleShowNPCLocationOnMap );
         }
 
         internal void onPostRenderEvent( object sender, EventArgs e ) {
@@ -248,6 +248,120 @@ namespace DemiacleSvm.UiMods {
                 return;
             }
         }
+
+        /*
+
+        public void drawSocialPageOptions() {
+
+            // Draw Tabs
+            // Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( this.xPositionOnScreen - panel1X + 60, this.yPositionOnScreen + 20 ), new Rectangle( 1 * 16, 368, 16, 16 ), Color.White, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f );
+
+            // Draw Panel
+            Game1.drawDialogueBox( Game1.activeClickableMenu.xPositionOnScreen - panel1X, Game1.activeClickableMenu.yPositionOnScreen, panelWidth, Game1.activeClickableMenu.height, false, true );
+
+            // Draw Content
+            int slotPosition = ( int ) typeof( SocialPage ).GetField( "slotPosition", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( Game1.activeClickableMenu );
+            int offsetY = 0;
+            for( int i = slotPosition; i < slotPosition + 5; i++ ) {
+
+                // Safety check... this exists inside the client so lets reproduce here just in case
+                if( i > friendNames.Count ) {
+                    return;
+                }
+
+                // Set Checkbox position - TODO this should be removed from the drawing method if possible
+                checkboxes[ i ].bounds.X = Game1.activeClickableMenu.xPositionOnScreen - 50;
+                checkboxes[ i ].bounds.Y = Game1.activeClickableMenu.yPositionOnScreen + 130 + offsetY;
+
+                // Draw Checkbox
+                checkboxes[ i ].draw( Game1.spriteBatch, 0, 0 );
+                offsetY += 112;
+
+                // Set color for magnifying glass
+                Color magnifyingGlassColor = Color.Gray;
+                if( checkboxes[ i ].isChecked ) {
+                    magnifyingGlassColor = Color.White;
+                }
+
+                // Draw Magnifying glasses
+                Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( checkboxes[ i ].bounds.X - 50, checkboxes[ i ].bounds.Y ), new Rectangle( 80, 0, 16, 16 ), magnifyingGlassColor, 0f, Vector2.Zero, 3, SpriteEffects.None, 1f );
+
+                // Keep just in case
+                // Draw Large Heart
+                // Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( checkboxes[ i ].bounds.X + heartOffsetX, checkboxes[ i ].bounds.Y ), new Rectangle( 218, 428, 7, 6 ), Color.White, 0f, Vector2.Zero, 8, SpriteEffects.None, 0.88f );
+
+                // Fill Hearts
+                int friendshipPoints = 0;
+                int friendshipLevel = 0;
+
+                if( Game1.player.friendships.ContainsKey( friendNames[ i ].name ) ) {
+                    friendshipPoints = Game1.player.friendships[ friendNames[ i ].name ][ 0 ] % 250;
+                    friendshipLevel = Game1.player.friendships[ friendNames[ i ].name ][ 0 ] / 250;
+                }
+
+                int heartLevelOffsetX = 32 * friendshipLevel;
+
+                drawHeartFill( friendshipLevel, friendshipPoints, checkboxes[ i ].bounds );
+
+                // Draw line below boxes omitting the last box... Hacky but W/E
+                if( offsetY != 560 ) {
+                    Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( checkboxes[ i ].bounds.X - 50, checkboxes[ i ].bounds.Y + 72, panelWidth / 2 - 6, 4 ), Color.SaddleBrown );
+                    Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( checkboxes[ i ].bounds.X - 50, checkboxes[ i ].bounds.Y + 76, panelWidth / 2 - 6, 4 ), Color.BurlyWood );
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Stores all the data from the social page for use in drawing
+        /// </summary>
+        internal void OnMenuChange( object sender, EventArgsClickableMenuChanged e ) {
+
+            if( !( Game1.activeClickableMenu is GameMenu ) ) {
+                return;
+            }
+
+            // Get pages from GameMenu            
+            var pages = ( List<IClickableMenu> ) typeof( GameMenu ).GetField( "pages", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( Game1.activeClickableMenu );
+
+            // Override socialPage with a fresh socialPageMod
+            for( int k = 0; k < pages.Count; k++ ) {
+
+                // Page[k] looks to be created every time the menu is opened so this needs to override the page every time
+                if( pages[ k ] is SocialPage ) {
+
+                    //socialPage = new SocialPageMod( pages[k].xPositionOnScreen, pages[ k ] .yPositionOnScreen, pages[ k ].width, pages[ k ].height );
+
+
+                    friendNames = ( List<ClickableTextureComponent> ) typeof( SocialPage ).GetField( "friendNames", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( socialPage );
+                }
+            }
+
+            checkboxes.Clear();
+
+            // Create checkboxes in the same order as friends are
+            foreach( ClickableTextureComponent friend in friendNames ) {
+
+                int optionIndex = friend.name.GetHashCode();
+
+                var checkbox = new OptionsCheckbox( "", optionIndex );
+                checkboxes.Add( checkbox );
+
+                // Disable checkbox if player has not talked to npc yet
+                if( !( Game1.player.friendships.ContainsKey( friend.name ) ) ) {
+                    checkbox.greyedOut = true;
+                    checkbox.isChecked = false;
+                }
+
+                // Ensure an entry exists
+                if( ModEntry.modData.locationOfTownsfolkOptions.ContainsKey( optionIndex ) == false ) {
+                    ModEntry.modData.locationOfTownsfolkOptions.Add( optionIndex, false );
+                }
+
+                checkbox.isChecked = ModEntry.modData.locationOfTownsfolkOptions[ optionIndex ];
+            }
+        }*/
+
 
         /// <summary>
         /// Resets and populates the list of townsfolk to display every time the game menu is called
