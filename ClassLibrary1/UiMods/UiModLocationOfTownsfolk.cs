@@ -55,9 +55,10 @@ namespace DemiacleSvm.UiMods {
                 // If key for some reason doesn't exist
                 if( !( ModEntry.modData.locationOfTownsfolkOptions.ContainsKey( key ) ) ) {
                     continue;
+                }
 
                 // If key exists and value is false dont display anything
-                } else if ( ModEntry.modData.locationOfTownsfolkOptions[ key ] == false ) {
+                if ( ModEntry.modData.locationOfTownsfolkOptions[ key ] == false ) {
                     continue;
                 }
                 
@@ -254,8 +255,6 @@ namespace DemiacleSvm.UiMods {
                 var npcMugShot = new ClickableTextureComponent( npc.name, new Rectangle( positionX + offsetX, positionY + offsetY, Game1.activeClickableMenu.width, Game1.tileSize ), ( string ) null, npc.name, npc.sprite.Texture, rect, ( float ) Game1.pixelZoom, false );
                 npcMugShot.scale = 3f;
                 npcMugShot.draw( Game1.spriteBatch );
-                
-                return;
             }
         }
 
@@ -306,7 +305,11 @@ namespace DemiacleSvm.UiMods {
                 // Draw Magnifying glasses
                 Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( checkboxes[ i ].bounds.X - 50, checkboxes[ i ].bounds.Y ), new Rectangle( 80, 0, 16, 16 ), magnifyingGlassColor, 0f, Vector2.Zero, 3, SpriteEffects.None, 1f );
 
-                
+                // Draw line below boxes omitting the last box... Hacky but W/E
+                if( offsetY != 560 ) {
+                    Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( checkboxes[ i ].bounds.X - 50, checkboxes[ i ].bounds.Y + 72, socialPanelWidth / 2 - 6, 4 ), Color.SaddleBrown );
+                    Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( checkboxes[ i ].bounds.X - 50, checkboxes[ i ].bounds.Y + 76, socialPanelWidth / 2 - 6, 4 ), Color.BurlyWood );
+                }
 
                 // ReDraw the mouse
                 Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
@@ -377,13 +380,13 @@ namespace DemiacleSvm.UiMods {
         public void toggleShowNPCLocationOnMap( bool setting ) {
 
             GraphicsEvents.OnPostRenderGuiEvent -= drawNPCLocationsOnMap;
-            GraphicsEvents.OnPreRenderGuiEvent -= drawSocialPageOptions;
+            GraphicsEvents.OnPostRenderGuiEvent -= drawSocialPageOptions;
             ControlEvents.MouseChanged -= handleClick;
             MenuEvents.MenuChanged -= onMenuChange;
 
             if( setting ) {
                 GraphicsEvents.OnPostRenderGuiEvent += drawNPCLocationsOnMap;
-                GraphicsEvents.OnPreRenderGuiEvent += drawSocialPageOptions;
+                GraphicsEvents.OnPostRenderGuiEvent += drawSocialPageOptions;
                 ControlEvents.MouseChanged += handleClick;
                 MenuEvents.MenuChanged += onMenuChange;
             }
@@ -391,6 +394,10 @@ namespace DemiacleSvm.UiMods {
         }
 
         private void handleClick( object sender, EventArgsMouseStateChanged e ) {
+            if( !( Game1.activeClickableMenu is GameMenu ) ) {
+                return;
+            }
+
             if( e.NewState.LeftButton == ButtonState.Pressed ) {
                 var slotPosition = ( int ) typeof( SocialPage ).GetField( "slotPosition", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( socialPage );
 

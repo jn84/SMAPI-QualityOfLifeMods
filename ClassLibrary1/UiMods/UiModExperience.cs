@@ -114,6 +114,8 @@ namespace DemiacleSvm.UiMods {
 
             
 
+            
+
             //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( 10, 10 ), new Rectangle( 0, 0, 10, 10 ), Color.Aqua ); DRAW A MOUSE CURSOR
             //Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( 0, 0, 64, 64 ), Color.Azure ); DRAW A RECTANGLE
             //Game1.drawWithBorder( "test", Color.Bisque, Color.Aquamarine, new Vector2( 64,64) ); TEXT WITH BORDER
@@ -166,13 +168,19 @@ namespace DemiacleSvm.UiMods {
                 }
             }
 
+            
+
             levelOfCurrentlyDisplayedExp = currentLevel;
 
+            if( levelOfCurrentlyDisplayedExp > 9 ) {
+                return;
+            }
             // Sets the exp for next level and the exp that has already been obtained based on current level
             
             int expRequiredToLevel = getExperienceRequiredToLevel( levelOfCurrentlyDisplayedExp );
             int expAlreadyEarnedFromPreviousLevels = getExperienceGainedFromPreviousLevels( levelOfCurrentlyDisplayedExp );
-
+            //Game1.player.experiencePoints[ currentLevelIndex ] = 14000;
+            Game1.player.gainExperience( 0, 1490);
             float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expAlreadyEarnedFromPreviousLevels;
 
 

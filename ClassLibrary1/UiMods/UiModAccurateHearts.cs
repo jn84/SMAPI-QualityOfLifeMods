@@ -82,7 +82,6 @@ namespace DemiacleSvm.UiMods {
                 int friendshipLevel = 0;
 
                 if( Game1.player.friendships.ContainsKey( friendNames[ i ].name ) ) {
-                    Game1.player.friendships[ friendNames[ i ].name ][ 0 ] = 620; // TODO DELETE THIS LINE
                     friendshipPoints = Game1.player.friendships[ friendNames[ i ].name ][ 0 ] % 250;
                     friendshipLevel = Game1.player.friendships[ friendNames[ i ].name ][ 0 ] / 250;
                 }

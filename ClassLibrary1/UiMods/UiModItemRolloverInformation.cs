@@ -49,7 +49,7 @@ namespace DemiacleSvm.UiMods {
             string sellForAmount = "";
             string harvestPrice = "";
 
-            if( hoverItem.salePrice() > 0 ) {
+            if( hoverItem.salePrice() > 0 && hoverItem.Name != "Scythe" ) {
                 sellForAmount = "\n  " + hoverItem.salePrice() / 2;
 
                 if( hoverItem.canStackWith( hoverItem ) && hoverItem.getStack() > 1 ) {
