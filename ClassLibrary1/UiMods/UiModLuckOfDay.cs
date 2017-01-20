@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
 using StardewValley;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Menus;
+using System;
 
 namespace DemiacleSvm.UiMods {
+    /// <summary>
+    /// The icon below the day that shows your luck for the day when hovered
+    /// </summary>
     class UiModLuckOfDay : UiModWithOptions{
 
         private ClickableTextureComponent icon;
@@ -20,13 +18,9 @@ namespace DemiacleSvm.UiMods {
             addOption( SHOW_LUCK_ICON, toggleOption );
         }
 
-        internal void setHoverTextAndDiceColoer() {
-
-        }
-
         internal void drawDiceIcon( object sender, EventArgs e ) {
             //TODO refactor this into new day
-            Color color = new Color( Color.White.ToVector4() );
+            var color = new Color( Color.White.ToVector4() );
 
             if( Game1.dailyLuck > 0.04d ) {
                 hoverText = "You're feelin' lucky!!";
@@ -49,34 +43,27 @@ namespace DemiacleSvm.UiMods {
             icon.draw( Game1.spriteBatch, color, 1 );
         }
 
-        
         internal void adjustIconXToBlackBorder( object sender, EventArgsCurrentLocationChanged e ) {
             icon = new ClickableTextureComponent( "", new Rectangle( ( int ) DemiacleUtility.getWidthInPlayArea() - 134, 260, 10 * Game1.pixelZoom, 14 * Game1.pixelZoom ), "", "", Game1.mouseCursors, new Rectangle( 50, 428, 10, 14 ), Game1.pixelZoom );
         }
 
         internal void drawHoverTextOverEverything( object sender, EventArgs e ) {
-
             if( icon.containsPoint( Game1.oldMouseState.X, Game1.oldMouseState.Y ) ) {
                 IClickableMenu.drawHoverText( Game1.spriteBatch, hoverText, Game1.dialogueFont );
             }
-
         }
 
         public void toggleOption( bool setting ) {
 
-            if( setting ) {
-                LocationEvents.CurrentLocationChanged -= adjustIconXToBlackBorder;
-                GraphicsEvents.OnPreRenderHudEvent -= drawDiceIcon;
-                GraphicsEvents.OnPostRenderHudEvent -= drawHoverTextOverEverything;
+            LocationEvents.CurrentLocationChanged -= adjustIconXToBlackBorder;
+            GraphicsEvents.OnPreRenderHudEvent -= drawDiceIcon;
+            GraphicsEvents.OnPostRenderHudEvent -= drawHoverTextOverEverything;
 
+            if( setting ) {
                 adjustIconXToBlackBorder( null, null );
                 LocationEvents.CurrentLocationChanged += adjustIconXToBlackBorder;
                 GraphicsEvents.OnPreRenderHudEvent += drawDiceIcon;
                 GraphicsEvents.OnPostRenderHudEvent += drawHoverTextOverEverything;
-            } else {
-                LocationEvents.CurrentLocationChanged -= adjustIconXToBlackBorder;
-                GraphicsEvents.OnPreRenderHudEvent -= drawDiceIcon;
-                GraphicsEvents.OnPostRenderHudEvent -= drawHoverTextOverEverything;
             }
 
         }

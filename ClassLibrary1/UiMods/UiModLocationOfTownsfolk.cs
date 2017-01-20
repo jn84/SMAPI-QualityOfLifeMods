@@ -1,17 +1,12 @@
-﻿using StardewValley;
-using StardewValley.Menus;
-using StardewValley.Monsters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Microsoft.Xna.Framework;
-using StardewModdingAPI.Events;
-using System.Reflection;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI.Events;
+using StardewValley;
+using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DemiacleSvm.UiMods {
 
@@ -37,7 +32,7 @@ namespace DemiacleSvm.UiMods {
         }
 
         internal void drawNPCLocationsOnMap( object sender, EventArgs e ) {
-
+            
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
                 return;
             }
@@ -61,7 +56,6 @@ namespace DemiacleSvm.UiMods {
                 if ( ModEntry.modData.locationOfTownsfolkOptions[ key ] == false ) {
                     continue;
                 }
-                
 
                 Rectangle rect = npc.getMugShotSourceRect();
                 rect.Height = rect.Height - 8;
@@ -258,8 +252,6 @@ namespace DemiacleSvm.UiMods {
             }
         }
 
-        
-
         public void drawSocialPageOptions( object sender, EventArgs e ) {
 
             if( !( Game1.activeClickableMenu is GameMenu ) ) {
@@ -271,9 +263,6 @@ namespace DemiacleSvm.UiMods {
             if( currentMenu.currentTab != GameMenu.socialTab ) {
                 return;
             }
-
-            // Draw Tabs
-            // Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( this.xPositionOnScreen - panel1X + 60, this.yPositionOnScreen + 20 ), new Rectangle( 1 * 16, 368, 16, 16 ), Color.White, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 1f );
 
             // Draw Panel
             Game1.drawDialogueBox( Game1.activeClickableMenu.xPositionOnScreen - socialPanelOffsetX, Game1.activeClickableMenu.yPositionOnScreen, socialPanelWidth, Game1.activeClickableMenu.height, false, true );
@@ -314,14 +303,11 @@ namespace DemiacleSvm.UiMods {
                 // ReDraw the mouse
                 Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
 
-
                 // Keep just in case
                 // Draw Large Heart
                 // Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( checkboxes[ i ].bounds.X + heartOffsetX, checkboxes[ i ].bounds.Y ), new Rectangle( 218, 428, 7, 6 ), Color.White, 0f, Vector2.Zero, 8, SpriteEffects.None, 0.88f );
             }
         }
-
-
 
         /// <summary>
         /// Resets and populates the list of townsfolk and checkboxes to display every time the game menu is called

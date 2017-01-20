@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StardewModdingAPI.Events;
+﻿using StardewModdingAPI.Events;
 using StardewValley.Menus;
+using System;
 using System.Reflection;
 
 namespace DemiacleSvm.UiMods {
@@ -12,7 +8,7 @@ namespace DemiacleSvm.UiMods {
 
         internal static void onMenuChange( object sender, EventArgsClickableMenuChanged e ) {
             try {
-                TitleMenu menu = e.NewMenu as TitleMenu;
+                var menu = e.NewMenu as TitleMenu;
                 menu.skipToTitleButtons();
 
                 FieldInfo logoTimer = menu.GetType().GetField( "chuckleFishTimer", BindingFlags.Instance | BindingFlags.NonPublic );

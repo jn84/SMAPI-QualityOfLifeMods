@@ -1,14 +1,11 @@
-﻿using StardewValley;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI.Events;
+using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StardewModdingAPI.Events;
 using System.Reflection;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace DemiacleSvm.UiMods {
 
@@ -19,9 +16,6 @@ namespace DemiacleSvm.UiMods {
         
         private List<ClickableTextureComponent> friendNames;
         private SocialPage socialPage;
-
-        int panelWidth = 180;
-        int panel1X = 144;
 
         public const string SHOW_HEART_FILLS = "Show heart fills";
 
@@ -134,16 +128,15 @@ namespace DemiacleSvm.UiMods {
 
         public void toggleVisibleHearts( bool setting ) {
 
+            GraphicsEvents.OnPostRenderGuiEvent -= drawHeartFills;
+            MenuEvents.MenuChanged -= OnMenuChange;
+
             if( setting ) {
-                MenuEvents.MenuChanged -= OnMenuChange;
-                GraphicsEvents.OnPostRenderGuiEvent -= drawHeartFills;
                 MenuEvents.MenuChanged += OnMenuChange;
                 GraphicsEvents.OnPostRenderGuiEvent += drawHeartFills;
-            } else {
-                GraphicsEvents.OnPostRenderGuiEvent -= drawHeartFills;
-                MenuEvents.MenuChanged -= OnMenuChange;
             }
 
         }
+
     }
 }

@@ -1,39 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DemiacleSvm.UiMods;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using Microsoft.Xna.Framework;
-
-using StardewValley.Buildings;
-using StardewValley.Characters;
-using StardewValley.Locations;
-using StardewValley.Monsters;
-using StardewValley.Objects;
-using StardewValley.Quests;
-using StardewValley.TerrainFeatures;
-using System.Xml.Serialization;
-using DemiacleSvm.UiMods;
-using Microsoft.Xna.Framework.Audio;
-using Polenter.Serialization;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-
-//create list of mobs
-
-//create boss mobs
-
-//create all mobs on game create
-
-//create spawn timers on event or on timers
-
-//remove normal mob spawn and rocks when entering mine
-//create persistant mob and rocks when entering mine ONLY the first time.
-//load persistant mobs and rocks and ladder if previously visited
-
 
 namespace DemiacleSvm {
     public class ModEntry : Mod {
@@ -49,10 +20,12 @@ namespace DemiacleSvm {
             modEntry = this;
             modData = new ModData();
 
-            // General mods needed for all other mods
+            // Loads the correct settings on character load
             PlayerEvents.LoadedGame += loadModData;
-            
+
             // Mods
+            MenuEvents.MenuChanged += SkipIntro.onMenuChange;
+
             var uiModAccurateHearts = new UiModAccurateHearts();
             var uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk();
             var uiModItemrolloverInformation = new UiModItemRolloverInformation();

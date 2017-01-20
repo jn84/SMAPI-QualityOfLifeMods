@@ -1,14 +1,12 @@
-﻿using StardewValley;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI.Events;
+using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using StardewModdingAPI.Events;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace DemiacleSvm.UiMods {
 
@@ -16,7 +14,6 @@ namespace DemiacleSvm.UiMods {
     /// Handler that overrides Toolbar and InventoryMenu
     /// </summary>
     class UiModItemRolloverInformation :UiModWithOptions {
-
 
         public const string SHOW_EXTRA_ITEM_INFORMATION = "Show extra tooltip information";
 
@@ -42,6 +39,7 @@ namespace DemiacleSvm.UiMods {
         }
 
         private void drawAdvancedToolip( object sender, EventArgs e ) {
+
             if( hoverItem == null ) {
                 return;
             }
@@ -77,47 +75,71 @@ namespace DemiacleSvm.UiMods {
 
             // Draw coin
             if( sellForAmount != "" ) {
+                float height = 0;
 
-                float borderOffsetYForIcon = 16;
-                float offsetHeight = Game1.smallFont.MeasureString( hoverItem.getDescription() + "\n objectType" ).Y + Game1.dialogueFont.MeasureString( "The height of 1 line" ).Y + borderOffsetYForIcon;
+                // Width of 11 border pixels
+                height += Game1.pixelZoom * 11;
 
-                // Offset by health and stamina gained text
+                // Mouse height
+                height += 9 * Game1.pixelZoom;
+
+                height += Game1.smallFont.MeasureString( hoverItem.getDescription() ).Y;
+
+                height += Game1.smallFont.MeasureString( hoverItem.getCategoryName() ).Y;
+
+                height += Game1.dialogueFont.MeasureString( hoverItem.Name + sellForAmount + harvestPrice ).Y;
+
+                // Size of attachmentSlots
+                height += ( Game1.tileSize + 4 ) * hoverItem.attachmentSlots();
+
+                // If item is edible
                 if( ( hoverItem as StardewValley.Object ).edibility != -300 ) {
-                    offsetHeight += 38 * 2;
 
-                    // Offset displayed buffs text
+                    // Size of health and stamina display
+                    if( ( hoverItem as StardewValley.Object ).edibility < 0 ) {
+                        height += 39;
+                    } else {
+                        height += 78;
+                    }
+
+                    string[] info = Game1.objectInformation[ hoverItem.parentSheetIndex ].Split( '/' );
+                    if( info.Length > 5 && info[ 5 ].Equals( "drink" ) ) {
+
+                    }
+
+                    // Size of buff display
                     if( Game1.objectInformation[ ( hoverItem as StardewValley.Object ).parentSheetIndex ].Split( '/' ).Length >= 7 ) {
                         string[] buffIconsToDisplay = Game1.objectInformation[ ( hoverItem as StardewValley.Object ).parentSheetIndex ].Split( '/' )[ 6 ].Split( ' ' );
                         for( int i = 0; i < buffIconsToDisplay.Count(); i++ ) {
                             if( buffIconsToDisplay[ i ] != "0" ) {
-                                offsetHeight += 38;
+                                height += 34;
                             }
                         }
+                        height += 4;
                     }
                 }
 
-                // compensates for the inacurate measure of text and borders
-                float offsetYHoverBackground = 61;
-
-                float heightThatMeasuresHoverBackground = Game1.smallFont.MeasureString( hoverItem.getDescription() + "\n objectType" ).Y + Game1.dialogueFont.MeasureString( "The height of \n 2 lines" ).Y +  offsetHeight - offsetYHoverBackground;
-
                 float iconPositionY = 0;
-                float fixTopX = 0;
-                if( Game1.getMouseY() + heightThatMeasuresHoverBackground > Game1.viewport.Height ) {
-                    iconPositionY = Game1.viewport.Height - offsetHeight;
+                float fixIconTopX = 0;
+
+                // If tooltip is outside view bounds
+                if( Game1.getMouseY() + height > Game1.viewport.Height ) {
+                    int offsetY = 112;
+                    iconPositionY = Game1.viewport.Height - height + offsetY;
                 } else {
-                    iconPositionY = Game1.getMousePosition().Y + 112;
-                    fixTopX = 16;
+                    int yOffsetFromTopOfBox = 112;
+                    iconPositionY = Game1.getMousePosition().Y + yOffsetFromTopOfBox;
+                    fixIconTopX = 16;
                 }
 
                 float iconPositionX = Game1.getMousePosition().X + 78;
 
-                Game1.spriteBatch.Draw( Game1.debrisSpriteSheet, new Vector2( iconPositionX - fixTopX, iconPositionY ), new Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.debrisSpriteSheet, 8, 16, 16 ) ), Color.White, 0f, new Vector2( 8f, 8f ), ( float ) Game1.pixelZoom, SpriteEffects.None, 0.95f );
+                Game1.spriteBatch.Draw( Game1.debrisSpriteSheet, new Vector2( iconPositionX - fixIconTopX, iconPositionY ), new Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.debrisSpriteSheet, 8, 16, 16 ) ), Color.White, 0f, new Vector2( 8f, 8f ), ( float ) Game1.pixelZoom, SpriteEffects.None, 0.95f );
                
                 // Draw harvest icon
                 if( isDrawingHarvestPrice ) {
                     var spriteRectangle = new Rectangle( 60, 428, 10, 10 );
-                    Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( iconPositionX + Game1.dialogueFont.MeasureString( sellForAmount ).X - 10 - fixTopX, iconPositionY - 20 ), spriteRectangle, Color.White, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
+                    Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( iconPositionX + Game1.dialogueFont.MeasureString( sellForAmount ).X - 10 - fixIconTopX, iconPositionY - 20 ), spriteRectangle, Color.White, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
                 }
 
             }

@@ -1,19 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StardewModdingAPI.Events;
-using StardewValley.Tools;
-using System.Timers;
-using System.Media;
-using Microsoft.Xna.Framework.Audio;
-using System.Runtime.InteropServices;
 using System.IO;
+using System.Threading.Tasks;
+using System.Timers;
 
 namespace DemiacleSvm.UiMods {
 
@@ -28,12 +24,11 @@ namespace DemiacleSvm.UiMods {
      * Combat = 4
      * Luck = 5 
     */
-    
+
     /// <summary>
     /// The mod that shows an experienceBar and plays an animation on level up
     /// </summary>
     class UiModExperience : UiModWithOptions{
-
 
         public const string ALLOW_EXPERIENCE_BAR_TO_FADE_OUT = "Allow experience bar to fade out";
         public const string SHOW_EXPERIENCE_BAR = "Show experience bar";
@@ -68,7 +63,6 @@ namespace DemiacleSvm.UiMods {
         Rectangle levelUpIconRectangle;
 
         public UiModExperience() {
-            
 
             GraphicsEvents.OnPreRenderHudEvent += onPreRenderEvent;
             LocationEvents.CurrentLocationChanged += removeAllExpPointDisplays;
@@ -112,23 +106,9 @@ namespace DemiacleSvm.UiMods {
 
         internal void onPreRenderEvent( object sender, EventArgs e ) {
 
-            
-
-            
-
-            //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( 10, 10 ), new Rectangle( 0, 0, 10, 10 ), Color.Aqua ); DRAW A MOUSE CURSOR
-            //Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( 0, 0, 64, 64 ), Color.Azure ); DRAW A RECTANGLE
-            //Game1.drawWithBorder( "test", Color.Bisque, Color.Aquamarine, new Vector2( 64,64) ); TEXT WITH BORDER
-
-
-            //Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) ( num5 + num113 - Game1.pixelZoom  ), ( float ) ( num4 ) ), new Rectangle?( new Rectangle( 145, 338, 14, 9 ) ), Color.Black * 0.35f, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.87f );
-            //Game1.spriteBatch.Draw( Game1.mouseCursors, netoggleOptionw Vector2( Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - 200, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom -52 ), new Rectangle?( new Rectangle( 159, 338, 14, 9 ) ), Color.White * ( 1f ), 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.87f );
-            //ClickableTextureComponent expBar = new ClickableTextureComponent( "T", new Rectangle( 100, 100, 14 * Game1.pixelZoom, 9 * Game1.pixelZoom ), ( string ) null, "blurb", Game1.mouseCursors, new Rectangle( 159, 338, 14, 9 ), ( float ) Game1.pixelZoom, true ) ;
-            //expBar.draw( Game1.spriteBatch );
-
             Item currentItem = Game1.player.CurrentItem;
 
-            Rectangle spriteRectangle = new Rectangle( 10, 428, 10, 10 );
+            var spriteRectangle = new Rectangle( 10, 428, 10, 10 );
             int currentLevel = 0;
 
             // Display exp type depending on item
@@ -168,21 +148,17 @@ namespace DemiacleSvm.UiMods {
                 }
             }
 
-            
-
             levelOfCurrentlyDisplayedExp = currentLevel;
 
             if( levelOfCurrentlyDisplayedExp > 9 ) {
                 return;
             }
-            // Sets the exp for next level and the exp that has already been obtained based on current level
             
+            // Sets the exp for next level and the exp that has already been obtained based on current level
             int expRequiredToLevel = getExperienceRequiredToLevel( levelOfCurrentlyDisplayedExp );
             int expAlreadyEarnedFromPreviousLevels = getExperienceGainedFromPreviousLevels( levelOfCurrentlyDisplayedExp );
-            //Game1.player.experiencePoints[ currentLevelIndex ] = 14000;
-            Game1.player.gainExperience( 0, 1490);
-            float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expAlreadyEarnedFromPreviousLevels;
 
+            float nextExp = Game1.player.experiencePoints[ currentLevelIndex ] - expAlreadyEarnedFromPreviousLevels;
 
             // Show experience bar if item has changed
             if( previousItem != currentItem ) {
@@ -201,11 +177,11 @@ namespace DemiacleSvm.UiMods {
             previousItem = currentItem;
             currentExp = nextExp;
 
-            if( ModEntry.modData.uiOptions[ SHOW_EXPERIENCE_BAR ] == false || shouldDrawExperienceBar == false ) {
+            if( ModEntry.modData.uiOptions[ SHOW_EXPERIENCE_BAR ] == false || shouldDrawExperienceBar == false  || levelOfCurrentlyDisplayedExp == 10 ) {
                 return;
             }
 
-            int barWidth = Convert.ToInt32( ( currentExp / expRequiredToLevel ) * maxBarWidth );
+            int barWidth = Convert.ToInt32( ( currentExp / ( expRequiredToLevel - expAlreadyEarnedFromPreviousLevels ) ) * maxBarWidth );
             float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right - 340;
 
             // Shift display if game view has black borders
@@ -227,7 +203,7 @@ namespace DemiacleSvm.UiMods {
             // Hacky way to handle a mouseover
             test = new ClickableTextureComponent( "", new Rectangle( ( int ) positionX - 36, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 80, 260, 100 ), "", "", Game1.mouseCursors, new Rectangle( 0, 0, 0, 0 ), Game1.pixelZoom );
             if( test.containsPoint( Game1.getMouseX(), Game1.getMouseY() ) ) {
-                Game1.drawWithBorder( $"{currentExp - expAlreadyEarnedFromPreviousLevels} / {  expRequiredToLevel - expAlreadyEarnedFromPreviousLevels}", Color.Black, Color.White, new Vector2( positionX + 20, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 114 ) );
+                Game1.drawWithBorder( $"{currentExp} / {  expRequiredToLevel - expAlreadyEarnedFromPreviousLevels}", Color.Black, Color.White, new Vector2( positionX + 20, Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Bottom - 114 ) );
             }
 
             // Level Up display

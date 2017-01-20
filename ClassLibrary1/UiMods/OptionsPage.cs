@@ -1,14 +1,10 @@
-﻿using StardewModdingAPI.Events;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using DemiacleSvm.UiMods;
 
 namespace DemiacleSvm.UiMods {
     class OptionsPage {
@@ -47,7 +43,6 @@ namespace DemiacleSvm.UiMods {
         }
 
         private void onKeyPress( object sender, EventArgsKeyPressed e ) {
-
             if( !Game1.player.canMove ) {
                 return;
             }
