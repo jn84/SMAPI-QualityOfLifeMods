@@ -18,24 +18,22 @@ namespace DemiacleSvm.UiMods {
         public const string SHOW_EXTRA_ITEM_INFORMATION = "Show extra tooltip information";
 
         Item hoverItem;
+        private bool isDrawingShopInformation = false;
 
         public UiModItemRolloverInformation() {
-            addOption( SHOW_EXTRA_ITEM_INFORMATION, toggleOption );
+            addCheckboxOption( SHOW_EXTRA_ITEM_INFORMATION, true, onSettingChange );
         }
 
-        private void toggleOption( bool setting ) {
+        private void onSettingChange() {
+            var setting = ( bool ) ModEntry.modData.checkboxOptions[ SHOW_EXTRA_ITEM_INFORMATION ];
+
+            GraphicsEvents.OnPreRenderEvent -= removeDefaultHoverItems;
+            GraphicsEvents.OnPostRenderEvent -= drawAdvancedToolip;
 
             if ( setting ) {
-                GraphicsEvents.OnPreRenderEvent -= removeDefaultHoverItems;
-                GraphicsEvents.OnPostRenderEvent -= drawAdvancedToolip;
-
                 GraphicsEvents.OnPostRenderEvent += drawAdvancedToolip;
                 GraphicsEvents.OnPreRenderEvent += removeDefaultHoverItems;
-            } else {
-                GraphicsEvents.OnPostRenderEvent -= drawAdvancedToolip;
-                GraphicsEvents.OnPreRenderEvent -= removeDefaultHoverItems;
             }
-
         }
 
         private void drawAdvancedToolip( object sender, EventArgs e ) {
@@ -70,6 +68,28 @@ namespace DemiacleSvm.UiMods {
 
             }
 
+            // Draws harvest info for seeds in shop
+            if( Game1.activeClickableMenu is ShopMenu ) {
+                if( isDrawingShopInformation && ( ( StardewValley.Object ) hoverItem ).type == "Seeds" && harvestPrice != "" ) {
+                    int positionX = Game1.getMouseX() + 50;
+                    int positionY = Game1.getMouseY() - 30;
+
+                    // Box and text
+                    Game1.drawDialogueBox( positionX, positionY - 100, 220, 176, false, true );
+                    //Game1.drawWithBorder( harvestPrice, Color.Gray, Color.Black, new Vector2( positionX, positionY ) );
+                    Game1.spriteBatch.DrawString( Game1.dialogueFont, harvestPrice, new Vector2( positionX + 26, positionY + 4 ), Color.Black );
+
+                    // Harvest icon
+                    var spriteRectangle = new Rectangle( 60, 428, 10, 10 );
+                    Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( positionX + 38, positionY ), spriteRectangle, Color.White, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom, SpriteEffects.None, 0.85f );
+
+                    isDrawingShopInformation = false;
+                }
+
+                return;
+            }
+            
+
             IClickableMenu.drawToolTip( Game1.spriteBatch, hoverItem.getDescription(), hoverItem.Name + sellForAmount + harvestPrice, hoverItem, false, -1, 0, -1, -1, null, -1 );
             string test = hoverItem.getDescription();
 
@@ -93,7 +113,7 @@ namespace DemiacleSvm.UiMods {
                 height += ( Game1.tileSize + 4 ) * hoverItem.attachmentSlots();
 
                 // If item is edible
-                if( ( hoverItem as StardewValley.Object ).edibility != -300 ) {
+                if( hoverItem is StardewValley.Object && ( hoverItem as StardewValley.Object ).edibility != -300 ) {
 
                     // Size of health and stamina display
                     if( ( hoverItem as StardewValley.Object ).edibility < 0 ) {
@@ -121,8 +141,9 @@ namespace DemiacleSvm.UiMods {
 
                 float iconPositionY = 0;
                 float fixIconTopX = 0;
+                float iconPositionX = Game1.getMousePosition().X + 78;
 
-                // If tooltip is outside view bounds
+                // If tooltip is outside Y view bounds
                 if( Game1.getMouseY() + height > Game1.viewport.Height ) {
                     int offsetY = 112;
                     iconPositionY = Game1.viewport.Height - height + offsetY;
@@ -132,7 +153,20 @@ namespace DemiacleSvm.UiMods {
                     fixIconTopX = 16;
                 }
 
-                float iconPositionX = Game1.getMousePosition().X + 78;
+                int offsetMouseAndBorder = 64;
+                int textWidth = Math.Max( ( int ) Game1.dialogueFont.MeasureString( hoverItem.Name ).X, ( int ) Game1.smallFont.MeasureString( hoverItem.getDescription() ).X );
+                int tooltipWidthAndMouseX = (int) Game1.getMouseX() + textWidth + offsetMouseAndBorder;
+
+                // If tooltip is outside X view bounds
+                if( tooltipWidthAndMouseX > Game1.viewport.Width ) {
+                    iconPositionX = Game1.viewport.Width - textWidth + 14;
+                    if( Game1.getMouseY() + height > Game1.viewport.Height ) {
+                        // Do nothing
+                    } else {
+                        iconPositionY += 16;
+                    }
+                }
+
 
                 Game1.spriteBatch.Draw( Game1.debrisSpriteSheet, new Vector2( iconPositionX - fixIconTopX, iconPositionY ), new Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.debrisSpriteSheet, 8, 16, 16 ) ), Color.White, 0f, new Vector2( 8f, 8f ), ( float ) Game1.pixelZoom, SpriteEffects.None, 0.95f );
                
@@ -181,6 +215,11 @@ namespace DemiacleSvm.UiMods {
                 typeof( ItemGrabMenu ).GetField( "hoveredItem", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public ).SetValue( itemGrabMenu, null );
             }
 
+            if( Game1.activeClickableMenu is ShopMenu ) {
+                var shopMenu = ( ShopMenu ) Game1.activeClickableMenu;
+                hoverItem = ( Item ) typeof( ShopMenu ).GetField( "hoveredItem", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public ).GetValue( shopMenu );
+                isDrawingShopInformation = true;
+            }
         }
 
     }

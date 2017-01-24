@@ -10,8 +10,8 @@
     <ProjectGuid>{40D249C8-810B-48FE-ADE4-24819BBBD5FB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Demiacle_SVM</RootNamespace>
-    <AssemblyName>Demiacle_SVM</AssemblyName>
+    <RootNamespace>Demiacle_UiMod</RootNamespace>
+    <AssemblyName>Demiacle_UiMod</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -36,7 +36,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\..\SteamLibrary2\steamapps\common\Stardew Valley\Mods\Demiacle_SVM\</OutputPath>
+    <OutputPath>..\..\..\SteamLibrary2\steamapps\common\Stardew Valley\Mods\Demiacle_UiMod\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -55,10 +55,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework.Xact, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
-    <Reference Include="Polenter.SharpSerializer, Version=2.20.0.0, Culture=neutral, PublicKeyToken=8f4f20011571ee5f, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpSerializer.2.20\lib\net20\Polenter.SharpSerializer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Stardew Valley, Version=1.0.6124.25603, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SteamLibrary2\steamapps\common\Stardew Valley\Stardew Valley.exe</HintPath>
@@ -76,7 +72,9 @@
     <Compile Include="DemiacleUtility.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
+    <Compile Include="UiMods\OptionData.cs" />
     <Compile Include="UiMods\OptionsPage.cs" />
+    <Compile Include="UiMods\OptionsPageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Serializer.cs" />
@@ -90,7 +88,9 @@
     <Compile Include="UiMods\UiModWithOptions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="manifest.json" />
+    <None Include="manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

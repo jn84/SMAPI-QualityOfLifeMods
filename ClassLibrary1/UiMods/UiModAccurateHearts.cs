@@ -20,7 +20,7 @@ namespace DemiacleSvm.UiMods {
         public const string SHOW_HEART_FILLS = "Show heart fills";
 
         public UiModAccurateHearts() {
-            addOption( SHOW_HEART_FILLS, toggleVisibleHearts );
+            addCheckboxOption( SHOW_HEART_FILLS, true, toggleVisibleHearts );
         }
         
         /// <summary>
@@ -72,19 +72,29 @@ namespace DemiacleSvm.UiMods {
                 offsetYforEachSlot += 112;      
                 
                 // Fill Hearts
-                int friendshipPoints = 0;
+                int friendshipPointsForCurrentLevel = 0;
                 int friendshipLevel = 0;
 
-                if( Game1.player.friendships.ContainsKey( friendNames[ i ].name ) ) {
-                    friendshipPoints = Game1.player.friendships[ friendNames[ i ].name ][ 0 ] % 250;
+                if( Game1.player.friendships.ContainsKey( friendNames[ i ].name ) && Game1.player.friendships[ friendNames[ i ].name ][0] > 0  ) {
+                    friendshipPointsForCurrentLevel = Game1.player.friendships[ friendNames[ i ].name ][ 0 ] % 250;
                     friendshipLevel = Game1.player.friendships[ friendNames[ i ].name ][ 0 ] / 250;
+                } else {
+                    continue; 
                 }
+                int totalFriendshipPoints = Game1.player.friendships[ friendNames[ i ].name ][ 0 ];
 
-                drawEachIndividualSquare( friendshipLevel, friendshipPoints,  yPosition );
-                
+                // If hearts are maxed, draw nothing
+                if( totalFriendshipPoints > 3000 ) {
+                    return;
+                } else if( friendNames[ i ].name != Game1.player.spouse && totalFriendshipPoints > 2500 ) {
+                    return;
+                }
+                drawEachIndividualSquare( friendshipLevel, friendshipPointsForCurrentLevel,  yPosition );
+
                 // ReDraw the mouse
-                Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
-
+                if( !Game1.options.hardwareCursor ) {
+                    Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
+                }
             }
 
         }
@@ -100,7 +110,14 @@ namespace DemiacleSvm.UiMods {
             // 12 amount of amountOfPixelsToFill is the max
             // Ratios are a tad off so the last point is only half as much... its fine
             int amountOfPixelsToFill = friendshipPoints / 20;
-            int heartLevelOffsetX = 32 * friendshipLevel;
+            int heartLevelOffsetX;
+
+            if( friendshipLevel > 10 ) {
+                heartLevelOffsetX = 32 * ( friendshipLevel - 10 );
+                yPosition += ( 7 * 4 );
+            } else {
+               heartLevelOffsetX = 32 * friendshipLevel;
+            }
 
             int[,] heartFillArray = {
                  { 1, 1, 0, 1, 1, },
@@ -111,12 +128,16 @@ namespace DemiacleSvm.UiMods {
 
             int distanceAwayFromFirstHeartPositionX = 316;
 
+           
+
             // Draw the squares from bottom to top and left to right
             for( int row = 3; row >= 0; row-- ) {
                 for( int column = 0; column < 5; column++ ) {
                     if( amountOfPixelsToFill < 1 ) {
                         return;
                     }
+                    
+                    
 
                     if( heartFillArray[ row, column ] == 1 ) {
                         Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( Game1.activeClickableMenu.xPositionOnScreen + distanceAwayFromFirstHeartPositionX + heartLevelOffsetX + ( column * 4 ), yPosition + 14 + ( row * 4 ), 4, 4 ), Color.Crimson );
@@ -126,12 +147,12 @@ namespace DemiacleSvm.UiMods {
             }
         }
 
-        public void toggleVisibleHearts( bool setting ) {
+        public void toggleVisibleHearts() {
 
             GraphicsEvents.OnPostRenderGuiEvent -= drawHeartFills;
             MenuEvents.MenuChanged -= OnMenuChange;
 
-            if( setting ) {
+            if( ModEntry.modData.checkboxOptions[ SHOW_HEART_FILLS ] ) {
                 MenuEvents.MenuChanged += OnMenuChange;
                 GraphicsEvents.OnPostRenderGuiEvent += drawHeartFills;
             }

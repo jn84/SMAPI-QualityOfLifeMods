@@ -17,6 +17,9 @@ namespace DemiacleSvm.UiMods {
 
         private SocialPage socialPage;
 
+        private bool isClicking;
+        private List<string> listOfHoveredInformation = new List<string>();
+
         private List<ClickableTextureComponent> friendNames;
         private List<NPC> townsfolk = new List<NPC>();
         private List<OptionsCheckbox> checkboxes = new List<OptionsCheckbox>();
@@ -28,7 +31,7 @@ namespace DemiacleSvm.UiMods {
 
 
         public UiModLocationOfTownsfolk() {
-            addOption( SHOW_NPCS_ON_MAP, toggleShowNPCLocationOnMap );
+            addCheckboxOption( SHOW_NPCS_ON_MAP, true, toggleShowNPCLocationOnMap );
         }
 
         internal void drawNPCLocationsOnMap( object sender, EventArgs e ) {
@@ -42,7 +45,9 @@ namespace DemiacleSvm.UiMods {
             if(  currentMenu.currentTab != GameMenu.mapTab ) {
                 return;
             }
-            
+
+            listOfHoveredInformation.Clear();
+
             foreach( NPC npc in townsfolk ) {
 
                 int key = npc.name.GetHashCode();
@@ -57,179 +62,185 @@ namespace DemiacleSvm.UiMods {
                     continue;
                 }
 
-                Rectangle rect = npc.getMugShotSourceRect();
-                rect.Height = rect.Height - 8;
-
-                int offsetX = 0;
-                int offsetY = 0;
+                int offsetIconX = 0;
+                int offsetIconY = 0;
                 
                 // Set the correct position for character head mugshots
                 switch( npc.currentLocation.name ) {
 
                     case "Town":
-                        offsetX = 680;
-                        offsetY = 360;
+                    case "JoshHouse":
+                    case "HarveyRoom":
+                        offsetIconX = 680;
+                        offsetIconY = 360;
                         break;
 
                     case "HaleyHouse":
-                        offsetX = 652;
-                        offsetY = 408;
+                        offsetIconX = 652;
+                        offsetIconY = 408;
                         break;
 
                     case "SamHouse":
-                        offsetX = 612;
-                        offsetY = 396;
+                        offsetIconX = 612;
+                        offsetIconY = 396;
                         break;
 
                     case "Blacksmith":
-                        offsetX = 852;
-                        offsetY = 388;
+                        offsetIconX = 852;
+                        offsetIconY = 388;
                         break;
 
                     case "ManorHouse":
-                        offsetX = 768;
-                        offsetY = 388;
+                        offsetIconX = 768;
+                        offsetIconY = 388;
                         break;
 
                     case "SeedShop":
-                        offsetX = 696;
-                        offsetY = 296;
+                        offsetIconX = 696;
+                        offsetIconY = 296;
                         break;
 
                     case "Saloon":
-                        offsetX = 716;
-                        offsetY = 352;
+                        offsetIconX = 716;
+                        offsetIconY = 352;
+                        break;
+
+                    case "Farm":
+                    case "FarmHouse":
+                        offsetIconX = 470;
+                        offsetIconY = 260;
                         break;
 
                     case "Trailer":
-                        offsetX = 780;
-                        offsetY = 360;
+                        offsetIconX = 780;
+                        offsetIconY = 360;
                         break;
 
                     case "Hospital":
-                        offsetX = 680;
-                        offsetY = 304;
+                        offsetIconX = 680;
+                        offsetIconY = 304;
                         break;
                                         
                     case "Beach":
-                        offsetX = 790;
-                        offsetY = 550;
+                        offsetIconX = 790;
+                        offsetIconY = 550;
                         break;
 
                     case "ElliottHouse":
-                        offsetX = 260;
-                        offsetY = 572;
+                        offsetIconX = 826;
+                        offsetIconY = 550;
                         break;
 
                     case "ScienceHouse":
-                        offsetX = 732;
-                        offsetY = 148;
+                    case "SebastianRoom":
+                        offsetIconX = 732;
+                        offsetIconY = 148;
                         break;
 
                     case "Mountain":
-                        offsetX = 762;
-                        offsetY = 154;
-                        break;
-
-                    case "SebastianRoom":
+                        offsetIconX = 762;
+                        offsetIconY = 154;
                         break;
 
                     case "Tent":
-                        offsetX = 784;
-                        offsetY = 128;
+                        offsetIconX = 784;
+                        offsetIconY = 128;
                         break;
 
                     case "Forest":
-                        offsetX = 80;
-                        offsetY = 272;
+                        offsetIconX = 80;
+                        offsetIconY = 272;
                         break;
 
                     case "WizardHouseBasement":
                     case "WizardHouse":
-                        offsetX = 196;
-                        offsetY = 352;
+                        offsetIconX = 196;
+                        offsetIconY = 352;
                         break;
 
                     case "AnimalShop":
-                        offsetX = 420;
-                        offsetY = 392;
+                        offsetIconX = 420;
+                        offsetIconY = 392;
                         break;
 
                     case "LeahHouse":
-                        offsetX = 452;
-                        offsetY = 436;
+                        offsetIconX = 452;
+                        offsetIconY = 436;
                         break;
 
                     case "BusStop":
-                        offsetX = 516;
-                        offsetY = 224;
+                        offsetIconX = 516;
+                        offsetIconY = 224;
                         break;
 
                     case "Mine":
-                        offsetX = 880;
-                        offsetY = 100;
+                        offsetIconX = 880;
+                        offsetIconY = 100;
                         break;
 
                     case "Sewer":
-                        offsetX = 380;
-                        offsetY = 596;
+                        offsetIconX = 380;
+                        offsetIconY = 596;
                         break;
                     
                     case "Club":
                     case "Desert":
-                        offsetX = 60;
-                        offsetY = 92;
+                        offsetIconX = 60;
+                        offsetIconY = 92;
                         break;
                     
                     case "ArchaeologyHouse":
-                        offsetX = 892;
-                        offsetY = 416;
+                        offsetIconX = 892;
+                        offsetIconY = 416;
                         break;                    
 
                     case "Woods":
-                        offsetX = 100;
-                        offsetY = 272;
+                        offsetIconX = 100;
+                        offsetIconY = 272;
                         break;
 
                     case "Railroad":
-                        offsetX = 644;
-                        offsetY = 64;
+                        offsetIconX = 644;
+                        offsetIconY = 64;
                         break;
                     
                     case "FishShop":
-                        offsetX = 844;
-                        offsetY = 608;
+                        offsetIconX = 844;
+                        offsetIconY = 608;
                         break;
 
                     case "BathHouse_Entry":
                     case "BathHouse_MensLocker":
                     case "BathHouse_WomensLocker":
                     case "BathHouse_Pool":
-                        offsetX = 576;
-                        offsetY = 60;
+                        offsetIconX = 576;
+                        offsetIconY = 60;
                         break;
 
                     case "CommunityCenter":
-                        offsetX = 692;
-                        offsetY = 204;
+                        offsetIconX = 692;
+                        offsetIconY = 204;
                         break;
 
                     case "JojaMart":
-                        offsetX = 872;
-                        offsetY = 280;
+                        offsetIconX = 872;
+                        offsetIconY = 280;
                         break;
                     
                     case "Backwoods":
-                        offsetX = 460;
-                        offsetY = 156;
+                        offsetIconX = 460;
+                        offsetIconY = 156;
                         break;
 
-                    case "BugLand":
                     case "SandyHouse":
+                        offsetIconX = 40;
+                        offsetIconY = 40;
+                        break;
+
+                    // Known locations that npcs never use
+                    case "BugLand":
                     case "Greenhouse":
                     case "SkullCave":
-                    case "JoshHouse":
-                    case "HarveyRoom":
                     case "Tunnel":
                     case "Cellar":
                     case "WitchSwamp":
@@ -238,18 +249,152 @@ namespace DemiacleSvm.UiMods {
                     case "Summit":
                     case "AdentureGuild":
                     default:
-                        ModEntry.Log( $"The location {npc.currentLocation.name} is not set for the uiMod location of townsfolk... please add and use reference from MapPages.cs" );
+                        ModEntry.Log( $"The location {npc.currentLocation.name} is not set" );
                         break;
 
+                }
+
+                int cropFactor = 0;
+
+                switch( npc.name ) {
+                    case "Abigail":
+                        cropFactor = 7;
+                        break;
+                    case "Alex":
+                        cropFactor = 8;
+                        break;
+                    case "Caroline":
+                        cropFactor = 5;
+                        break;
+                    case "Clint":
+                         cropFactor = 10;
+                        break;
+                    case "Demetrius":
+                        cropFactor = 11;
+                        break;
+                    case "Dwarf":
+                        cropFactor = 8;
+                        break;
+                    case "Elliott":
+                        cropFactor = 9;
+                        break;
+                    case "Emily":
+                        cropFactor = 8;
+                        break;
+                    case "Evelyn":
+                        cropFactor = 5;
+                        break;
+                    case "George":
+                        cropFactor = 5;
+                        break;
+                    case "Gus":
+                        cropFactor = 7;
+                        break;
+                    case "Haley":
+                        cropFactor = 6;
+                        break;
+                    case "Harvey":
+                        cropFactor = 9;
+                        break;
+                    case "Jas":
+                        cropFactor = 6;
+                        break;
+                    case "Jodi":
+                        cropFactor = 7;
+                        break;
+                    case "Kent":
+                        cropFactor = 10;
+                        break;
+                    case "Krobus":
+                        cropFactor = 7;
+                        break;
+                    case "Leah":
+                        cropFactor = 6;
+                        break;
+                    case "Lewis":
+                        cropFactor = 8;
+                        break;
+                    case "Linus":
+                        cropFactor = 4;
+                        break;
+                    case "Marnie":
+                        cropFactor = 5;
+                        break;
+                    case "Maru":
+                        cropFactor = 6;
+                        break;
+                    case "Pam":
+                        cropFactor = 5;
+                        break;
+                    case "Penny":
+                        cropFactor = 6;
+                        break;
+                    case "Pierre":
+                        cropFactor = 9;
+                        break;
+                    case "Robin":
+                        cropFactor = 7;
+                        break;
+                    case "Sandy":
+                        cropFactor = 7;
+                        break;
+                    case "Sam":
+                        cropFactor = 9;
+                        break;
+                    case "Sebastian":
+                        cropFactor = 7;
+                        break;
+                    case "Shane":
+                        cropFactor = 8;
+                        break;
+                    case "Vincent":
+                        cropFactor = 6;
+                        break;
+                    case "Willy":
+                        cropFactor = 10;
+                        break;
+                    case "Marlon":
+                        cropFactor = 2;
+                        break;
+                    case "Wizard":
+                        cropFactor = 9;
+                        break;
+                    // Child name is the only unknown
+                    default:
+                        cropFactor = 4;
+                        break;
                 }
 
                 int positionX = Game1.activeClickableMenu.xPositionOnScreen - 180;
                 int positionY = Game1.activeClickableMenu.yPositionOnScreen - 40;
 
-                var npcMugShot = new ClickableTextureComponent( npc.name, new Rectangle( positionX + offsetX, positionY + offsetY, Game1.activeClickableMenu.width, Game1.tileSize ), ( string ) null, npc.name, npc.sprite.Texture, rect, ( float ) Game1.pixelZoom, false );
-                npcMugShot.scale = 3f;
+                Rectangle rect = npc.getMugShotSourceRect();
+                rect.Height -= cropFactor / 2;
+                rect.Y -= cropFactor / 2;
+
+                float scale = 2.3f;
+                var npcMugShot = new ClickableTextureComponent( npc.name, new Rectangle( positionX + offsetIconX, positionY + offsetIconY, 0, 0 ), null, npc.name, npc.sprite.Texture, rect, scale, false );
                 npcMugShot.draw( Game1.spriteBatch );
+
             }
+            
+            // ReDraw the mouse
+            if( !Game1.options.hardwareCursor ) {
+                Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getMouseX(), ( float ) Game1.getMouseY() ), new Microsoft.Xna.Framework.Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.mouseCursor, 16, 16 ) ), Color.White * Game1.mouseCursorTransparency, 0.0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
+            }
+
+            // ReDraw the tooltip
+            var listOfPages = ( List<IClickableMenu> ) typeof( GameMenu ).GetField( "pages", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( currentMenu );
+            var mapPage = ( MapPage ) listOfPages[ currentMenu.currentTab ];
+            var defaultHoverText = ( string ) typeof( MapPage ).GetField( "hoverText", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( mapPage );
+
+            IClickableMenu.drawHoverText( Game1.spriteBatch, defaultHoverText, Game1.smallFont, 0, 0, -1, ( string ) null, -1, ( string[] ) null, ( Item ) null, 0, -1, -1, -1, -1, 1f, ( CraftingRecipe ) null );
+
+
+        }
+
+        public void overrideTooltipInformation( object sender, EventArgs e ) {
+            return;
         }
 
         public void drawSocialPageOptions( object sender, EventArgs e ) {
@@ -363,14 +508,17 @@ namespace DemiacleSvm.UiMods {
             }
         }
 
-        public void toggleShowNPCLocationOnMap( bool setting ) {
+        public void toggleShowNPCLocationOnMap() {
+            bool setting = ModEntry.modData.checkboxOptions[ SHOW_NPCS_ON_MAP ];
 
+            GraphicsEvents.OnPreRenderGuiEvent -= overrideTooltipInformation;
             GraphicsEvents.OnPostRenderGuiEvent -= drawNPCLocationsOnMap;
             GraphicsEvents.OnPostRenderGuiEvent -= drawSocialPageOptions;
             ControlEvents.MouseChanged -= handleClick;
             MenuEvents.MenuChanged -= onMenuChange;
 
             if( setting ) {
+                GraphicsEvents.OnPreRenderGuiEvent += overrideTooltipInformation;
                 GraphicsEvents.OnPostRenderGuiEvent += drawNPCLocationsOnMap;
                 GraphicsEvents.OnPostRenderGuiEvent += drawSocialPageOptions;
                 ControlEvents.MouseChanged += handleClick;
@@ -384,7 +532,8 @@ namespace DemiacleSvm.UiMods {
                 return;
             }
 
-            if( e.NewState.LeftButton == ButtonState.Pressed ) {
+            if( e.NewState.LeftButton == ButtonState.Pressed && !isClicking ) {
+                isClicking = true;
                 var slotPosition = ( int ) typeof( SocialPage ).GetField( "slotPosition", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( socialPage );
 
                 for( int i = slotPosition; i < slotPosition + 5; i++ ) {
@@ -394,6 +543,10 @@ namespace DemiacleSvm.UiMods {
                     }
                 }
 
+            }
+
+            if ( e.NewState.LeftButton == ButtonState.Released) {
+                isClicking = false;
             }
         }
 

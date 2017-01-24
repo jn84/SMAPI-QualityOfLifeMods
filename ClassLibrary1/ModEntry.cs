@@ -10,36 +10,23 @@ namespace DemiacleSvm {
     public class ModEntry : Mod {
 
         public static ModData modData;
-        private readonly string modDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_SVM\\";
-        private const string saveFilePostfix = "_modData.xml";
         public static ModEntry modEntry;
+        public static IModHelper helper;
+        // TODO Replace with helper method mod already has a saver and loader so change to use that
+        public static readonly string modDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_UiMod\\";
+        public const string saveFilePostfix = "_modData.xml";
         public static Boolean isTesting = false;
             
         public override void Entry(IModHelper helper) {
-
-            modEntry = this;
+            ModEntry.helper = helper;
+            ModEntry.modEntry = this;
             modData = new ModData();
 
             // Loads the correct settings on character load
             PlayerEvents.LoadedGame += loadModData;
-
-            // Mods
+           
+            // Skip Intro
             MenuEvents.MenuChanged += SkipIntro.onMenuChange;
-
-            var uiModAccurateHearts = new UiModAccurateHearts();
-            var uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk();
-            var uiModItemrolloverInformation = new UiModItemRolloverInformation();
-            var uiModExperience = new UiModExperience();
-            var uiModluckOfDay = new UiModLuckOfDay();
-
-            var uiMods = new List<UiModWithOptions>();
-            uiMods.Add( uiModAccurateHearts );
-            uiMods.Add( uiModLocationOfTownsfolk );
-            uiMods.Add( uiModItemrolloverInformation );
-            uiMods.Add( uiModExperience );
-            uiMods.Add( uiModluckOfDay );
-
-            var optionPage = new OptionsPage( uiMods );
 
         }
 
@@ -62,14 +49,14 @@ namespace DemiacleSvm {
             // File: \Mods\Demiacle_SVM\playerName_modData.xml
             // load file 
             if( File.Exists( modDirectory + playerName + saveFilePostfix ) ) {
-                this.Monitor.Log( $"Mod data already exists for this {playerName}.... loading" );
-                ModData loadedData = new ModData();
+                this.Monitor.Log( $"Mod data already exists for player {playerName}.... loading" );
+                var loadedData = new ModData();
                 Serializer.ReadFromXmlFile( out loadedData, playerName );
 
                 // Only load options valid for this build
-                foreach( var data in loadedData.uiOptions ) {
-                    if( modData.uiOptions.ContainsKey( data.Key ) ) {
-                        modData.uiOptions[ data.Key ] = loadedData.uiOptions[ data.Key ];
+                foreach( var data in loadedData.checkboxOptions ) {
+                    if( modData.checkboxOptions.ContainsKey( data.Key ) ) {
+                        modData.checkboxOptions[ data.Key ] = loadedData.checkboxOptions[ data.Key ];
                     }
                 }
 
@@ -81,10 +68,30 @@ namespace DemiacleSvm {
 
             // create file and ModData
             } else {
-                this.Monitor.Log( $"Mod data does not exist for this {playerName}... creating file" );
+                this.Monitor.Log( $"Mod data does not exist for player {playerName}... creating file" );
                 updateModData();
             }
 
+            initializeMods();
+
+        }
+
+        private void initializeMods() {
+
+            var uiModAccurateHearts = new UiModAccurateHearts();
+            var uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk();
+            var uiModItemrolloverInformation = new UiModItemRolloverInformation();
+            var uiModExperience = new UiModExperience();
+            var uiModluckOfDay = new UiModLuckOfDay();
+
+            var uiMods = new List<UiModWithOptions>();
+            uiMods.Add( uiModAccurateHearts );
+            uiMods.Add( uiModLocationOfTownsfolk );
+            uiMods.Add( uiModItemrolloverInformation );
+            uiMods.Add( uiModExperience );
+            uiMods.Add( uiModluckOfDay );
+
+            var optionPageHandler = new OptionsPageHandler( uiMods );
         }
 
         /// <summary>

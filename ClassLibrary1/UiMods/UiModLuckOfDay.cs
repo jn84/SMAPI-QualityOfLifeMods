@@ -15,10 +15,14 @@ namespace DemiacleSvm.UiMods {
         public const string SHOW_LUCK_ICON = "Show luck icon";
 
         public UiModLuckOfDay() {
-            addOption( SHOW_LUCK_ICON, toggleOption );
+            addCheckboxOption( SHOW_LUCK_ICON, true, toggleOption );
         }
 
         internal void drawDiceIcon( object sender, EventArgs e ) {
+            if( Game1.eventUp ) {
+                return;
+            }
+
             //TODO refactor this into new day
             var color = new Color( Color.White.ToVector4() );
 
@@ -53,13 +57,13 @@ namespace DemiacleSvm.UiMods {
             }
         }
 
-        public void toggleOption( bool setting ) {
+        public void toggleOption() {
 
             LocationEvents.CurrentLocationChanged -= adjustIconXToBlackBorder;
             GraphicsEvents.OnPreRenderHudEvent -= drawDiceIcon;
             GraphicsEvents.OnPostRenderHudEvent -= drawHoverTextOverEverything;
 
-            if( setting ) {
+            if( ModEntry.modData.checkboxOptions[ SHOW_LUCK_ICON ] ) {
                 adjustIconXToBlackBorder( null, null );
                 LocationEvents.CurrentLocationChanged += adjustIconXToBlackBorder;
                 GraphicsEvents.OnPreRenderHudEvent += drawDiceIcon;
