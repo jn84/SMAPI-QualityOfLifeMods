@@ -30,8 +30,9 @@ namespace ModToolbox {
 
             GraphicsEvents.OnPostRenderEvent += drawButton;
             ControlEvents.MouseChanged += handleButtonclick;
-
+            
         }
+
 
         private void handleButtonclick( object sender, EventArgsMouseStateChanged e ) {
             if ( Game1.activeClickableMenu is TitleMenu == false ) {
@@ -48,7 +49,14 @@ namespace ModToolbox {
                 return;
             }
 
-            button.draw( Game1.spriteBatch );
+
+            var titleMenu = ( TitleMenu ) Game1.activeClickableMenu;
+            var logoFadeTimer = (int) typeof( TitleMenu ).GetField( "logoFadeTimer", BindingFlags.Instance | BindingFlags.NonPublic ).GetValue( titleMenu );
+
+            if( logoFadeTimer < 1 ) {
+                button.draw( Game1.spriteBatch );
+            }
+
         }
 
         internal static void Log( string log ) {

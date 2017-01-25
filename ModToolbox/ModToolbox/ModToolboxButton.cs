@@ -7,18 +7,23 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI.Events;
 
 namespace ModToolbox {
     class ModToolboxButton : IClickableMenu {
 
-        public Rectangle bounds;
+        public Rectangle bounds = new Rectangle();
 
-        public ModToolboxButton() {
+        private void setDefaultVariables() {
             width = 196;
             height = 70;
             xPositionOnScreen = 20;
-            yPositionOnScreen = 80;
-            bounds = new Rectangle( xPositionOnScreen, yPositionOnScreen, width, height );
+            yPositionOnScreen = Game1.viewport.Height - 100;
+
+            bounds.Width = width;
+            bounds.Height = height;
+            bounds.X = xPositionOnScreen;
+            bounds.Y = yPositionOnScreen;
         }
 
         public override void receiveRightClick( int x, int y, bool playSound = true ) {
@@ -28,7 +33,7 @@ namespace ModToolbox {
             base.receiveLeftClick( x, y, playSound );
 
             if ( bounds.Contains( x, y ) ) {
-                Game1.activeClickableMenu = new SpriteSheetFinder( Game1.activeClickableMenu );
+                Game1.activeClickableMenu = new SpriteSheetFinder( );
             }
 
         }
@@ -36,6 +41,7 @@ namespace ModToolbox {
         public override void draw( SpriteBatch b ) {
             base.draw( b );
 
+            setDefaultVariables();
 
             IClickableMenu.drawTextureBox( Game1.spriteBatch, xPositionOnScreen, yPositionOnScreen, width, height, Color.White );
             if ( bounds.Contains( Game1.getMouseX(), Game1.getMouseY() ) ) {
