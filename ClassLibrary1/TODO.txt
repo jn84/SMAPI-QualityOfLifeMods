@@ -90,6 +90,8 @@
     -Add options page for game mods
 
 -Qualit of life mods
+
+	-auto open gate
 	-ability to choose how fast a 10 minute increment is
 	-Summon horse anywhere
     -See fish type before cought
@@ -103,3 +105,6 @@
 	-Allow player to wait out the time of day... like camp in rpg
     -Allow grass to drop hay so you can collect and store it without a silo 
 	-roads and boots increase speed
+
+-Possible way to implement content load override
+	-Bassically change the directory the content loader loads files and on failure default to the original games files
