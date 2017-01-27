@@ -36,7 +36,9 @@ namespace ModToolbox {
         private int rightClickStartPositionY;
         private int rightClickDeltaY;
         private int rightClickDeltaX;
-        private TextBox boxToCopyFrom = new TextBox( Game1.content.Load<Texture2D>( "LooseSprites\\textBox" ), ( Texture2D ) null, Game1.smallFont, Game1.textColor );
+        private TextBox clipboardFeedback = new TextBox( Game1.content.Load<Texture2D>( "LooseSprites\\textBox" ), ( Texture2D ) null, Game1.smallFont, Game1.textColor );
+
+        System.Timers.Timer clipboardFadeTimer = new System.Timers.Timer();
 
         public SpriteSheetFinder(  ) {
             ControlEvents.MouseChanged += releaseRightClick;
@@ -56,10 +58,10 @@ namespace ModToolbox {
 
             allTextures.Reverse();
 
-            boxToCopyFrom.Width = 300;
-            boxToCopyFrom.Height = 200;
+            clipboardFeedback.Y = Game1.viewport.Height;
+            clipboardFadeTimer.Elapsed += ( sender, e ) => clipboardFeedback.Y = Game1.viewport.Height;
 
-    }
+        }
 
         private void getAllFilesInThisDirectory( string exeDirectory, string pathName = "" ) {
             var directoryInfo = new DirectoryInfo( exeDirectory );
@@ -144,9 +146,8 @@ namespace ModToolbox {
                 IClickableMenu.drawTextureBox( Game1.spriteBatch, snappingPositionX, snappingPositionY, snappingWidth, snappingHeight, Color.White );
                 Game1.spriteBatch.DrawString( Game1.smallFont, text, new Vector2( snappingPositionX + 16, snappingPositionY + 16), Color.Black );
             }
-
-            // Draw box to copy from
-            boxToCopyFrom.Draw( b );
+            // Draw feedback when copied to clipboard
+            clipboardFeedback.Draw( b );
 
             // Redraw mouse
             Game1.spriteBatch.Draw( Game1.mouseCursors, new Vector2( ( float ) Game1.getOldMouseX(), ( float ) Game1.getOldMouseY() ), new Rectangle?( Game1.getSourceRectForStandardTileSheet( Game1.mouseCursors, Game1.options.gamepadControls ? 44 : 0, 16, 16 ) ), Color.White, 0f, Vector2.Zero, ( float ) Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f );
@@ -179,9 +180,12 @@ namespace ModToolbox {
         public override void receiveScrollWheelAction( int direction ) {
             base.receiveScrollWheelAction( direction );
 
+
+            rightClickDeltaX = 0;
+            rightClickDeltaY = 0;
+
             if ( direction < 0 ) {
                 currentTextureIndex++;
-
                 if ( currentTextureIndex > allTextures.Count - 1 ) {
                     currentTextureIndex = 0;
                 }
@@ -216,6 +220,9 @@ namespace ModToolbox {
 
             positionToCropX = x - positionOfTextureX;
             positionToCropY = y - positionOfTextureY;
+            widthOfCrop = 0;
+            heightOfCrop = 0;
+
 
         }
 
@@ -223,6 +230,7 @@ namespace ModToolbox {
             base.leftClickHeld( x, y );
             setCropSize( x, y );
         }
+
 
         private void snapSelectionToTiles( ref int x, ref int y ) {
 
@@ -325,18 +333,28 @@ namespace ModToolbox {
                 isSnappingToTileSize = !isSnappingToTileSize;
             }
 
-            // Currently windows only
+            // Copy to clipboard and show feedback
             if( key == Keys.Enter ) {
 
-                
+                // use predefined load for textures that are already in game from loadContent() in game1
+                string copiedToClipboard = "Copied to clipboard";
+                clipboardFeedback.Width = (int) Game1.smallFont.MeasureString( copiedToClipboard ).X + 30;
+                clipboardFeedback.Height = (int) Game1.smallFont.MeasureString( copiedToClipboard ).Y + 10;
+                clipboardFeedback.X = Game1.viewport.Width / 2 - clipboardFeedback.Width / 2;
+                clipboardFeedback.Y = Game1.viewport.Height / 2 - clipboardFeedback.Height / 2;
+                clipboardFeedback.Text = copiedToClipboard;
 
-                string stringToClipboard = "test";
+                clipboardFadeTimer.Interval = 2000;
+                clipboardFadeTimer.Start();
 
+                string stringToClipboard = $"ClickableTextureComponent clickableTextureComponent = new ClickableTextureComponent( new Rectangle( 0, 0, {widthOfCrop}, {heightOfCrop}), Game1.content.Load<Texture2D>( \"{contentLocation[ currentTextureIndex ].Replace( @"\", @"\\" )}\" ), new Rectangle( {positionToCropX}, {positionToCropY}, {widthOfCrop}, {heightOfCrop} ), {scale} );";
                 // Windows only
                 var thread = new Thread( () => System.Windows.Forms.Clipboard.SetText( stringToClipboard ) );
                 thread.SetApartmentState( ApartmentState.STA ); //Set the thread to STA
                 thread.Start();
                 thread.Join(); //Wait for the thread to end
+
+
             }
 
         }
