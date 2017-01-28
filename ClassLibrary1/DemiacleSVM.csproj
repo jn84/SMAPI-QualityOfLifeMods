@@ -70,8 +70,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DemiacleUtility.cs" />
+    <Compile Include="ElevatorMenuMod.cs" />
+    <Compile Include="MineShaftExtension.cs" />
+    <Compile Include="MineShaftMod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
+    <Compile Include="OutdoorMonsters\AI\HoldStill.cs" />
+    <Compile Include="OutdoorMonsters\AI\MovementType.cs" />
+    <Compile Include="OutdoorMonsters\AI\MoveTowardsTarget.cs" />
+    <Compile Include="OutdoorMonsters\AI\PathFinder.cs" />
+    <Compile Include="OutdoorMonsters\AI\PathFinderMap.cs" />
+    <Compile Include="OutdoorMonsters\AI\PathFinding.cs" />
+    <Compile Include="OutdoorMonsters\OutDoorMonster.cs" />
+    <Compile Include="OutdoorMonsters\OutDoorRockCrab.cs" />
+    <Compile Include="OutdoorMonsters\OutDoorShadowBrute.cs" />
+    <Compile Include="PersistantMonsters.cs" />
+    <Compile Include="ScytheDamageMod.cs" />
+    <Compile Include="SpeedMod.cs" />
     <Compile Include="UiMods\OptionData.cs" />
     <Compile Include="UiMods\OptionsPage.cs" />
     <Compile Include="UiMods\OptionsPageHandler.cs" />
@@ -104,6 +119,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.1.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.1.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
