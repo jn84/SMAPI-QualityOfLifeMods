@@ -10,8 +10,8 @@
     <ProjectGuid>{40D249C8-810B-48FE-ADE4-24819BBBD5FB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Demiacle_UiMod</RootNamespace>
-    <AssemblyName>Demiacle_UiMod</AssemblyName>
+    <RootNamespace>ImprovedQualityOfLife</RootNamespace>
+    <AssemblyName>ImprovedQualityOfLife</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -21,10 +21,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\SteamLibrary2\steamapps\common\Stardew Valley\Mods\ImprovedQualityOfLife\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -57,7 +58,7 @@
     <Reference Include="Microsoft.Xna.Framework.Xact, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
     <Reference Include="Stardew Valley, Version=1.0.6124.25603, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SteamLibrary2\steamapps\common\Stardew Valley\Stardew Valley.exe</HintPath>
+      <HintPath>..\..\..\..\SteamLibrary2\steamapps\common\Stardew Valley\Stardew Valley.exe</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -70,37 +71,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DemiacleUtility.cs" />
-    <Compile Include="ElevatorMenuMod.cs" />
-    <Compile Include="MineShaftExtension.cs" />
-    <Compile Include="MineShaftMod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
-    <Compile Include="OutdoorMonsters\AI\HoldStill.cs" />
-    <Compile Include="OutdoorMonsters\AI\MovementType.cs" />
-    <Compile Include="OutdoorMonsters\AI\MoveTowardsTarget.cs" />
-    <Compile Include="OutdoorMonsters\AI\PathFinder.cs" />
-    <Compile Include="OutdoorMonsters\AI\PathFinderMap.cs" />
-    <Compile Include="OutdoorMonsters\AI\PathFinding.cs" />
-    <Compile Include="OutdoorMonsters\OutDoorMonster.cs" />
-    <Compile Include="OutdoorMonsters\OutDoorRockCrab.cs" />
-    <Compile Include="OutdoorMonsters\OutDoorShadowBrute.cs" />
-    <Compile Include="PersistantMonsters.cs" />
     <Compile Include="ScytheDamageMod.cs" />
     <Compile Include="SpeedMod.cs" />
-    <Compile Include="UiMods\OptionData.cs" />
-    <Compile Include="UiMods\OptionsPage.cs" />
-    <Compile Include="UiMods\OptionsPageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Serializer.cs" />
-    <Compile Include="UiMods\ExpPointDisplay.cs" />
-    <Compile Include="UiMods\SkipIntro.cs" />
-    <Compile Include="UiMods\UiModAccurateHearts.cs" />
-    <Compile Include="UiMods\UiModExperience.cs" />
-    <Compile Include="UiMods\UiModItemRolloverInformation.cs" />
-    <Compile Include="UiMods\UiModLocationOfTownsfolk.cs" />
-    <Compile Include="UiMods\UiModLuckOfDay.cs" />
-    <Compile Include="UiMods\UiModWithOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json">
@@ -111,9 +88,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="LevelUp.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace DemiacleSvm {
+namespace Demiacle.ImprovedQualityOfLife {
     class DemiacleUtility {
 
         /// <summary>

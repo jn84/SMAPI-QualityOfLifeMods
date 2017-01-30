@@ -2,7 +2,7 @@
 using StardewValley;
 using StardewValley.Tools;
 
-namespace DemiacleSvm {
+namespace Demiacle.ImprovedQualityOfLife {
     public class ScytheDamageMod {
 
         public ScytheDamageMod() {

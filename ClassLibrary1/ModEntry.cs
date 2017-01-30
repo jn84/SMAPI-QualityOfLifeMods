@@ -1,12 +1,11 @@
-﻿using DemiacleSvm.UiMods;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace DemiacleSvm {
+namespace Demiacle.ImprovedQualityOfLife {
     public class ModEntry : Mod {
 
         public static ModData modData;
@@ -25,9 +24,6 @@ namespace DemiacleSvm {
             // Loads the correct settings on character load
             PlayerEvents.LoadedGame += loadModData;
            
-            // Skip Intro
-            MenuEvents.MenuChanged += SkipIntro.onMenuChange;
-
         }
 
         internal static void Log( string log ) {
@@ -78,20 +74,6 @@ namespace DemiacleSvm {
 
         private void initializeMods() {
 
-            var uiModAccurateHearts = new UiModAccurateHearts();
-            var uiModLocationOfTownsfolk = new UiModLocationOfTownsfolk();
-            var uiModItemrolloverInformation = new UiModItemRolloverInformation();
-            var uiModExperience = new UiModExperience();
-            var uiModluckOfDay = new UiModLuckOfDay();
-
-            var uiMods = new List<UiModWithOptions>();
-            uiMods.Add( uiModAccurateHearts );
-            uiMods.Add( uiModLocationOfTownsfolk );
-            uiMods.Add( uiModItemrolloverInformation );
-            uiMods.Add( uiModExperience );
-            uiMods.Add( uiModluckOfDay );
-
-            var optionPageHandler = new OptionsPageHandler( uiMods );
         }
 
         /// <summary>

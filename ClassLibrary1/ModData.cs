@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace DemiacleSvm {
+namespace Demiacle.ImprovedQualityOfLife {
     public class ModData {
 
         // Uses the directory path as its namespace for loading and whatnot
