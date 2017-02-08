@@ -12,7 +12,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         public static ModEntry modEntry;
         public static IModHelper helper;
         // TODO Replace with helper method mod already has a saver and loader so change to use that
-        public static readonly string modDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\Mods\\Demiacle_UiMod\\";
+        public static string modDirectory;
         public const string saveFilePostfix = "_modData.xml";
         public static Boolean isTesting = false;
             
@@ -20,9 +20,10 @@ namespace Demiacle.ImprovedQualityOfLife {
             ModEntry.helper = helper;
             ModEntry.modEntry = this;
             modData = new ModData();
+            modDirectory = helper.DirectoryPath + "\\";
 
             // Loads the correct settings on character load
-            PlayerEvents.LoadedGame += loadModData;
+            SaveEvents.AfterLoad += loadModData;
            
         }
 
@@ -38,7 +39,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// <summary>
         /// Loads mod specific data
         /// </summary>
-        internal void loadModData( object sender, EventArgsLoadedGameChanged e ) {
+        internal void loadModData( object sender, EventArgs e ) {
 
             string playerName = Game1.player.name;
 
@@ -73,6 +74,9 @@ namespace Demiacle.ImprovedQualityOfLife {
         }
 
         private void initializeMods() {
+            var speedMod = new SpeedModOnRoads();
+            var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
+
 
         }
 
