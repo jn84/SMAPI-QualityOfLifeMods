@@ -75,7 +75,9 @@ namespace Demiacle.ImprovedQualityOfLife {
 
         private void initializeMods() {
             var speedMod = new SpeedModOnRoads();
-            var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
+
+            // Too many limitations... currently abandoned
+            //var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
 
 
         }
