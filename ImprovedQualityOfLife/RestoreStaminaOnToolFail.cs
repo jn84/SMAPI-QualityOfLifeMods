@@ -3,15 +3,18 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Tools;
 using Microsoft.Xna.Framework;
+using xTile.Tiles;
+using xTile.Layers;
+using xTile.ObjectModel;
+using StardewValley.TerrainFeatures;
 
 namespace Demiacle.ImprovedQualityOfLife {
     internal class RestoreStaminaOnToolFail {
 
-        private bool foundToolEvent = false;
         private float restoreAmount = 0;
 
-        private uint dirtHoed;
         private int toolPower;
+        private bool hasCaluclatedRestore = false;
 
         public RestoreStaminaOnToolFail() {
             GameEvents.UpdateTick += checkForToolAction;
@@ -21,90 +24,121 @@ namespace Demiacle.ImprovedQualityOfLife {
             Farmer player = Game1.player;
 
             if( player.usingTool ) {
-
-                Tool index = player.CurrentTool;
-                foundToolEvent = true;
-                toolPower = Math.Max ( player.toolPower, 1);
-
-                if( index is Hoe ) {
+                toolPower = player.toolPower;
+                if( hasCaluclatedRestore == true ) {
+                    return;
                 }
 
-                if( index is Axe ) {
+                hasCaluclatedRestore = true;
+                Tool currentTool = player.CurrentTool;
+                Vector2 toolLocation = player.GetToolLocation() / Game1.tileSize;
+                toolLocation.X = (int) Math.Floor( toolLocation.X );
+                toolLocation.Y = (int) Math.Floor( toolLocation.Y );
+                var toolLocationX = (int) toolLocation.X;
+                var toolLocationY = (int) toolLocation.Y;
 
-                    int i = 0;
+                if( currentTool is Hoe ) {
+
+                    // Check if you can even dig
+                    if( Game1.currentLocation.doesTileHaveProperty( toolLocationX, toolLocationY, "Diggable", "Back" ) == null ) {
+                        return;
+                    }
+
+                    // Check if already dug
+                    if( Game1.currentLocation.isTileHoeDirt( toolLocation ) == false ) {
+                        return; 
+                    }
+
+                    restoreAmount = 2 + ( float ) player.FarmingLevel * 0.1f;
+
                 }
 
-                if( index is Pickaxe ) {
-                    int i = 0;
+                if( currentTool is Axe ) {
 
-                }
+                    // Check for trees
+                    if( Game1.currentLocation.terrainFeatures.ContainsKey( toolLocation ) && 
+                        Game1.currentLocation.terrainFeatures[ toolLocation ] is Tree ) {
+                        return;
+                    }
 
-                if( index is WateringCan ) {
-                    int i = 0;
+                    // Check for twigs or weeds
+                    if( Game1.currentLocation.objects.ContainsKey( toolLocation ) && ( Game1.currentLocation.objects[ toolLocation ].name == "Twig" || Game1.currentLocation.objects[ toolLocation ].name == "Weeds" ) ) {
+                        return;
+                    }
 
-                }
+                    // Check for advanced tree stumps
+                    if( Game1.currentLocation is Farm ) {
+                        var toolHitBounds = new Rectangle( toolLocationX * Game1.tileSize, toolLocationY * Game1.tileSize, Game1.tileSize, Game1.tileSize );
+                        foreach( var item in (Game1.currentLocation as Farm).resourceClumps ) {
+                            if( item.getBoundingBox( item.tile ).Contains( toolHitBounds  ) ) {
+                                return;
+                            }
+                        }
+                    } 
 
-                if( index is FishingRod ) {
-                    int i = 0;
+                    restoreAmount = 2 + ( float ) player.ForagingLevel * 0.1f;
 
                 }
                 
+                if( currentTool is Pickaxe ) {
 
-            } else if( foundToolEvent ) {
 
-                // Restore if dirt was never hoed
-                // Fires if hoe is used on any tile with diggable property
-                if( dirtHoed != Game1.stats.dirtHoed ) {
-                    dirtHoed = Game1.stats.dirtHoed;
-                } else {
-                    restoreAmount = ( ( float ) ( 2 * toolPower ) - ( float ) player.FarmingLevel * 0.1f );
-                }
+                    if( Game1.currentLocation.objects.ContainsKey( toolLocation ) ) {
 
-                // Restore if pickaxe doesn't hit a rock
-                // Fires if the object name is not Stone or does not have the word Boulder in it
-                if( player.CurrentTool is Pickaxe ) {
+                        StardewValley.Object groundObject = Game1.currentLocation.objects[ toolLocation ];
 
-                    var x = ( int ) player.GetToolLocation( false ).X;
-                    var y = ( int ) player.GetToolLocation( false ).Y;
-                    StardewValley.SerializableDictionary<Vector2, StardewValley.Object> gameObjects = Game1.currentLocation.objects;
+                        // Check if stone or boulder
+                        if( groundObject.name.Contains( "Stone" ) || groundObject.name.Contains( "Boulder" ) ) {
+                            return;
+                        }
 
-                    if( gameObjects.ContainsKey( new Vector2( x / Game1.tileSize, y / Game1.tileSize ) ) ) {
-
-                        StardewValley.Object objectThatJustGotHit = gameObjects[ new Vector2( x, y ) ];
-
-                        if( objectThatJustGotHit.name.Equals( "Stone" ) || objectThatJustGotHit.name.Contains( "Boulder" ) ) {
-                            // Do nothing
-                        } else {
-                            restoreAmount = ( ( float ) ( 2 * toolPower ) - ( float ) player.FarmingLevel * 0.1f );
+                        // Check if crafting object
+                        if( groundObject.type.Equals( "Crafting" ) && groundObject.fragility != 2 ) {
+                            return;
                         }
 
                     }
 
-                }
-
-                // Restore if axe is not used on tree
-                if( player.CurrentTool is Axe ) {
-
-                    var x = ( int ) player.GetToolLocation( false ).X;
-                    var y = ( int ) player.GetToolLocation( false ).Y;
-                    StardewValley.SerializableDictionary<Vector2, StardewValley.Object> gameObjects = Game1.currentLocation.objects;
-
-                    if( gameObjects.ContainsKey( new Vector2( x / Game1.tileSize, y / Game1.tileSize ) ) ) {
-
-                        StardewValley.Object objectThatJustGotHit = gameObjects[ new Vector2( x, y ) ];
-
-                        if( objectThatJustGotHit.name.Equals( "Stone" ) || objectThatJustGotHit.name.Contains( "Boulder" ) ) {
-                            // Do nothing
-                        } else {
-                            restoreAmount = ( ( float ) ( 2 * toolPower ) - ( float ) player.FarmingLevel * 0.1f );
-                        }
-
+                    // Check if removing hoedirt
+                    if( ( Game1.currentLocation.doesTileHaveProperty( toolLocationX, toolLocationY, "Diggable", "Back" ) == null ) ) {
+                        return;
                     }
 
+                    restoreAmount = 2 + ( float ) player.miningLevel * 0.1f;
+
                 }
+
+                if( currentTool is WateringCan ) {
+
+                    // Check if watering hoedirt
+                    if( ( Game1.currentLocation.isTileHoeDirt( toolLocation ) == true ) ) {
+                        return;
+                    }
+
+                    restoreAmount = 2 + ( float ) player.farmingLevel * 0.1f;
+
+                }
+
+                if( currentTool is FishingRod ) {
+
+                    // Check for water
+                    if( Game1.currentLocation.doesTileHaveProperty( toolLocationX, toolLocationY, "Water", "Back" ) != null && Game1.currentLocation.doesTileHaveProperty( toolLocationX, toolLocationY, "NoFishing", "Back" ) == null && Game1.currentLocation.getTileIndexAt( toolLocationX, toolLocationY, "Buildings" ) == -1 || Game1.currentLocation.doesTileHaveProperty( toolLocationX, toolLocationY, "Water", "Buildings" ) != null) {
+                        return;
+                    }
+
+                    restoreAmount = 2 + ( float ) ( 8.0 - ( double ) player.FishingLevel * 0.100000001490116 );
+
+                }
+
+            } else if( toolPower == 0 && restoreAmount > 0 ) {
 
                 Game1.player.stamina += restoreAmount;
-                foundToolEvent = false;
+
+                toolPower = -1;
+                restoreAmount = -1;
+                hasCaluclatedRestore = false;
+            } else if( hasCaluclatedRestore ) {
+                hasCaluclatedRestore = false;
             }
 
 

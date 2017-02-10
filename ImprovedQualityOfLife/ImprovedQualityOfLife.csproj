@@ -70,9 +70,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoOpenGate.cs" />
+    <Compile Include="BetterHorse.cs" />
     <Compile Include="DemiacleUtility.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
+    <Compile Include="ReduceHorseBoundingBox.cs" />
     <Compile Include="RestoreStaminaOnToolFail.cs" />
     <Compile Include="SpeedModOnRoads.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
