@@ -1,6 +1,6 @@
 ﻿-Qualit of life mods
 
-	-auto open gate
+	Complete -auto open gate
 	-ability to choose how fast a 10 minute increment is
 	-Summon horse anywhere
     -See fish type before cought

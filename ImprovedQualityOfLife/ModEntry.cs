@@ -78,6 +78,8 @@ namespace Demiacle.ImprovedQualityOfLife {
             var reduceHorseBoundingBox = new ReduceHorseBoundingBox();
             var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
             var autoOpenGate = new AutoOpenGate();
+            var alterTimeSpeed = new AlterTimeSpeed();
+            var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
 
 
         }

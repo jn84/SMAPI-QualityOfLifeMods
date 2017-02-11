@@ -15,7 +15,7 @@ namespace Demiacle.ImprovedQualityOfLife {
                 return boundingBox;
             }
 
-            boundingBox.Inflate( -14 - Game1.pixelZoom, 0);
+            boundingBox.Inflate( -12 - Game1.pixelZoom, 0);
             return boundingBox;
         }
 
