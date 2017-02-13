@@ -26,6 +26,7 @@ namespace Demiacle.ImprovedQualityOfLife {
                 } else {
                     modOption.xPositionOnScreen = Game1.viewport.Width / 2 - modOption.width / 2;
                     modOption.yPositionOnScreen = Game1.viewport.Height / 2 - modOption.height / 2;
+                    modOption.resetPosition();
                     Game1.activeClickableMenu = modOption;
                 }
 

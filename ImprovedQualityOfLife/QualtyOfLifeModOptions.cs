@@ -25,19 +25,22 @@ namespace Demiacle.ImprovedQualityOfLife {
         private bool scrolling;
         private Rectangle scrollBarRunner;
 
-        public QualtyOfLifeModOptions( )
-      : base( 0, 0, 800, 800, false)
+        public const string TIME_PER_TEN_MINUTE_OPTION = "Seconds";
+
+        public QualtyOfLifeModOptions()
+      : base( 0, 0, 1000, 700, false)
     {
-            this.upArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 459, 11, 12 ), ( float ) Game1.pixelZoom, false );
-            this.downArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 472, 11, 12 ), ( float ) Game1.pixelZoom, false );
-            this.scrollBar = new ClickableTextureComponent( new Rectangle( this.upArrow.bounds.X + Game1.pixelZoom * 3, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom, 10 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 435, 463, 6, 10 ), ( float ) Game1.pixelZoom, false );
-            this.scrollBarRunner = new Rectangle( this.scrollBar.bounds.X, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, this.scrollBar.bounds.Width, height - Game1.tileSize * 2 - this.upArrow.bounds.Height - Game1.pixelZoom * 2 );
-            for( int index = 0; index < 7; ++index )
-                this.optionSlots.Add( new ClickableComponent( new Rectangle( this.xPositionOnScreen + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + index * ( ( height - Game1.tileSize * 2 ) / 7 ), width - Game1.tileSize / 2, ( height - Game1.tileSize * 2 ) / 7 + Game1.pixelZoom ), string.Concat( ( object ) index ) ) );
-            this.options.Add( new OptionsElement( "Quality of Life Mod v0.1" ) );
+            //this.upArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 459, 11, 12 ), ( float ) Game1.pixelZoom, false );
+            //this.downArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 472, 11, 12 ), ( float ) Game1.pixelZoom, false );
+            //this.scrollBar = new ClickableTextureComponent( new Rectangle( this.upArrow.bounds.X + Game1.pixelZoom * 3, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom, 10 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 435, 463, 6, 10 ), ( float ) Game1.pixelZoom, false );
+            //this.scrollBarRunner = new Rectangle( this.scrollBar.bounds.X, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, this.scrollBar.bounds.Width, height - Game1.tileSize * 2 - this.upArrow.bounds.Height - Game1.pixelZoom * 2 );
+            //for( int index = 0; index < 7; ++index )
+            //    this.optionSlots.Add( new ClickableComponent( new Rectangle( this.xPositionOnScreen + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + index * ( ( height - Game1.tileSize * 2 ) / 7 ), width - Game1.tileSize / 2, ( height - Game1.tileSize * 2 ) / 7 + Game1.pixelZoom ), string.Concat( ( object ) index ) ) );
+
+            options.Add( new OptionsElement( "Quality of Life Mod v0.1" ) );
 
             // Time per 10 minute option
-            this.options.Add( new OptionsElement( "Additional seconds per 10 minute tick" ) );
+            options.Add( new OptionsElement( "Additional seconds per 10 minute tick" ) );
             var optionValue = new List<string>();
             optionValue.Add( "-6" );
             optionValue.Add( "-5" );
@@ -70,13 +73,21 @@ namespace Demiacle.ImprovedQualityOfLife {
             optionValue.Add( "40" );
             optionValue.Add( "50" );
             optionValue.Add( "60" );
-            optionValue.Add( "120" );
-            optionValue.Add( "180" );
-            optionValue.Add( "300" );
 
-            var optionsPlusMinus = new OptionsPlusMinus( "", 2, optionValue, -1, -1 );
+            var optionsPlusMinus = new ModOptionsPlusMinus( TIME_PER_TEN_MINUTE_OPTION, 6, optionValue, -1, -1 );
             options.Add( ( OptionsElement ) optionsPlusMinus );
 
+        }
+
+        public void resetPosition() {
+
+            upArrow = new ClickableTextureComponent( new Rectangle( xPositionOnScreen + width + Game1.tileSize / 4, yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 459, 11, 12 ), ( float ) Game1.pixelZoom, false );
+            downArrow = new ClickableTextureComponent( new Rectangle( xPositionOnScreen + width + Game1.tileSize / 4, yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 472, 11, 12 ), ( float ) Game1.pixelZoom, false );
+            scrollBar = new ClickableTextureComponent( new Rectangle( upArrow.bounds.X + Game1.pixelZoom * 3, upArrow.bounds.Y + upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom, 10 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 435, 463, 6, 10 ), ( float ) Game1.pixelZoom, false );
+            scrollBarRunner = new Rectangle( scrollBar.bounds.X, upArrow.bounds.Y + upArrow.bounds.Height + Game1.pixelZoom, scrollBar.bounds.Width, height - Game1.tileSize * 2 - upArrow.bounds.Height - Game1.pixelZoom * 2 );
+            optionSlots.Clear();
+            for( int index = 0; index < 7; ++index )
+                optionSlots.Add( new ClickableComponent( new Rectangle( xPositionOnScreen + Game1.tileSize / 4, yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + index * ( ( height - Game1.tileSize * 2 ) / 7 ), width - Game1.tileSize / 2, ( height - Game1.tileSize * 2 ) / 7 + Game1.pixelZoom ), string.Concat( ( object ) index ) ) );
         }
 
         private void setScrollBarToCurrentIndex() {
@@ -171,6 +182,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             this.currentItemIndex = Math.Max( 0, Math.Min( this.options.Count - 7, this.currentItemIndex ) );
             for( int index = 0; index < this.optionSlots.Count; ++index ) {
                 if( this.optionSlots[ index ].bounds.Contains( x, y ) && this.currentItemIndex + index < this.options.Count && this.options[ this.currentItemIndex + index ].bounds.Contains( x - this.optionSlots[ index ].bounds.X, y - this.optionSlots[ index ].bounds.Y ) ) {
+                    // Handle option clicks
                     this.options[ this.currentItemIndex + index ].receiveLeftClick( x - this.optionSlots[ index ].bounds.X, y - this.optionSlots[ index ].bounds.Y );
                     this.optionsSlotHeld = index;
                     break;
@@ -195,7 +207,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         public override void draw( SpriteBatch b ) {
             b.End();
             b.Begin( SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, ( DepthStencilState ) null, ( RasterizerState ) null );
-            Game1.drawDialogueBox(0,0, width, height, false, true);
+            Game1.drawDialogueBox( xPositionOnScreen, yPositionOnScreen, width, height, false, true);
             for( int index = 0; index < this.optionSlots.Count; ++index ) {
                 if( this.currentItemIndex >= 0 && this.currentItemIndex + index < this.options.Count )
                     this.options[ this.currentItemIndex + index ].draw( b, this.optionSlots[ index ].bounds.X, this.optionSlots[ index ].bounds.Y );

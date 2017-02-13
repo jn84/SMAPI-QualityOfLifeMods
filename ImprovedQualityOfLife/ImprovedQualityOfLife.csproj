@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlterTimeSpeed.cs" />
+    <Compile Include="ModOptionsPlusMinus.cs" />
     <Compile Include="QualityOfLifeModOptionHandler.cs" />
     <Compile Include="AutoOpenGate.cs" />
     <Compile Include="BetterHorse.cs" />

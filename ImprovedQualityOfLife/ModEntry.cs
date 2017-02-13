@@ -51,17 +51,18 @@ namespace Demiacle.ImprovedQualityOfLife {
                 Serializer.ReadFromXmlFile( out loadedData, playerName );
 
                 // Only load options valid for this build
-                foreach( var data in loadedData.checkboxOptions ) {
-                    if( modData.checkboxOptions.ContainsKey( data.Key ) ) {
-                        modData.checkboxOptions[ data.Key ] = loadedData.checkboxOptions[ data.Key ];
+                foreach( var data in loadedData.boolOptions ) {
+                    if( modData.boolOptions.ContainsKey( data.Key ) ) {
+                        modData.boolOptions[ data.Key ] = loadedData.boolOptions[ data.Key ];
                     }
                 }
 
-                // Always load character location data
-                // Beware this may need a check later
-                modData.locationOfTownsfolkOptions = loadedData.locationOfTownsfolkOptions;
+                foreach( var data in loadedData.intOptions ) {
+                    if( modData.intOptions.ContainsKey( data.Key ) ) {
+                        modData.intOptions[ data.Key ] = loadedData.intOptions[ data.Key ];
+                    }
+                }
                     
-                // If need to add more options create object here and merge with loaded data
 
             // create file and ModData
             } else {
@@ -74,12 +75,13 @@ namespace Demiacle.ImprovedQualityOfLife {
         }
 
         private void initializeMods() {
+            var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
+
             var speedMod = new SpeedModOnRoads();
             var reduceHorseBoundingBox = new ReduceHorseBoundingBox();
             var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
             var autoOpenGate = new AutoOpenGate();
             var alterTimeSpeed = new AlterTimeSpeed();
-            var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
 
 
         }
