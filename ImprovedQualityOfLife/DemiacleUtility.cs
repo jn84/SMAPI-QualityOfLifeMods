@@ -65,6 +65,23 @@ namespace Demiacle.ImprovedQualityOfLife {
 
     }
 }
+/*
+  var midFrame = Game1.player.sprite.currentAnimation[ 3 ];
+
+            // Add a delegate to the 4th frame
+            if( midFrame.frameBehavior != overrideScytheTool ) {
+
+                midFrame.frameBehavior = overrideScytheTool;
+                Game1.player.sprite.currentAnimation[ 3 ] = midFrame;
+                return;
+
+            }
+            
+*/
+
+
+
+
 
 
 // Below is a list of things worth keeping as a reference

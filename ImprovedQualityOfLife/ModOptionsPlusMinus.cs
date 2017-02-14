@@ -49,6 +49,7 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             if( previousOptions != updatedOption ) {
                 ModEntry.modData.intOptions[ label ] = selected;
+                ModEntry.updateModData();
             }
 
         }

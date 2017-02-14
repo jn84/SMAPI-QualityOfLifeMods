@@ -26,6 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -43,7 +44,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -75,6 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlterTimeSpeed.cs" />
+    <Compile Include="FarmDebrisMod.cs" />
+    <Compile Include="FastForwardHour.cs" />
+    <Compile Include="GrassDropsBeforeSilo.cs" />
     <Compile Include="ModOptionsPlusMinus.cs" />
     <Compile Include="QualityOfLifeModOptionHandler.cs" />
     <Compile Include="AutoOpenGate.cs" />
@@ -83,12 +87,15 @@
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
     <Compile Include="QualtyOfLifeModOptions.cs" />
+    <Compile Include="QuickFish.cs" />
     <Compile Include="ReduceHorseBoundingBox.cs" />
     <Compile Include="RestoreStaminaOnToolFail.cs" />
+    <Compile Include="ShowFishBeforeCaught.cs" />
     <Compile Include="SpeedModOnRoads.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Serializer.cs" />
+    <Compile Include="SummonHorseAnywhere.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json">

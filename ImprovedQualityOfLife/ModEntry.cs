@@ -41,6 +41,9 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// </summary>
         internal void loadModData( object sender, EventArgs e ) {
 
+            // Set default options
+            modData.intOptions.Add( QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION, 6 );
+
             string playerName = Game1.player.name;
 
             // File: \Mods\Demiacle_SVM\playerName_modData.xml
@@ -70,19 +73,31 @@ namespace Demiacle.ImprovedQualityOfLife {
                 updateModData();
             }
 
+
             initializeMods();
 
         }
 
         private void initializeMods() {
+
             var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
 
             var speedMod = new SpeedModOnRoads();
             var reduceHorseBoundingBox = new ReduceHorseBoundingBox();
-            var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
+
+            // Broken
+            //var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
+
             var autoOpenGate = new AutoOpenGate();
             var alterTimeSpeed = new AlterTimeSpeed();
+            var showFishBeforeCaught = new ShowFishBeforeCaught();
+            var summonHorseAnywhere = new SummonHorseAnywhere();
+            var grassDropsBeforeSilo = new GrassDropsBeforeSilo();
+            var quickFish = new QuickFish();
+            var fastForwardHour = new FastForwardHour();
 
+            //Abandoned
+            //var farmDebrisMod = new FarmDebrisMod();
 
         }
 
