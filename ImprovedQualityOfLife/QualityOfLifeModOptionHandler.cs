@@ -18,7 +18,7 @@ namespace Demiacle.ImprovedQualityOfLife {
                 return;
             }
 
-            if( e.KeyPressed == Microsoft.Xna.Framework.Input.Keys.G ) {
+            if( e.KeyPressed == ModEntry.modConfig.alterTenMinuteKey ) {
 
                 if( Game1.activeClickableMenu == modOption ) {
                     Game1.activeClickableMenu = null;

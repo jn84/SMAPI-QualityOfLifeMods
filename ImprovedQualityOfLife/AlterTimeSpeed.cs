@@ -15,6 +15,8 @@ namespace Demiacle.ImprovedQualityOfLife {
 
         public AlterTimeSpeed() {
 
+            LocationEvents.CurrentLocationChanged += adjustIndoorOutdoorTimer;
+            MenuEvents.MenuClosed += onTimeMenuRemove;
             GameEvents.UpdateTick += addRemoveTime;
             timer.Start();
 
@@ -52,25 +54,37 @@ namespace Demiacle.ImprovedQualityOfLife {
             optionTable.Add( 60000 );
         }
 
+        private void onTimeMenuRemove( object sender, EventArgsClickableMenuClosed e ) {
+            if( e.PriorMenu is QualtyOfLifeModOptions ) {
+                resetTimer( false );
+            }
+        }
+
+        private void adjustIndoorOutdoorTimer( object sender, EventArgsCurrentLocationChanged e ) {
+
+            int option = e.NewLocation.isOutdoors ? ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
+            amountOfTimeToAlterPerTenMinutes = optionTable[ option ];
+
+            int timePerTenMinute = optionTable[ option ];
+            int totalTimeNeededForUpdatedTick = timePerTenMinute + 7000;
+            int timeStillNeededToCompleteUpdatedTick = totalTimeNeededForUpdatedTick - timePassedPerTenMinuteUpdate;
+
+            // Time will be added no matter what so only reduce to 0
+            Game1.gameTimeInterval = Math.Max( 7000 - timeStillNeededToCompleteUpdatedTick, 0 );
+
+        }
+
         private void addRemoveTime( object sender, EventArgs e ) {
 
-            int option = ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ];
-            amountOfTimeToAlterPerTenMinutes = optionTable[ option ];
-            
-            // Reset counter every 10 minutes
-            if( timeOfDayToAlter != Game1.timeOfDay ) {
-                ModEntry.Log( $"10 minute length took {timer.ElapsedMilliseconds}" );
-                timer.Reset();
-                timer.Start();
-                timeOfDayToAlter = Game1.timeOfDay;
-                timePassedPerTenMinuteUpdate = 0;
-
-                // Fast forward time if we are speeding up the clock
-                if( amountOfTimeToAlterPerTenMinutes < 0 ) {
-                    Game1.gameTimeInterval -= amountOfTimeToAlterPerTenMinutes;
-                }
+            // Don't count time if any option menu is open
+            if( Game1.activeClickableMenu != null ) {
+                return;
             }
 
+            // Reset counter every 10 minutes
+            if( timeOfDayToAlter != Game1.timeOfDay ) {
+                resetTimer( true );
+            }
 
             // If slowed enough time do nothing
             if( timePassedPerTenMinuteUpdate > amountOfTimeToAlterPerTenMinutes ) {
@@ -81,8 +95,31 @@ namespace Demiacle.ImprovedQualityOfLife {
             int timePassedThisTick = Game1.currentGameTime.ElapsedGameTime.Milliseconds;
             timePassedPerTenMinuteUpdate += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
             Game1.gameTimeInterval -= timePassedThisTick;
-
         }
-        
+
+        private void resetTimer( bool logTimeTaken ) {
+
+            // Force reset
+            Game1.gameTimeInterval = 0;
+
+            int option = Game1.currentLocation.isOutdoors ? ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
+            amountOfTimeToAlterPerTenMinutes = optionTable[ option ];
+
+            if( logTimeTaken ) {
+                ModEntry.Log( $"10 minute length took {timer.ElapsedMilliseconds}" );
+                timer.Reset();
+                timer.Start();
+            }
+            
+            timeOfDayToAlter = Game1.timeOfDay;
+
+            timePassedPerTenMinuteUpdate = 0;
+
+            // Fast forward time if we are speeding up the clock
+            if( amountOfTimeToAlterPerTenMinutes < 0 ) {
+                Game1.gameTimeInterval -= amountOfTimeToAlterPerTenMinutes;
+            }
+        }
+
     }
 }

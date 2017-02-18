@@ -25,11 +25,11 @@ namespace Demiacle.ImprovedQualityOfLife {
         private bool scrolling;
         private Rectangle scrollBarRunner;
 
-        public const string TIME_PER_TEN_MINUTE_OPTION = "Seconds per 10 minute tick";
+        public const string TIME_PER_TEN_MINUTE_OPTION = "Seconds per 10m outside";
+        public const string TIME_PER_TEN_MINUTE_INSIDE_OPTION = "Seconds per 10m inside";
 
-        public QualtyOfLifeModOptions()
-      : base( 0, 0, 860, 700, false)
-    {
+        public QualtyOfLifeModOptions() : base( 0, 0, 860, 700, false ) {
+
             //this.upArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 459, 11, 12 ), ( float ) Game1.pixelZoom, false );
             //this.downArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 472, 11, 12 ), ( float ) Game1.pixelZoom, false );
             //this.scrollBar = new ClickableTextureComponent( new Rectangle( this.upArrow.bounds.X + Game1.pixelZoom * 3, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom, 10 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 435, 463, 6, 10 ), ( float ) Game1.pixelZoom, false );
@@ -74,8 +74,10 @@ namespace Demiacle.ImprovedQualityOfLife {
             secondsPerTenMinuteList.Add( "60" );
 
             var secondsPerTenMinuteOption = new ModOptionsPlusMinus( TIME_PER_TEN_MINUTE_OPTION, 6, secondsPerTenMinuteList, -1, -1 );
-            options.Add( ( OptionsElement ) secondsPerTenMinuteOption );
+            options.Add( secondsPerTenMinuteOption );
 
+            var secondsPerTenMinuteOptionInside = new ModOptionsPlusMinus( TIME_PER_TEN_MINUTE_INSIDE_OPTION, 6, secondsPerTenMinuteList.ToList(), -1, -1 );
+            options.Add( secondsPerTenMinuteOptionInside );
         }
         
         public void resetPosition() {
@@ -184,7 +186,9 @@ namespace Demiacle.ImprovedQualityOfLife {
         public override void draw( SpriteBatch b ) {
             b.End();
             b.Begin( SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, ( DepthStencilState ) null, ( RasterizerState ) null );
-            Game1.drawDialogueBox( xPositionOnScreen, yPositionOnScreen - 14, width, 200, false, true);
+
+            // THING IS FUNKY draw box not based on window values
+            Game1.drawDialogueBox( xPositionOnScreen, yPositionOnScreen - 14, width, 300, false, true);
             for( int index = 0; index < this.optionSlots.Count; ++index ) {
                 if( this.currentItemIndex >= 0 && this.currentItemIndex + index < this.options.Count )
                     this.options[ this.currentItemIndex + index ].draw( b, this.optionSlots[ index ].bounds.X, this.optionSlots[ index ].bounds.Y );

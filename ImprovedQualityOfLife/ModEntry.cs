@@ -15,12 +15,16 @@ namespace Demiacle.ImprovedQualityOfLife {
         public static string modDirectory;
         public const string saveFilePostfix = "_modData.xml";
         public static Boolean isTesting = false;
+        public static ModConfig modConfig;
             
         public override void Entry(IModHelper helper) {
             ModEntry.helper = helper;
             ModEntry.modEntry = this;
             modData = new ModData();
             modDirectory = helper.DirectoryPath + "\\";
+            
+            // Move To Config
+            modConfig =  helper.ReadConfig<ModConfig>();
 
             // Loads the correct settings on character load
             SaveEvents.AfterLoad += loadModData;
@@ -40,6 +44,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// Loads mod specific data
         /// </summary>
         internal void loadModData( object sender, EventArgs e ) {
+
 
             // Set default options
             modData.intOptions.Add( QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION, 6 );
@@ -95,6 +100,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             var grassDropsBeforeSilo = new GrassDropsBeforeSilo();
             var quickFish = new QuickFish();
             var fastForwardHour = new FastForwardHour();
+            var toolInventory = new ToolInventory();
 
             //Abandoned
             //var farmDebrisMod = new FarmDebrisMod();
@@ -105,6 +111,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// Overwrites the current modData to file
         /// </summary>
         internal static void updateModData() {
+            helper.WriteConfig<ModConfig>( modConfig );
             Serializer.WriteToXmlFile( modData, Game1.player.name );
         }
 

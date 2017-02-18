@@ -63,18 +63,22 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlterTimeSpeed.cs" />
     <Compile Include="FarmDebrisMod.cs" />
     <Compile Include="FastForwardHour.cs" />
     <Compile Include="GrassDropsBeforeSilo.cs" />
+    <Compile Include="ModConfig.cs" />
     <Compile Include="ModOptionsPlusMinus.cs" />
     <Compile Include="QualityOfLifeModOptionHandler.cs" />
     <Compile Include="AutoOpenGate.cs" />
@@ -92,6 +96,7 @@
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SummonHorseAnywhere.cs" />
+    <Compile Include="ToolInventory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json">

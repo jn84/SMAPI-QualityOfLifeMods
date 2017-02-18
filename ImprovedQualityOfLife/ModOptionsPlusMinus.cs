@@ -32,11 +32,11 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             if( minusButton.Contains( x, y ) && this.selected != 0 ) {
                 this.selected = this.selected - 1;
-                OptionsPlusMinus.snapZoomMinus = true;
+                //OptionsPlusMinus.snapZoomMinus = true;
                 Game1.playSound( "drumkit6" );
             } else if( plusButton.Contains( x, y ) && this.selected != this.options.Count - 1 ) {
                 this.selected = this.selected + 1;
-                OptionsPlusMinus.snapZoomPlus = true;
+                //OptionsPlusMinus.snapZoomPlus = true;
                 Game1.playSound( "drumkit6" );
             }
             if( this.selected < 0 )

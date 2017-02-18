@@ -24,8 +24,8 @@ namespace Demiacle.ImprovedQualityOfLife {
             //GraphicsEvents.OnPostRenderEvent += animateHorse;
         }
 
+        // DISABLED ATM
         private void animateHorse( object sender, EventArgs e ) {
-
 
             // Only fires if callHorseOnZPress found a valid horse
             if( runningHorse != null ) {
@@ -89,17 +89,11 @@ namespace Demiacle.ImprovedQualityOfLife {
                     new FarmerSprite.AnimationFrame(12, 70),
                     new FarmerSprite.AnimationFrame(13, 70)
                     } );
-
                 }
-
             }
-
         }
 
         private void callHorseOnZPress( object sender, EventArgsKeyPressed e ) {
-
-            //Game1.currentLocation.characters.Add( new ShadowShaman( Game1.player.position));
-            //Game1.currentLocation.characters.Add( new Horse(Game1.player.getTileX(), Game1.player.getTileY() ));
 
             // Do nothing 
             // If riding horse
@@ -107,8 +101,8 @@ namespace Demiacle.ImprovedQualityOfLife {
             // If horse is already being called
             // If event up
             // If menu up
-            // If keypress is not Z
-            if( Game1.player.isRidingHorse() || Game1.currentLocation.isOutdoors == false || runningHorse != null || Game1.eventUp || Game1.activeClickableMenu != null || e.KeyPressed != Keys.Z ) {
+            // If keypress is not configured key ( defaults to z )
+            if( Game1.player.isRidingHorse() || Game1.currentLocation.isOutdoors == false || runningHorse != null || Game1.eventUp || Game1.activeClickableMenu != null || e.KeyPressed != ModEntry.modConfig.summonHorseKey ) {
                 return;
             }
 
@@ -159,7 +153,6 @@ namespace Demiacle.ImprovedQualityOfLife {
             int positionYToRunTo = Game1.player.getTileY() * Game1.tileSize;
 
             positionToRunTo = new Vector2( positionXToRunTo, positionYToRunTo );
-
 
             //Game1.currentLocation.tile
 
