@@ -15,7 +15,7 @@ namespace Demiacle.ImprovedQualityOfLife {
 
         private void displayFastForwardDialogureOnPressX( object sender, EventArgsKeyPressed e ) {
 
-            if( e.KeyPressed == ModEntry.modConfig.waitOneHourKey && Game1.activeClickableMenu == null && Game1.eventUp == false ) {
+            if( e.KeyPressed.ToString() == ModEntry.modConfig.waitOneHourKey && Game1.activeClickableMenu == null && Game1.eventUp == false ) {
 
                 var responses = new List<Response>();
 

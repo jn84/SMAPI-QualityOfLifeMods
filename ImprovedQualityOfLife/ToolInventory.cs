@@ -24,9 +24,14 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             findToolsInsideChests();
             PlayerEvents.InventoryChanged += checkIfToolContainerChanged;
-            GraphicsEvents.OnPreRenderHudEvent += drawToolInventory;
             ControlEvents.MouseChanged += handleRightClick;
+            PlayerEvents.InventoryChanged += attachDrawMethodAfterLastHudDrawEvent;
 
+        }
+
+        private void attachDrawMethodAfterLastHudDrawEvent( object sender, EventArgsInventoryChanged e ) {
+            GraphicsEvents.OnPreRenderHudEvent += drawToolInventory;
+            PlayerEvents.InventoryChanged -= attachDrawMethodAfterLastHudDrawEvent;
         }
 
         private void handleRightClick( object sender, EventArgsMouseStateChanged e ) {

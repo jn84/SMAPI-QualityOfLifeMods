@@ -102,7 +102,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             // If event up
             // If menu up
             // If keypress is not configured key ( defaults to z )
-            if( Game1.player.isRidingHorse() || Game1.currentLocation.isOutdoors == false || runningHorse != null || Game1.eventUp || Game1.activeClickableMenu != null || e.KeyPressed != ModEntry.modConfig.summonHorseKey ) {
+            if( Game1.player.isRidingHorse() || Game1.currentLocation.isOutdoors == false || runningHorse != null || Game1.eventUp || Game1.activeClickableMenu != null || e.KeyPressed.ToString() != ModEntry.modConfig.summonHorseKey ) {
                 return;
             }
 

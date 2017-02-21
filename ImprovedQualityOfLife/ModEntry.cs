@@ -85,26 +85,52 @@ namespace Demiacle.ImprovedQualityOfLife {
 
         private void initializeMods() {
 
-            var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
+            if( modConfig.enableAlterTenMinute ) {
+                var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
+                var alterTimeSpeed = new AlterTimeSpeed();
+            }
 
-            var speedMod = new SpeedModOnRoads();
-            var reduceHorseBoundingBox = new ReduceHorseBoundingBox();
+            if( modConfig.enableFasterSpeedOnRoad ) {
+                var speedMod = new SpeedModOnRoads();
+            }
+
+            if( modConfig.enableHorsePassThroughSingleTiles ) {
+                var reduceHorseBoundingBox = new ReduceHorseBoundingBox();
+            }
+
+            if( modConfig.enableAutoOpenGate ) {
+                var autoOpenGate = new AutoOpenGate();
+            }
+
+            if( modConfig.showFishBeforeCaught ) {
+                var showFishBeforeCaught = new ShowFishBeforeCaught();
+            }
+
+            if( modConfig.enableSummonHorseAnywhere ) {
+                var summonHorseAnywhere = new SummonHorseAnywhere();
+            }
+
+            if( modConfig.enableGrassDropsWithoutSilo ) {
+                var grassDropsBeforeSilo = new GrassDropsBeforeSilo();
+            }
+
+            if( modConfig.enableQuickFishing ) {
+                var quickFish = new QuickFish();
+            }
+
+            if( modConfig.enableFastForwardHourOnKeyPress ) {
+                var fastForwardHour = new FastForwardHour();
+            }
+
+            if( modConfig.showToolInventory ) {
+                var toolInventory = new ToolInventory();
+            }
 
             // Broken
             //var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
 
-            var autoOpenGate = new AutoOpenGate();
-            var alterTimeSpeed = new AlterTimeSpeed();
-            var showFishBeforeCaught = new ShowFishBeforeCaught();
-            var summonHorseAnywhere = new SummonHorseAnywhere();
-            var grassDropsBeforeSilo = new GrassDropsBeforeSilo();
-            var quickFish = new QuickFish();
-            var fastForwardHour = new FastForwardHour();
-            var toolInventory = new ToolInventory();
-
             //Abandoned
             //var farmDebrisMod = new FarmDebrisMod();
-
         }
 
         /// <summary>

@@ -21,4 +21,4 @@
 	Complete -roads increase speed
 
 	COMPLETE - Add a tool inventory window to hold all tools
-	- Allow time interval for 10 minute ticks to 0
+	- Allow time interval for 10 minute ticks to 0 and also allow barrels to progres at a different time interval
