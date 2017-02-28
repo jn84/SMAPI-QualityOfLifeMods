@@ -85,7 +85,7 @@
     <Compile Include="DemiacleUtility.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModEntry.cs" />
-    <Compile Include="QualtyOfLifeModOptions.cs" />
+    <Compile Include="QualtiyOfLifeModOptions.cs" />
     <Compile Include="QuickFish.cs" />
     <Compile Include="ReduceHorseBoundingBox.cs" />
     <Compile Include="RestoreStaminaOnToolFail.cs" />
