@@ -9,10 +9,16 @@ using System.Reflection.Emit;
 namespace Demiacle.ImprovedQualityOfLife {
     internal class FastForwardHour {
 
+        /// <summary>
+        /// This mod fast forwards the game clock by performing 6 update 10 minute ticks when a key is pressed
+        /// </summary>
         public FastForwardHour() {
             ControlEvents.KeyPressed += displayFastForwardDialogureOnPressX;
         }
 
+        /// <summary>
+        /// Opens a question dialogue when the appropriate key is pressed
+        /// </summary>
         private void displayFastForwardDialogureOnPressX( object sender, EventArgsKeyPressed e ) {
 
             if( e.KeyPressed.ToString() == ModEntry.modConfig.waitOneHourKey && Game1.activeClickableMenu == null && Game1.eventUp == false ) {
@@ -27,13 +33,21 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        /// <summary>
+        /// The delegate to fire after the question dialogue is answered
+        /// </summary>
+        /// <param name="who">Unused</param>
+        /// <param name="whichAnswer">The answer the player has chosen</param>
         private void fastForwardTime( Farmer who, string whichAnswer ) {
             if( whichAnswer == "yes" ) {
-                Game1.globalFadeToBlack( removeFadeOut );
+                Game1.globalFadeToBlack( fadeBackIn );
             }
         }
 
-        private void removeFadeOut() {
+        /// <summary>
+        /// Fires right after fadeToBlack
+        /// </summary>
+        private void fadeBackIn() {
 
             for( int i = 0; i < 6; i++ ) {
                 Game1.performTenMinuteClockUpdate();

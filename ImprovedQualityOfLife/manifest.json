@@ -2,12 +2,12 @@
   "Name": "Improved quality of life",
    "Author": "Demiacle",
    "Version": {
-      "MajorVersion": 0,
-      "MinorVersion": 1,
-      "PatchVersion": 1,
-      "Build": 1
+      "MajorVersion": 1,
+      "MinorVersion": 0,
+      "PatchVersion": 0,
+      "Build": 0
    },
-   "Description": "Improves and introduces a host of mechanics for an improved quality of life in Stardew Valley.",
+   "Description": "Improves a host of mechanics for an improved quality of life in Stardew Valley.",
    "UniqueID": "Demiacle.ImprovedQualityOfLife",
    "EntryDll": "ImprovedQualityOfLife.dll"
 }

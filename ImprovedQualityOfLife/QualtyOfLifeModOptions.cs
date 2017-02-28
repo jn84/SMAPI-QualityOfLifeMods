@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Demiacle.ImprovedQualityOfLife {
     class QualtyOfLifeModOptions : IClickableMenu {
+
         private string descriptionText = "";
         private string hoverText = "";
         private List<ClickableComponent> optionSlots = new List<ClickableComponent>();
@@ -28,6 +29,9 @@ namespace Demiacle.ImprovedQualityOfLife {
         public const string TIME_PER_TEN_MINUTE_OPTION = "Seconds per 10m outside";
         public const string TIME_PER_TEN_MINUTE_INSIDE_OPTION = "Seconds per 10m inside";
 
+        /// <summary>
+        /// This whole class is a hack for creating the options for AlterSpeedTime SUBJECT TO CHANGE
+        /// </summary>
         public QualtyOfLifeModOptions() : base( 0, 0, 860, 700, false ) {
 
             //this.upArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 459, 11, 12 ), ( float ) Game1.pixelZoom, false );

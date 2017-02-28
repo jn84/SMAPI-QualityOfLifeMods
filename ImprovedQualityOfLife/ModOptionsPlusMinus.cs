@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 namespace Demiacle.ImprovedQualityOfLife {
     class ModOptionsPlusMinus : OptionsPlusMinus {
 
+        /// <summary>
+        /// A custom PlusMinus class for AlterTimeSpeed mod
+        /// </summary>
         public ModOptionsPlusMinus( string label, int defaultSetting, List<string> options, int x = -1, int y = -1 ) : base( label, -2, options, x, y ) {
 
             if( ModEntry.modData.intOptions.ContainsKey( label ) ) {
@@ -19,10 +22,13 @@ namespace Demiacle.ImprovedQualityOfLife {
                 selected = defaultSetting;
                 ModEntry.modData.intOptions[ label ] = selected;
             }
-
         }
 
+        /// <summary>
+        /// Changes the selected option only usable currently for AlterTimeSpeed mod
+        /// </summary>
         public override void receiveLeftClick( int x, int y ) {
+
             var minusButton = (Rectangle) typeof( OptionsPlusMinus ).GetField( "minusButton", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( this );
             var plusButton = (Rectangle) typeof( OptionsPlusMinus ).GetField( "plusButton", BindingFlags.NonPublic | BindingFlags.Instance ).GetValue( this );
 
@@ -32,13 +38,12 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             if( minusButton.Contains( x, y ) && this.selected != 0 ) {
                 this.selected = this.selected - 1;
-                //OptionsPlusMinus.snapZoomMinus = true;
                 Game1.playSound( "drumkit6" );
             } else if( plusButton.Contains( x, y ) && this.selected != this.options.Count - 1 ) {
                 this.selected = this.selected + 1;
-                //OptionsPlusMinus.snapZoomPlus = true;
                 Game1.playSound( "drumkit6" );
             }
+
             if( this.selected < 0 )
                 this.selected = 0;
 
@@ -51,7 +56,6 @@ namespace Demiacle.ImprovedQualityOfLife {
                 ModEntry.modData.intOptions[ label ] = selected;
                 ModEntry.updateModData();
             }
-
         }
 
     }

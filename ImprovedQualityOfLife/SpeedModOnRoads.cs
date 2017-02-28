@@ -31,13 +31,15 @@ namespace Demiacle.ImprovedQualityOfLife {
         private const int fasterSpeed = 2;
         private const int fastestSpeed = 3;
 
-        Buff buff = new Buff( 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 7000, "source" );
-        Buff buff2 = new Buff( 22 );
+        Buff speedBuff = new Buff( 22 );
 
+        /// <summary>
+        /// This mod adds a speed buff when on built roads. The buff is hacked from the item Savage Ring
+        /// </summary>
         public SpeedModOnRoads() {
             GameEvents.FourthUpdateTick += checkPlayerTileForRoad;
-            buff2.description = "Roads make you speedy!";
-            buff2.glow = Color.White;
+            speedBuff.description = "Roads make you speedy!";
+            speedBuff.glow = Color.White;
         }
 
         /// <summary>
@@ -60,15 +62,13 @@ namespace Demiacle.ImprovedQualityOfLife {
 
                 if( Game1.buffsDisplay.hasBuff( 22 ) == false ) {
                     
-                    Game1.buffsDisplay.addOtherBuff( buff2 );
-                    //player.buffs.Add( buff );
+                    Game1.buffsDisplay.addOtherBuff( speedBuff );
                 }
 
-                buff2.millisecondsDuration = 300;
-
+                speedBuff.millisecondsDuration = 300;
             }
-
         }
+
     }
 }
 

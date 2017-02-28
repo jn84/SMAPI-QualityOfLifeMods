@@ -9,6 +9,9 @@ using System.Runtime.CompilerServices;
 namespace Demiacle.ImprovedQualityOfLife {
     internal class GrassDropsBeforeSilo {
 
+        /// <summary>
+        /// This mod allows hay to be collected from grass without a silo. It works by replacing a method via pointer replacement
+        /// </summary>
         public GrassDropsBeforeSilo() {
 
             MethodInfo methodToReplace = typeof( Farm ).GetMethod( "tryToAddHay", BindingFlags.Instance | BindingFlags.Public );
@@ -37,15 +40,19 @@ namespace Demiacle.ImprovedQualityOfLife {
 
         }
 
+        /// <summary>
+        /// This method replaces the one in Farm class and drops hay if a silo is either full or if the player doesn't have one
+        /// </summary>
+        /// <param name="num">The amount of hay gained from action</param>
+        /// <returns>The amount of hay to be stored in the silo</returns>
         public int tryToAddHayMod( int num ) {
 
             // Method only exists in farm so will always be farm
-
             Farm farm = (Farm) Game1.getLocationFromName( "Farm" );
 
             float random = Game1.random.Next( 0, 2 );
 
-            // Only drop hay at a 50/50 change when grass is cut and silos are maxed
+            // Only drop hay at a 50/50 chance when grass is cut and silos are maxed
             if( farm.piecesOfHay >= Utility.numSilos() * 240 && random > 0.5f && num > 0) {
                 farm.debris.Add( new Debris( 178, Game1.player.GetToolLocation(), Game1.player.position ) );
                 return -1;

@@ -17,6 +17,9 @@ namespace Demiacle.ImprovedQualityOfLife {
         Horse originalHorse;
         BetterHorse betterHorse = new BetterHorse();
 
+        /// <summary>
+        /// This 
+        /// </summary>
         public ReduceHorseBoundingBox() {
             replaceHorse( null, null );
 
@@ -27,6 +30,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             //LocationEvents.CurrentLocationChanged += restoreRegularHorse;
         }
 
+        [Obsolete( "Never fires" )]
         private void replaceRegularHorse( object sender, EventArgsCurrentLocationChanged e ) {
             if( e.NewLocation is Farm ) {
                 replaceHorse( null, null );
@@ -34,12 +38,16 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        [Obsolete( "Never fires" )]
         private void restoreRegularHorse( object sender, EventArgsCurrentLocationChanged e ) {
             if( e.NewLocation is FarmHouse ) {
                 restoreHorse(null,null);
             }
         }
 
+        /// <summary>
+        /// Restores the original horse before serialization
+        /// </summary>
         private void restoreHorse( object sender, EventArgs e ) {
 
             foreach( var location in Game1.locations ) {
@@ -51,11 +59,12 @@ namespace Demiacle.ImprovedQualityOfLife {
                         location.characters[ i ] = originalHorse;
                     }
                 }
-
             }
-
         }
 
+        /// <summary>
+        /// Replaces the original horse after load/save
+        /// </summary>
         private void replaceHorse( object sender, EventArgs e ) {
 
             foreach( var location in Game1.locations ) {
@@ -73,12 +82,10 @@ namespace Demiacle.ImprovedQualityOfLife {
                         return;
                     }
                 }
-
             }
-
         }
 
-        // Never fires but keep for debugging purposes
+        [Obsolete( "Never fires" )]
         private void spawnHorse( object sender, EventArgsMouseStateChanged e ) {
             if( e.NewState.RightButton == ButtonState.Pressed && isSpawned == false) {
                 Game1.currentLocation.characters.Add( new Horse( (int) Game1.player.position.X / 64, (int) Game1.player.position.Y /64));

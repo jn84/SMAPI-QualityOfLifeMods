@@ -4,6 +4,10 @@ using StardewValley;
 using StardewValley.Menus;
 
 namespace Demiacle.ImprovedQualityOfLife {
+
+    /// <summary>
+    /// Handles the creation of the menu for AlterSpeedtime
+    /// </summary>
     internal class QualityOfLifeModOptionHandler {
 
         QualtyOfLifeModOptions modOption = new QualtyOfLifeModOptions();
@@ -29,9 +33,7 @@ namespace Demiacle.ImprovedQualityOfLife {
                     modOption.resetPosition();
                     Game1.activeClickableMenu = modOption;
                 }
-
             }
-
         }
 
     }

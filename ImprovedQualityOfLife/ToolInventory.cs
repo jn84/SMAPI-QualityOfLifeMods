@@ -8,6 +8,7 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley.Tools;
 
 namespace Demiacle.ImprovedQualityOfLife {
     internal class ToolInventory {
@@ -20,25 +21,36 @@ namespace Demiacle.ImprovedQualityOfLife {
         private int miniIconWidth = 32;
         private int miniIconHeight = 32;
 
+        /// <summary>
+        /// Adds a tool inventory that swaps tools with other tools that are stored away in a chest. It works by storing a reference to the tools container and swapping that with the current tool
+        /// </summary>
         public ToolInventory() {
 
-            findToolsInsideChests();
+            onLoadFindAllToolsInChests();
             PlayerEvents.InventoryChanged += checkIfToolContainerChanged;
             ControlEvents.MouseChanged += handleRightClick;
             PlayerEvents.InventoryChanged += attachDrawMethodAfterLastHudDrawEvent;
-
         }
 
+        /// <summary>
+        /// Attaches the delegate just after player is loaded so toolbar will show up after all loaded render hud events
+        /// **HACKY**
+        /// </summary>
         private void attachDrawMethodAfterLastHudDrawEvent( object sender, EventArgsInventoryChanged e ) {
-            GraphicsEvents.OnPreRenderHudEvent += drawToolInventory;
+            GraphicsEvents.OnPreRenderHudEvent += drawToolbar;
             PlayerEvents.InventoryChanged -= attachDrawMethodAfterLastHudDrawEvent;
         }
 
+        /// <summary>
+        /// Swaps tools when icon is right clicked
+        /// </summary>
         private void handleRightClick( object sender, EventArgsMouseStateChanged e ) {
+
             if( Game1.player.CurrentItem is Tool == false || Game1.player.canMove == false || Game1.player.usingTool || Game1.activeClickableMenu != null || Game1.eventUp || isToolPartOfCustomToolInventory( Game1.player.CurrentTool ) == false ) {
                 return;
             }
 
+            // Only fire next code on first registered click
             if( e.NewState.RightButton == ButtonState.Released ) {
                 isHeld = false;
             }
@@ -87,7 +99,10 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
-        private void findToolsInsideChests() {
+        /// <summary>
+        /// Populates a list of all the tools not in players inventory.
+        /// </summary>
+        private void onLoadFindAllToolsInChests() {
             foreach( var location in Game1.locations ) {
                 foreach( var objectInLocation in location.objects ) {
                     if( objectInLocation.Value is Chest ) {
@@ -106,6 +121,9 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        /// <summary>
+        /// Clears and repopulates a list of tools to swap
+        /// </summary>
         private void updateClickableComponents() {
 
             clickableComponents.Clear();
@@ -119,10 +137,12 @@ namespace Demiacle.ImprovedQualityOfLife {
                 clickableComponents.Add( clickableComponent );
                 count++;
             }           
-
         }
 
-        private void drawToolInventory( object sender, EventArgs e ) {
+        /// <summary>
+        /// Draws the toolbar based on the cached list
+        /// </summary>
+        private void drawToolbar( object sender, EventArgs e ) {
 
             if( Game1.player.CurrentItem is Tool == false || Game1.activeClickableMenu != null || Game1.eventUp || isToolPartOfCustomToolInventory( Game1.player.CurrentTool ) == false ) {
                 return;
@@ -140,10 +160,11 @@ namespace Demiacle.ImprovedQualityOfLife {
                 return;
             }
 
+            float alpha = ModEntry.helper.Reflection.GetPrivateField<float>( toolbar, "transparency" ).GetValue();
+
             int borderOffset = 12;
             int width = clickableComponents.Count * clickableComponents[0].bounds.Width + borderOffset * 2 ;
             var buttons = ( List<ClickableComponent> ) typeof( Toolbar ).GetField( "buttons", BindingFlags.Instance | BindingFlags.NonPublic ).GetValue( toolbar );
-            //int toolbarX = buttons[ Game1.player.CurrentToolIndex ].bounds.X - width / 2 + Game1.tileSize / 2;
             int toolbarY = buttons[ Game1.player.CurrentToolIndex ].bounds.Y;
 
             int toolbarX = Game1.viewport.Width / 2 - Game1.tileSize * 12 / 2 - Game1.pixelZoom * 4 + ( Game1.tileSize * 12 + Game1.tileSize / 2 ) / 2 - ( width / 2 );
@@ -156,7 +177,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
 
             // Draw window
-            IClickableMenu.drawTextureBox( Game1.spriteBatch, Game1.menuTexture, new Rectangle( 0, 256, 60, 60 ), toolbarX, toolbarY, width, miniIconHeight + 30, Color.White, 1f, false );
+            IClickableMenu.drawTextureBox( Game1.spriteBatch, Game1.menuTexture, new Rectangle( 0, 256, 60, 60 ), toolbarX, toolbarY, width, miniIconHeight + 30, Color.White * alpha, 1f, false );
 
             // Draw buttons and borders
             int count = 0;
@@ -187,14 +208,16 @@ namespace Demiacle.ImprovedQualityOfLife {
                     shiftedUpAmount += 10;
                 }
 
-                Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( clickableComponent.bounds.X + clickableComponent.bounds.Width, clickableComponent.bounds.Y + 4, 2, clickableComponent.bounds.Height - 4 ), Color.LightGoldenrodYellow * 0.4f );
-                Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( clickableComponent.bounds.X + clickableComponent.bounds.Width - 2, clickableComponent.bounds.Y + 4, 2, clickableComponent.bounds.Height - 4 ), Color.Maroon * 0.2f );
-                clickableComponent.item.drawInMenu( Game1.spriteBatch, new Vector2( clickableComponent.bounds.X - 8, clickableComponent.bounds.Y - borderOffset + shiftedUpAmount), 0.5f, 1f, 1, false );
+                Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( clickableComponent.bounds.X + clickableComponent.bounds.Width, clickableComponent.bounds.Y + 4, 2, clickableComponent.bounds.Height - 4 ), Color.LightGoldenrodYellow * 0.4f * alpha );
+                Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( clickableComponent.bounds.X + clickableComponent.bounds.Width - 2, clickableComponent.bounds.Y + 4, 2, clickableComponent.bounds.Height - 4 ), Color.Maroon * 0.2f * alpha);
+                clickableComponent.item.drawInMenu( Game1.spriteBatch, new Vector2( clickableComponent.bounds.X - 8, clickableComponent.bounds.Y - borderOffset + shiftedUpAmount), 0.5f, alpha, 1, false );
                 count++;
-
             }
         }
 
+        /// <summary>
+        /// Updates where the changed tool is stored. This also fires on load to populate the list
+        /// </summary>
         private void checkIfToolContainerChanged( object sender, EventArgsInventoryChanged e ) {
 
             // Do nothing if swap was just made
@@ -216,6 +239,10 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        /// <summary>
+        /// Updates or adds a tool to the toolbar
+        /// </summary>
+        /// <param name="item">The item added to the players inventory</param>
         private void handleItemAddedToInventory( Item item ) {
 
             // Add only selected items
@@ -237,6 +264,10 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        /// <summary>
+        /// Updates or removes a tool from toolbar
+        /// </summary>
+        /// <param name="item">The item removed from the players inventory</param>
         private void handleItemRemovedFromInventory( Item item ) {
 
             if( isToolPartOfCustomToolInventory( item ) ) {
@@ -259,24 +290,26 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        /// <summary>
+        /// Determine whether or not an item is a tool
+        /// </summary>
+        /// <param name="item">The tool to check</param>
+        /// <returns>True if the item is a tool</returns>
         private bool isToolPartOfCustomToolInventory( Item item ) {
 
             if( item is Tool == false ) {
                 return false;
             }
 
-            if( item.Name.Contains( "Axe" ) ||
-                item.Name.Contains( "Pickaxe" ) ||
+            if( item is Axe ||
+                item is Pickaxe ||
                 item.Name.Contains( "Scythe" ) ||
-                item.Name.Contains( "Hoe" ) ||
-                item.Name.Contains( "Watering" ) ||
-                item.Name.Contains( "Shears" ) ||
-                item.Name.Contains( "Copper Pan" ) ||
-                item.Name.Contains( "Milk Pail" ) ||
-
-                // Fishing
-                item.Name.Contains( "Rod" ) ||
-                item.Name.Contains( "Pole" )
+                item is Hoe ||
+                item is WateringCan ||
+                item is Shears ||
+                item is Pan ||
+                item is MilkPail ||
+                item is FishingRod
             ) {
                 return true;
             } else {

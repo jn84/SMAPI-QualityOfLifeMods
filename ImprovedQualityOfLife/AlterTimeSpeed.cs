@@ -11,14 +11,17 @@ namespace Demiacle.ImprovedQualityOfLife {
         private int timeOfDayToAlter;
         private List<int> optionTable = new List<int>();
 
-        System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
+        //System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
 
+        /// <summary>
+        /// Alters the time of a 10 minute increment
+        /// </summary>
         public AlterTimeSpeed() {
 
             LocationEvents.CurrentLocationChanged += adjustIndoorOutdoorTimer;
             MenuEvents.MenuClosed += onTimeMenuRemove;
-            GameEvents.UpdateTick += addRemoveTime;
-            timer.Start();
+            GameEvents.UpdateTick += addOrRemoveTime;
+            //timer.Start();
 
             //TODO write test to check vs option
             optionTable.Add( -6000 );
@@ -54,12 +57,18 @@ namespace Demiacle.ImprovedQualityOfLife {
             optionTable.Add( 60000 );
         }
 
+        /// <summary>
+        /// Reset the timer if menu is closed and last menu this mods option menu
+        /// </summary>
         private void onTimeMenuRemove( object sender, EventArgsClickableMenuClosed e ) {
             if( e.PriorMenu is QualtyOfLifeModOptions ) {
                 resetTimer( false );
             }
         }
 
+        /// <summary>
+        /// Handles a change timespeed when moving between locations
+        /// </summary>
         private void adjustIndoorOutdoorTimer( object sender, EventArgsCurrentLocationChanged e ) {
 
             int option = e.NewLocation.isOutdoors ? ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
@@ -71,10 +80,12 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             // Time will be added no matter what so only reduce to 0
             Game1.gameTimeInterval = Math.Max( 7000 - timeStillNeededToCompleteUpdatedTick, 0 );
-
         }
 
-        private void addRemoveTime( object sender, EventArgs e ) {
+        /// <summary>
+        /// Adds a total number of milliseconds to the Game1.gameTimeInterval which when 7000 is hit a 10 minute time increment is done
+        /// </summary>
+        private void addOrRemoveTime( object sender, EventArgs e ) {
 
             // Don't count time if any option menu is open
             if( Game1.activeClickableMenu != null ) {
@@ -97,6 +108,9 @@ namespace Demiacle.ImprovedQualityOfLife {
             Game1.gameTimeInterval -= timePassedThisTick;
         }
 
+        /// <summary>
+        /// Resets vars and reduces the time needed for a 10 minute tick if necessary.
+        /// </summary>
         private void resetTimer( bool logTimeTaken ) {
 
             // Force reset
@@ -105,11 +119,11 @@ namespace Demiacle.ImprovedQualityOfLife {
             int option = Game1.currentLocation.isOutdoors ? ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
             amountOfTimeToAlterPerTenMinutes = optionTable[ option ];
 
-            if( logTimeTaken ) {
-                ModEntry.Log( $"10 minute length took {timer.ElapsedMilliseconds}" );
-                timer.Reset();
-                timer.Start();
-            }
+            //if( logTimeTaken ) {
+                //ModEntry.Log( $"10 minute length took {timer.ElapsedMilliseconds}" );
+                //timer.Reset();
+                //timer.Start();
+            //}
             
             timeOfDayToAlter = Game1.timeOfDay;
 

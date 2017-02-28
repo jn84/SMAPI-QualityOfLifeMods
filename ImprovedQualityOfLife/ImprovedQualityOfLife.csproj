@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlterTimeSpeed.cs" />
-    <Compile Include="FarmDebrisMod.cs" />
     <Compile Include="FastForwardHour.cs" />
     <Compile Include="GrassDropsBeforeSilo.cs" />
     <Compile Include="ModConfig.cs" />

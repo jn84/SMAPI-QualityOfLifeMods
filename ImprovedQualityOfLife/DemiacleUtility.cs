@@ -23,6 +23,10 @@ namespace Demiacle.ImprovedQualityOfLife {
             } );
         }
 
+        /// <summary>
+        /// Gets the width of the current play area not including black borders
+        /// </summary>
+        /// <returns>Play area width</returns>
         public static float getWidthInPlayArea() {
             if( Game1.isOutdoorMapSmallerThanViewport() ) {
                 float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
@@ -35,6 +39,11 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        /// <summary>
+        /// Gets the width of the current play area not including black borders
+        /// </summary>
+        /// <param name="location">The GameLocation of the play area to check</param>
+        /// <returns>Play area width</returns>
         public static float getWidthInPlayArea( GameLocation location) {
             if( Game1.isOutdoorMapSmallerThanViewport() ) {
                 float positionX = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Right;
@@ -65,6 +74,9 @@ namespace Demiacle.ImprovedQualityOfLife {
 
     }
 }
+
+// The following is just for safe keeping
+
 /*
   var midFrame = Game1.player.sprite.currentAnimation[ 3 ];
 
@@ -78,11 +90,6 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
             
 */
-
-
-
-
-
 
 // Below is a list of things worth keeping as a reference
 

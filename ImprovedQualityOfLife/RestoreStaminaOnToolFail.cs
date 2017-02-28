@@ -16,6 +16,9 @@ namespace Demiacle.ImprovedQualityOfLife {
         private int toolPower;
         private bool hasCaluclatedRestore = false;
 
+        /// <summary>
+        /// This mod is used to restore stamina on failed tool uses - Currently on hold
+        /// </summary>
         public RestoreStaminaOnToolFail() {
             GameEvents.UpdateTick += checkForToolAction;
         }

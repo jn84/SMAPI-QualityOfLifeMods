@@ -20,11 +20,14 @@ namespace Demiacle.ImprovedQualityOfLife {
         private ShadowShaman poofAnimator = new ShadowShaman( Vector2.Zero );
 
         public SummonHorseAnywhere() {
-            ControlEvents.KeyPressed += callHorseOnZPress;
+            ControlEvents.KeyPressed += callHorseOnButtonPress;
             //GraphicsEvents.OnPostRenderEvent += animateHorse;
         }
 
-        // DISABLED ATM
+        /// <summary>
+        /// Animates a horse running from the left of the screen to the designated position
+        /// </summary>
+        [Obsolete( "Never Fires" )]
         private void animateHorse( object sender, EventArgs e ) {
 
             // Only fires if callHorseOnZPress found a valid horse
@@ -93,7 +96,10 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
-        private void callHorseOnZPress( object sender, EventArgsKeyPressed e ) {
+        /// <summary>
+        /// Removes your horse from its current location and places it next to the player
+        /// </summary>
+        private void callHorseOnButtonPress( object sender, EventArgsKeyPressed e ) {
 
             // Do nothing 
             // If riding horse

@@ -9,13 +9,12 @@ namespace Demiacle.ImprovedQualityOfLife {
     public class ModEntry : Mod {
 
         public static ModData modData;
+        public static ModConfig modConfig;
         public static ModEntry modEntry;
         public static IModHelper helper;
-        // TODO Replace with helper method mod already has a saver and loader so change to use that
         public static string modDirectory;
         public const string saveFilePostfix = "_modData.xml";
         public static Boolean isTesting = false;
-        public static ModConfig modConfig;
             
         public override void Entry(IModHelper helper) {
             ModEntry.helper = helper;
@@ -23,14 +22,14 @@ namespace Demiacle.ImprovedQualityOfLife {
             modData = new ModData();
             modDirectory = helper.DirectoryPath + "\\";
             
-            // Move To Config
             modConfig =  helper.ReadConfig<ModConfig>();
 
-            // Loads the correct settings on character load
-            SaveEvents.AfterLoad += loadModData;
-           
+            SaveEvents.AfterLoad += loadModDataAndInitialize;
         }
 
+        /// <summary>
+        /// Logs to the smapi console
+        /// </summary>
         internal static void Log( string log ) {
             if( isTesting ) {
                 System.Console.WriteLine( log );
@@ -41,10 +40,9 @@ namespace Demiacle.ImprovedQualityOfLife {
         }
 
         /// <summary>
-        /// Loads mod specific data
+        /// Loads mod specific data from xml into the ModData class and initializes mods afterwards
         /// </summary>
-        internal void loadModData( object sender, EventArgs e ) {
-
+        internal void loadModDataAndInitialize( object sender, EventArgs e ) {
 
             // Set default options
             modData.intOptions.Add( QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION, 6 );
@@ -78,11 +76,12 @@ namespace Demiacle.ImprovedQualityOfLife {
                 updateModData();
             }
 
-
             initializeMods();
-
         }
 
+        /// <summary>
+        /// Load all mods
+        /// </summary>
         private void initializeMods() {
 
             if( modConfig.enableAlterTenMinute ) {
@@ -128,9 +127,6 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             // Broken
             //var restoreStaminaOnToolFail = new RestoreStaminaOnToolFail();
-
-            //Abandoned
-            //var farmDebrisMod = new FarmDebrisMod();
         }
 
         /// <summary>

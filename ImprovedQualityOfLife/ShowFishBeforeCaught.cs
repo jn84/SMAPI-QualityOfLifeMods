@@ -13,10 +13,16 @@ namespace Demiacle.ImprovedQualityOfLife {
         Color borderColor = new Color( 10, 10, 10);
         Color color = new Color( 235, 235, 235);
 
+        /// <summary>
+        /// This mod displays the name of the fish currently being reeled in
+        /// </summary>
         public ShowFishBeforeCaught() {
             GraphicsEvents.OnPostRenderEvent += drawString;
         }
 
+        /// <summary>
+        /// Draws the name of the fish above the fish reeling bar
+        /// </summary>
         private void drawString( object sender, EventArgs e ) {
             if( Game1.player.CurrentTool is FishingRod && ( Game1.player.CurrentTool as FishingRod ).isReeling ) {
 
@@ -39,7 +45,6 @@ namespace Demiacle.ImprovedQualityOfLife {
                 }
 
                 Game1.drawWithBorder( fishName, borderColor, color, new Vector2( x, y ) );
-
             }
         }
 
