@@ -61,7 +61,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// Reset the timer if menu is closed and last menu this mods option menu
         /// </summary>
         private void onTimeMenuRemove( object sender, EventArgsClickableMenuClosed e ) {
-            if( e.PriorMenu is QualtyOfLifeModOptions ) {
+            if( e.PriorMenu is QualityOfLifeModOptions ) {
                 resetTimer( false );
             }
         }
@@ -71,7 +71,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// </summary>
         private void adjustIndoorOutdoorTimer( object sender, EventArgsCurrentLocationChanged e ) {
 
-            int option = e.NewLocation.isOutdoors ? ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
+            int option = e.NewLocation.isOutdoors ? ModEntry.modData.intOptions[ QualityOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualityOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
             amountOfTimeToAlterPerTenMinutes = optionTable[ option ];
 
             int timePerTenMinute = optionTable[ option ];
@@ -116,7 +116,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             // Force reset
             Game1.gameTimeInterval = 0;
 
-            int option = Game1.currentLocation.isOutdoors ? ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
+            int option = Game1.currentLocation.isOutdoors ? ModEntry.modData.intOptions[ QualityOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION ] : ModEntry.modData.intOptions[ QualityOfLifeModOptions.TIME_PER_TEN_MINUTE_INSIDE_OPTION ];
             amountOfTimeToAlterPerTenMinutes = optionTable[ option ];
 
             //if( logTimeTaken ) {

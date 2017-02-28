@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Demiacle.ImprovedQualityOfLife {
-    class QualtyOfLifeModOptions : IClickableMenu {
+    class QualityOfLifeModOptions : IClickableMenu {
 
         private string descriptionText = "";
         private string hoverText = "";
@@ -32,7 +32,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// <summary>
         /// This whole class is a hack for creating the options for AlterSpeedTime SUBJECT TO CHANGE
         /// </summary>
-        public QualtyOfLifeModOptions() : base( 0, 0, 860, 700, false ) {
+        public QualityOfLifeModOptions() : base( 0, 0, 860, 700, false ) {
 
             //this.upArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 459, 11, 12 ), ( float ) Game1.pixelZoom, false );
             //this.downArrow = new ClickableTextureComponent( new Rectangle( this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom ), Game1.mouseCursors, new Rectangle( 421, 472, 11, 12 ), ( float ) Game1.pixelZoom, false );

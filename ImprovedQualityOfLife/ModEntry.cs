@@ -45,7 +45,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         internal void loadModDataAndInitialize( object sender, EventArgs e ) {
 
             // Set default options
-            modData.intOptions.Add( QualtyOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION, 6 );
+            modData.intOptions.Add( QualityOfLifeModOptions.TIME_PER_TEN_MINUTE_OPTION, 6 );
 
             string playerName = Game1.player.name;
 

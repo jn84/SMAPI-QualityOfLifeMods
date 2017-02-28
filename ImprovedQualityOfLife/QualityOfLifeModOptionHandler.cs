@@ -10,7 +10,7 @@ namespace Demiacle.ImprovedQualityOfLife {
     /// </summary>
     internal class QualityOfLifeModOptionHandler {
 
-        QualtyOfLifeModOptions modOption = new QualtyOfLifeModOptions();
+        QualityOfLifeModOptions modOption = new QualityOfLifeModOptions();
 
         public QualityOfLifeModOptionHandler() {
             ControlEvents.KeyPressed += onKeyPress;
