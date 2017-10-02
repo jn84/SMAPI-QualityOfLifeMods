@@ -5,6 +5,7 @@ using StardewValley;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using SFarmer = StardewValley.Farmer;
 
 namespace Demiacle.ImprovedQualityOfLife {
     internal class FastForwardHour {
@@ -38,7 +39,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// </summary>
         /// <param name="who">Unused</param>
         /// <param name="whichAnswer">The answer the player has chosen</param>
-        private void fastForwardTime( Farmer who, string whichAnswer ) {
+        private void fastForwardTime( SFarmer who, string whichAnswer ) {
             if( whichAnswer == "yes" ) {
                 Game1.globalFadeToBlack( fadeBackIn );
             }
