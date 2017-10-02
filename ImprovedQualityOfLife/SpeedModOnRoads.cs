@@ -5,6 +5,7 @@ using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
+using SFarmer = StardewValley.Farmer;
 
 namespace Demiacle.ImprovedQualityOfLife {
 
@@ -51,7 +52,7 @@ namespace Demiacle.ImprovedQualityOfLife {
                 return;
             }
 
-            Farmer player = Game1.player;
+            SFarmer player = Game1.player;
             Point tileAtLocation = player.getTileLocationPoint();
 
             if( Game1.currentLocation.terrainFeatures.ContainsKey( new Vector2( tileAtLocation.X, tileAtLocation.Y) ) &&

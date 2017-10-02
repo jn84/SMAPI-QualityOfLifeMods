@@ -14,7 +14,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// <summary>
         /// A custom PlusMinus class for AlterTimeSpeed mod
         /// </summary>
-        public ModOptionsPlusMinus( string label, int defaultSetting, List<string> options, int x = -1, int y = -1 ) : base( label, -2, options, x, y ) {
+        public ModOptionsPlusMinus( string label, int defaultSetting, List<string> options, int x = -1, int y = -1 ) : base( label, -2, options, options, x, y ) {
 
             if( ModEntry.modData.intOptions.ContainsKey( label ) ) {
                 selected = ModEntry.modData.intOptions[ label ];

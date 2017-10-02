@@ -52,7 +52,7 @@ namespace Demiacle.ImprovedQualityOfLife {
 
                     if( groundObject.Value is Fence && ( groundObject.Value as Fence ).isGate ) {
 
-                        List<Vector2> adjacentTiles = Game1.player.getAdjacentTiles();
+                        List<Vector2> adjacentTiles = Utility.getAdjacentTileLocations(Game1.player.getTileLocation());
 
                         foreach( var item in adjacentTiles ) {
 

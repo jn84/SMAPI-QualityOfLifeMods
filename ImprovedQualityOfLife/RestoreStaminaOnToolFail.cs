@@ -7,6 +7,7 @@ using xTile.Tiles;
 using xTile.Layers;
 using xTile.ObjectModel;
 using StardewValley.TerrainFeatures;
+using SFarmer = StardewValley.Farmer;
 
 namespace Demiacle.ImprovedQualityOfLife {
     internal class RestoreStaminaOnToolFail {
@@ -24,7 +25,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         }
 
         private void checkForToolAction( object sender, EventArgs e ) {
-            Farmer player = Game1.player;
+            SFarmer player = Game1.player;
 
             if( player.usingTool ) {
                 toolPower = player.toolPower;
