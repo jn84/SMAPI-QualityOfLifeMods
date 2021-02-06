@@ -86,43 +86,43 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             if( modConfig.enableAlterTenMinute ) {
                 var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
-                var alterTimeSpeed = new AlterTimeSpeed(this);
+                var alterTimeSpeed = new AlterTimeSpeed();
             }
 
             if( modConfig.enableFasterSpeedOnRoad ) {
-                var speedMod = new SpeedModOnRoads(this);
+                var speedMod = new SpeedModOnRoads();
             }
 
             if( modConfig.enableHorsePassThroughSingleTiles ) {
-                var reduceHorseBoundingBox = new ReduceHorseBoundingBox(this);
+                var reduceHorseBoundingBox = new ReduceHorseBoundingBox();
             }
 
             if( modConfig.enableAutoOpenGate ) {
-                var autoOpenGate = new AutoOpenGate(this);
+                var autoOpenGate = new AutoOpenGate();
             }
 
             if( modConfig.showFishBeforeCaught ) {
-                var showFishBeforeCaught = new ShowFishBeforeCaught(this);
+                var showFishBeforeCaught = new ShowFishBeforeCaught();
             }
 
             if( modConfig.enableSummonHorseAnywhere ) {
-                var summonHorseAnywhere = new SummonHorseAnywhere(this);
+                var summonHorseAnywhere = new SummonHorseAnywhere();
             }
 
             if( modConfig.enableGrassDropsWithoutSilo ) {
-                var grassDropsBeforeSilo = new GrassDropsBeforeSilo(this);
+                var grassDropsBeforeSilo = new GrassDropsBeforeSilo();
             }
 
             if( modConfig.enableQuickFishing ) {
-                var quickFish = new QuickFish(this);
+                var quickFish = new QuickFish();
             }
 
             if( modConfig.enableFastForwardHourOnKeyPress ) {
-                var fastForwardHour = new FastForwardHour(this);
+                var fastForwardHour = new FastForwardHour();
             }
 
             if( modConfig.showToolInventory ) {
-                var toolInventory = new ToolInventory(this);
+                var toolInventory = new ToolInventory();
             }
 
             // Broken
