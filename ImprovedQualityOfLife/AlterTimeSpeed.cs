@@ -15,7 +15,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// <summary>
         /// Alters the time of a 10 minute increment
         /// </summary>
-        public AlterTimeSpeed() {
+        public AlterTimeSpeed(ModEntry modEntry) {
 
             
             LocationEvents.CurrentLocationChanged += adjustIndoorOutdoorTimer;
