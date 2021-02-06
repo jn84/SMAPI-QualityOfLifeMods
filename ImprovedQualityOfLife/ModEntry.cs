@@ -24,7 +24,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             
             modConfig =  helper.ReadConfig<ModConfig>();
 
-            SaveEvents.AfterLoad += loadModDataAndInitialize;
+            helper.Events.GameLoop.SaveLoaded += loadModDataAndInitialize;
         }
 
         /// <summary>
@@ -86,43 +86,43 @@ namespace Demiacle.ImprovedQualityOfLife {
 
             if( modConfig.enableAlterTenMinute ) {
                 var qualityOfLifeModOptionHandler = new QualityOfLifeModOptionHandler();
-                var alterTimeSpeed = new AlterTimeSpeed();
+                var alterTimeSpeed = new AlterTimeSpeed(this);
             }
 
             if( modConfig.enableFasterSpeedOnRoad ) {
-                var speedMod = new SpeedModOnRoads();
+                var speedMod = new SpeedModOnRoads(this);
             }
 
             if( modConfig.enableHorsePassThroughSingleTiles ) {
-                var reduceHorseBoundingBox = new ReduceHorseBoundingBox();
+                var reduceHorseBoundingBox = new ReduceHorseBoundingBox(this);
             }
 
             if( modConfig.enableAutoOpenGate ) {
-                var autoOpenGate = new AutoOpenGate();
+                var autoOpenGate = new AutoOpenGate(this);
             }
 
             if( modConfig.showFishBeforeCaught ) {
-                var showFishBeforeCaught = new ShowFishBeforeCaught();
+                var showFishBeforeCaught = new ShowFishBeforeCaught(this);
             }
 
             if( modConfig.enableSummonHorseAnywhere ) {
-                var summonHorseAnywhere = new SummonHorseAnywhere();
+                var summonHorseAnywhere = new SummonHorseAnywhere(this);
             }
 
             if( modConfig.enableGrassDropsWithoutSilo ) {
-                var grassDropsBeforeSilo = new GrassDropsBeforeSilo();
+                var grassDropsBeforeSilo = new GrassDropsBeforeSilo(this);
             }
 
             if( modConfig.enableQuickFishing ) {
-                var quickFish = new QuickFish();
+                var quickFish = new QuickFish(this);
             }
 
             if( modConfig.enableFastForwardHourOnKeyPress ) {
-                var fastForwardHour = new FastForwardHour();
+                var fastForwardHour = new FastForwardHour(this);
             }
 
             if( modConfig.showToolInventory ) {
-                var toolInventory = new ToolInventory();
+                var toolInventory = new ToolInventory(this);
             }
 
             // Broken

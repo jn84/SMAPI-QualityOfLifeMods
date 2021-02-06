@@ -1,6 +1,7 @@
 ﻿using System;
 using StardewModdingAPI.Events;
 using System.Collections.Generic;
+using System.Linq;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -8,15 +9,15 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley.Tools;
 
 namespace Demiacle.ImprovedQualityOfLife {
     internal class ToolInventory {
 
-        private Dictionary<Tool, List<Item>> toolsAndTheirContainers = new Dictionary<Tool, List<Item>>();
-        private List<ClickableComponent> clickableComponents = new List<ClickableComponent>();
+        private Dictionary<Tool, IList<Item>> toolsAndTheirContainers = new Dictionary<Tool, IList<Item>>();
+        private IList<ClickableComponent> clickableComponents = new List<ClickableComponent>();
 
-        private bool isHeld;
         private bool justDidSwap = false;
         private int miniIconWidth = 32;
         private int miniIconHeight = 32;
@@ -24,44 +25,41 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// <summary>
         /// Adds a tool inventory that swaps tools with other tools that are stored away in a chest. It works by storing a reference to the tools container and swapping that with the current tool
         /// </summary>
-        public ToolInventory() {
-
+        public ToolInventory()
+        {
             onLoadFindAllToolsInChests();
-            PlayerEvents.InventoryChanged += checkIfToolContainerChanged;
-            ControlEvents.MouseChanged += handleRightClick;
-            PlayerEvents.InventoryChanged += attachDrawMethodAfterLastHudDrawEvent;
+
+            ModEntry.helper.Events.Player.InventoryChanged += checkIfToolContainerChanged;
+            ModEntry.helper.Events.Input.ButtonPressed += handleRightClick;
+            ModEntry.helper.Events.Player.InventoryChanged += attachDrawMethodAfterLastHudDrawEvent;
         }
 
         /// <summary>
         /// Attaches the delegate just after player is loaded so toolbar will show up after all loaded render hud events
         /// **HACKY**
         /// </summary>
-        private void attachDrawMethodAfterLastHudDrawEvent( object sender, EventArgsInventoryChanged e ) {
-            GraphicsEvents.OnPreRenderHudEvent += drawToolbar;
-            PlayerEvents.InventoryChanged -= attachDrawMethodAfterLastHudDrawEvent;
+        private void attachDrawMethodAfterLastHudDrawEvent( object sender, InventoryChangedEventArgs e )
+        {
+            ModEntry.helper.Events.Display.RenderedHud += drawToolbar;
+            ModEntry.helper.Events.Player.InventoryChanged += attachDrawMethodAfterLastHudDrawEvent;
         }
 
         /// <summary>
         /// Swaps tools when icon is right clicked
         /// </summary>
-        private void handleRightClick( object sender, EventArgsMouseStateChanged e ) {
-
-            if( Game1.player.CurrentItem is Tool == false || Game1.player.canMove == false || Game1.player.usingTool || Game1.activeClickableMenu != null || Game1.eventUp || isToolPartOfCustomToolInventory( Game1.player.CurrentTool ) == false ) {
+        private void handleRightClick( object sender, ButtonPressedEventArgs e )
+        {
+            // TODO: Make sure code detects correct button press (right click)
+            if(!(Game1.player.CurrentItem is Tool) || !(Game1.player.canMove) || Game1.player.usingTool || Game1.activeClickableMenu != null || Game1.eventUp || isToolPartOfCustomToolInventory( Game1.player.CurrentTool ) == false ) 
                 return;
-            }
 
             // Only fire next code on first registered click
-            if( e.NewState.RightButton == ButtonState.Released ) {
-                isHeld = false;
-            }
-
-            if( e.NewState.RightButton == ButtonState.Pressed && isHeld == false ) {
-                isHeld = true;
-
-                foreach( var component in clickableComponents.ToArray() ) {
-
-                    if( component.bounds.Contains( e.NewPosition.X, e.NewPosition.Y ) ) {
-
+            if (e.Button == SButton.MouseRight && !e.IsDown(SButton.MouseRight))
+            { 
+                foreach( var component in clickableComponents.ToList() ) 
+                {
+                    if(component.bounds.Contains((int)e.Cursor.GetScaledAbsolutePixels().X, (int)e.Cursor.GetScaledAbsolutePixels().Y))
+                    {
                         // Name vars
                         Item itemToSwapIn = component.item;
                         int swapInItemIndex = Game1.player.CurrentToolIndex;
@@ -85,11 +83,11 @@ namespace Demiacle.ImprovedQualityOfLife {
                         containerToPlaceSwappedOutItem[ swapOutItemIndex ] = itemToSwapOut;
 
                         // Update containers
-                        toolsAndTheirContainers[ itemToSwapIn as Tool ] = Game1.player.items;
+                        toolsAndTheirContainers[ itemToSwapIn as Tool ] = Game1.player.Items;
                         toolsAndTheirContainers[ itemToSwapOut as Tool ] = containerToPlaceSwappedOutItem;
 
                         // Only ignore next inv change if inventory is actually changed
-                        if( Game1.player.items != containerToPlaceSwappedOutItem ) {
+                        if( Game1.player.Items != containerToPlaceSwappedOutItem ) {
                             justDidSwap = true;
                         }
 
@@ -99,21 +97,24 @@ namespace Demiacle.ImprovedQualityOfLife {
             }
         }
 
+        // TODO: Adjust for multiplayer tools. Checks each player's farmhouse/cabin? Are tools tied to a player? Probably not
         /// <summary>
         /// Populates a list of all the tools not in players inventory.
         /// </summary>
-        private void onLoadFindAllToolsInChests() {
-            foreach( var location in Game1.locations ) {
-                foreach( var objectInLocation in location.objects ) {
-                    if( objectInLocation.Value is Chest ) {
-
-                        var currentChest = ( objectInLocation.Value as Chest );
+        private void onLoadFindAllToolsInChests() 
+        {
+            foreach( var location in Game1.locations ) 
+            {
+                foreach( var objectInLocation in location.Objects.Values ) 
+                {
+                    if( objectInLocation is Chest currentChest ) 
+                    {
                         var allItemsInChest = currentChest.items;
 
                         foreach( var itemInChest in allItemsInChest.ToArray() ) {
 
-                            if( itemInChest is Tool && isToolPartOfCustomToolInventory( itemInChest ) ) {
-                                toolsAndTheirContainers.Add( itemInChest as Tool, currentChest.items );
+                            if( itemInChest is Tool tool && isToolPartOfCustomToolInventory( tool ) ) {
+                                toolsAndTheirContainers.Add( tool, currentChest.items );
                             }
                         }
                     }
@@ -142,7 +143,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// <summary>
         /// Draws the toolbar based on the cached list
         /// </summary>
-        private void drawToolbar( object sender, EventArgs e ) {
+        private void drawToolbar( object sender, RenderedHudEventArgs e ) {
 
             if( Game1.player.CurrentItem is Tool == false || Game1.activeClickableMenu != null || Game1.eventUp || isToolPartOfCustomToolInventory( Game1.player.CurrentTool ) == false ) {
                 return;
@@ -160,7 +161,7 @@ namespace Demiacle.ImprovedQualityOfLife {
                 return;
             }
 
-            float alpha = ModEntry.helper.Reflection.GetPrivateField<float>( toolbar, "transparency" ).GetValue();
+            float alpha = ModEntry.helper.Reflection.GetField<float>(toolbar, "transparency").GetValue();
 
             int borderOffset = 12;
             int width = clickableComponents.Count * clickableComponents[0].bounds.Width + borderOffset * 2 ;
@@ -210,7 +211,7 @@ namespace Demiacle.ImprovedQualityOfLife {
 
                 Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( clickableComponent.bounds.X + clickableComponent.bounds.Width, clickableComponent.bounds.Y + 4, 2, clickableComponent.bounds.Height - 4 ), Color.LightGoldenrodYellow * 0.4f * alpha );
                 Game1.spriteBatch.Draw( Game1.staminaRect, new Rectangle( clickableComponent.bounds.X + clickableComponent.bounds.Width - 2, clickableComponent.bounds.Y + 4, 2, clickableComponent.bounds.Height - 4 ), Color.Maroon * 0.2f * alpha);
-                clickableComponent.item.drawInMenu( Game1.spriteBatch, new Vector2( clickableComponent.bounds.X - 8, clickableComponent.bounds.Y - borderOffset + shiftedUpAmount), 0.5f, alpha, 1, false );
+                clickableComponent.item.drawInMenu( Game1.spriteBatch, new Vector2( clickableComponent.bounds.X - 8, clickableComponent.bounds.Y - borderOffset + shiftedUpAmount), 0.5f, alpha, 1, StackDrawType.Hide );
                 count++;
             }
         }
@@ -218,25 +219,23 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// <summary>
         /// Updates where the changed tool is stored. This also fires on load to populate the list
         /// </summary>
-        private void checkIfToolContainerChanged( object sender, EventArgsInventoryChanged e ) {
+        private void checkIfToolContainerChanged( object sender, InventoryChangedEventArgs e ) {
 
             // Do nothing if swap was just made
-            if( justDidSwap ) {
+            if (justDidSwap) 
+            {
                 justDidSwap = false;
                 return;
             }
 
-            if( e.Removed.Count > 0 ) {
-                foreach( var itemStackChange in e.Removed ) {
-                    handleItemRemovedFromInventory( itemStackChange.Item );
-                }
-            }
+            if (e.Removed.Any()) 
+                foreach( var itemStackChange in e.Removed )
+                    handleItemRemovedFromInventory( itemStackChange );
+            
+            if (e.Added.Any()) 
+                foreach( var itemStackChange in e.Added ) 
+                    handleItemAddedToInventory( itemStackChange );
 
-            if( e.Added.Count > 0 ) {
-                foreach( var itemStackChange in e.Added ) {
-                    handleItemAddedToInventory( itemStackChange.Item );
-                }
-            }
         }
 
         /// <summary>
