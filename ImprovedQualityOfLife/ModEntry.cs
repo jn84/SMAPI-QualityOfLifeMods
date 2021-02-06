@@ -24,7 +24,7 @@ namespace Demiacle.ImprovedQualityOfLife {
             
             modConfig =  helper.ReadConfig<ModConfig>();
 
-            SaveEvents.AfterLoad += loadModDataAndInitialize;
+            helper.Events.GameLoop.SaveLoaded += loadModDataAndInitialize;
         }
 
         /// <summary>

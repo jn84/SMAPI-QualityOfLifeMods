@@ -14,6 +14,7 @@ namespace Demiacle.ImprovedQualityOfLife {
         /// This mod fast forwards the game clock by performing 6 update 10 minute ticks when a key is pressed
         /// </summary>
         public FastForwardHour() {
+            // ModEntry.helper.Events.Input.ButtonPressed
             ControlEvents.KeyPressed += displayFastForwardDialogureOnPressX;
         }
 

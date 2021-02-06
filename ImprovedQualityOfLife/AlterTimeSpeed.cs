@@ -1,7 +1,8 @@
 ﻿using System;
-using StardewModdingAPI.Events;
+using StardewModdingAPI;
 using StardewValley;
 using System.Collections.Generic;
+using Netcode;
 
 namespace Demiacle.ImprovedQualityOfLife {
     internal class AlterTimeSpeed {
@@ -11,13 +12,12 @@ namespace Demiacle.ImprovedQualityOfLife {
         private int timeOfDayToAlter;
         private List<int> optionTable = new List<int>();
 
-        //System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
-
         /// <summary>
         /// Alters the time of a 10 minute increment
         /// </summary>
         public AlterTimeSpeed() {
 
+            
             LocationEvents.CurrentLocationChanged += adjustIndoorOutdoorTimer;
             MenuEvents.MenuClosed += onTimeMenuRemove;
             GameEvents.UpdateTick += addOrRemoveTime;
